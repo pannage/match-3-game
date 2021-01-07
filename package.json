@@ -1,0 +1,20 @@
+{
+  "name": "match-3-game",
+  "version": "1.0.0",
+  "description": "match 3 game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pannage/match-3-game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pannage/match-3-game/issues"
+  },
+  "homepage": "https://github.com/pannage/match-3-game#readme"
+}
