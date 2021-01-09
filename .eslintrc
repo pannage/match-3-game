@@ -1,0 +1,11 @@
+{
+    "extends": [
+      "airbnb"
+    ],
+    "parser": "babel-eslint",
+    "rules": {
+        "indent": ["error", 4],
+        "react/prefer-stateless-function": "off",
+        "react/jsx-indent": ["error", 4]
+    }
+  }
