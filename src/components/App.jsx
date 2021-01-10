@@ -1,21 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/App.css';
+import Board from './Board.jsx';
 
-function CreateBoard(props) {
-    const squaresArray = [];
-    for (let i = 0; i < props.squares.length; i += 1) {
-        squaresArray.push(<div draggable="true" id={i} className="square" key={i} style={{ backgroundImage: props.squares[i] }} />);
-    }
-
-    return (squaresArray);
-}
-
-CreateBoard.propTypes = {
-    squares: PropTypes.arrayOf(
-        PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    ).isRequired,
-};
 
 function CreateScore(props) {
     const { score } = props;
@@ -42,9 +29,20 @@ class App extends React.Component {
             'url("../images/green-candy.png")',
             'url("../images/blue-candy.png")',
         ];
+
         this.state = {
             score: 0,
-            squares: new Array(64).fill(0).map(() => this.candies[Math.floor(Math.random() * this.candies.length)]),
+            squares: new Array(64).fill(0)
+                .map(() => this.candies[Math.floor(Math.random() * this.candies.length)]),
+            boardData: new Array(8)
+                .fill(null)
+                .map(() => new Array(8).fill({ type: 1 })
+                    .map((cellData) => {
+                        return {
+                            ...cellData,
+                            url: this.candies[Math.floor(Math.random() * 6)]
+                        };
+                    })),
         };
         this.checkRowForFour = this.checkRowForFour.bind(this);
         this.checkColumnForFour = this.checkColumnForFour.bind(this);
@@ -60,13 +58,13 @@ class App extends React.Component {
 
     componentDidMount() {
         const that = this;
-        window.setInterval(() => {
-            that.checkRowForFour();
-            that.checkColumnForFour();
-            that.checkRowForThree();
-            that.checkColumnForThree();
-            that.moveIntoSquareBelow();
-        }, 200);
+        // setInterval(() => {
+        //     that.checkRowForFour();
+        //     that.checkColumnForFour();
+        //     that.checkRowForThree();
+        //     that.checkColumnForThree();
+        //     that.moveIntoSquareBelow();
+        // }, 200);
     }
 
     dragStart(e) {
@@ -250,12 +248,32 @@ class App extends React.Component {
 
     render() {
         const { score } = this.state;
-        const { squares } = this.state;
+        const { boardData } = this.state;
+
+        // const doubledSquares = [];
+        // let rowIndex = 0;
+        // squares.forEach((item, index) => {
+        //     if (index % 8 !== 0) {
+        //         doubledSquares[rowIndex].push(item);
+        //     } else {
+        //         doubledSquares.push([item]);
+        //         if (index !== 0) { rowIndex += 1; }
+        //     }
+        // });
+
         return (
             <div className="app">
                 <CreateScore score={score} />
-                <div className="grid" onDragStart={this.dragStart} onDragEnd={this.dragEnd} onDragOver={this.dragOver} onDragEnter={this.dragEnter} onDragLeave={this.dragLeave} onDrop={this.dragDrop}>
-                    <CreateBoard squares={squares} />
+                <div
+                    className="grid"
+                    onDragStart={this.dragStart}
+                    onDragEnd={this.dragEnd}
+                    onDragOver={this.dragOver}
+                    onDragEnter={this.dragEnter}
+                    onDragLeave={this.dragLeave}
+                    onDrop={this.dragDrop}
+                >
+                    <Board squares={boardData} />
                 </div>
             </div>
         );
