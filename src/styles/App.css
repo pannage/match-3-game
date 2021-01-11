@@ -12,10 +12,6 @@
     color: #85796b;
 }
 
-.grid div {
-    height: 70px;
-    width: 70px;
-}
 
 h3 {
  font-family: "Montserrat", sans-serif;
@@ -37,6 +33,21 @@ body, .app {
   max-width: 100vh;
   display: flex;
 }
+
+.board {
+    flex-wrap: wrap;
+}
+
+.board-row {
+    display: flex;
+}
+
+.board .cell {
+    height: 70px;
+    width: 70px;
+}
+
+
 
 .score-board {
   background-color: pink;
