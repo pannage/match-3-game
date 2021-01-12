@@ -65,39 +65,51 @@ class App extends React.Component {
         // }, 200);
     }
 
-    checkStartGameJewels() {
+    checkGameField() {
         const { boardData } = this.state;
-        let count = 1;
-
-        // const changeSqr = boardData[this.idToDrag[0]][this.idToDrag[1]];
-        // const { type } = changeSqr;
-        // const rowArrayItems = boardData[this.idToReplace[0]];
 
         boardData.forEach((rowArray, indexRow) => {
             rowArray.forEach((item, indexItem) => {
-                if (
-                    item.type === rowArray[indexItem + 1].type &&
-                    indexItem !== rowArray.length
-                ) {
-                    count += 1;
+                const leftCellType = rowArray[indexItem - 1]
+                    ? rowArray[indexItem - 1].type
+                    : null;
+                const rightCellType = rowArray[indexItem + 1]
+                    ? rowArray[indexItem + 1].type
+                    : null;
+                const topCellType = boardData[indexRow + 1]
+                    ? boardData[indexRow + 1][indexItem].type
+                    : null;
+                const bottomCellType = boardData[indexRow - 1]
+                    ? boardData[indexRow - 1][indexItem].type
+                    : null;
+                if (item.type === leftCellType && item.type === rightCellType) {
                     item.toDelete = true;
+                    rowArray[indexItem - 1].toDelete = true;
                     rowArray[indexItem + 1].toDelete = true;
-                } else if (count < 3 && indexItem !== 0) {
-                    count = 1;
-                    item.toDelete = false;
-                    rowArray[indexItem - 1].toDelete = false;
+                }
+
+                if (item.type === bottomCellType && item.type === topCellType) {
+                    item.toDelete = true;
+                    boardData[indexRow + 1][indexItem].toDelete = true;
+                    boardData[indexRow - 1][indexItem].toDelete = true;
                 }
             });
         });
 
-        console.log("boardData", boardData);
-        // boardData[this.idToReplace[0]][this.idToReplace[1]] = boardData[this.idToDrag[0]][this.idToDrag[1]];
-        // boardData[this.idToDrag[0]][this.idToDrag[1]] = changeSqr;
+        const newBoardData = boardData.map((row) => {
+            return row.map((cell) =>
+                cell.toDelete
+                    ? {
+                          url: "",
+                          type: "empty",
+                          toDelete: false,
+                      }
+                    : cell
+            );
+        });
 
-        this.setState({ boardData });
+        this.setState({ boardData: newBoardData });
     }
-
-    checkColumn() {}
 
     dragStart(e) {
         const id = parseInt(e.target.id, 10);
@@ -127,8 +139,8 @@ class App extends React.Component {
         boardData[this.idToReplace[0]][this.idToReplace[1]] =
             boardData[this.idToDrag[0]][this.idToDrag[1]];
         boardData[this.idToDrag[0]][this.idToDrag[1]] = changeSqr;
-        // this.checkJewels();
-        this.checkStartGameJewels();
+
+        this.checkGameField();
         this.setState({ boardData });
     }
 
