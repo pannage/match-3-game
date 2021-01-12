@@ -1,8 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import '../styles/App.css';
-import Board from './Board.jsx';
-
+import React from "react";
+import PropTypes from "prop-types";
+import "../styles/App.css";
+import Board from "./Board.jsx";
 
 function CreateScore(props) {
     const { score } = props;
@@ -32,17 +31,18 @@ class App extends React.Component {
 
         this.state = {
             score: 0,
-            boardData: new Array(8)
-                .fill(null)
-                .map(() => new Array(8).fill({ type: 1 })
-                    .map(() => {
-                        const randColor = this.candies[Math.floor(Math.random() * 6)];
-                        return {
-                            url: randColor,
-                            type: this.candies.indexOf(randColor),
-                            toDelete: false,
-                        };
-                    })),
+            boardData: new Array(8).fill(null).map(() =>
+                new Array(8).fill({ type: 1 }).map(() => {
+                    const randColor = this.candies[
+                        Math.floor(Math.random() * 6)
+                    ];
+                    return {
+                        url: randColor,
+                        type: this.candies.indexOf(randColor),
+                        toDelete: false,
+                    };
+                })
+            ),
         };
 
         this.dragStart = this.dragStart.bind(this);
@@ -56,6 +56,7 @@ class App extends React.Component {
     componentDidMount() {
         const that = this;
         // setInterval(() => {
+        //     that.checkRow();
         //     that.checkRowForFour();
         //     that.checkColumnForFour();
         //     that.checkRowForThree();
@@ -64,11 +65,55 @@ class App extends React.Component {
         // }, 200);
     }
 
-    dragStart(e) {
+    checkGameField() {
+        const { boardData } = this.state;
 
+        boardData.forEach((rowArray, indexRow) => {
+            rowArray.forEach((item, indexItem) => {
+                const leftCellType = rowArray[indexItem - 1]
+                    ? rowArray[indexItem - 1].type
+                    : null;
+                const rightCellType = rowArray[indexItem + 1]
+                    ? rowArray[indexItem + 1].type
+                    : null;
+                const topCellType = boardData[indexRow + 1]
+                    ? boardData[indexRow + 1][indexItem].type
+                    : null;
+                const bottomCellType = boardData[indexRow - 1]
+                    ? boardData[indexRow - 1][indexItem].type
+                    : null;
+                if (item.type === leftCellType && item.type === rightCellType) {
+                    item.toDelete = true;
+                    rowArray[indexItem - 1].toDelete = true;
+                    rowArray[indexItem + 1].toDelete = true;
+                }
+
+                if (item.type === bottomCellType && item.type === topCellType) {
+                    item.toDelete = true;
+                    boardData[indexRow + 1][indexItem].toDelete = true;
+                    boardData[indexRow - 1][indexItem].toDelete = true;
+                }
+            });
+        });
+
+        const newBoardData = boardData.map((row) => {
+            return row.map((cell) =>
+                cell.toDelete
+                    ? {
+                          url: "",
+                          type: "empty",
+                          toDelete: false,
+                      }
+                    : cell
+            );
+        });
+
+        this.setState({ boardData: newBoardData });
+    }
+
+    dragStart(e) {
         const id = parseInt(e.target.id, 10);
         this.idToDrag = id < 10 ? [0, id] : [Math.floor(id / 10), id % 10];
-
     }
 
     dragOver(e) {
@@ -91,16 +136,19 @@ class App extends React.Component {
 
         const changeSqr = boardData[this.idToReplace[0]][this.idToReplace[1]];
 
-        boardData[this.idToReplace[0]][this.idToReplace[1]] = boardData[this.idToDrag[0]][this.idToDrag[1]];
+        boardData[this.idToReplace[0]][this.idToReplace[1]] =
+            boardData[this.idToDrag[0]][this.idToDrag[1]];
         boardData[this.idToDrag[0]][this.idToDrag[1]] = changeSqr;
 
+        this.checkGameField();
         this.setState({ boardData });
     }
 
     dragEnd() {
-
-        const dragCheck = parseInt(this.idToDrag.join(''), 10);
-        const removeCheck = this.idToReplace ? parseInt(this.idToReplace.join(''), 10) : -1;
+        const dragCheck = parseInt(this.idToDrag.join(""), 10);
+        const removeCheck = this.idToReplace
+            ? parseInt(this.idToReplace.join(""), 10)
+            : -1;
 
         const validMoves = [
             dragCheck + 1,
@@ -116,14 +164,18 @@ class App extends React.Component {
         if (this.idToReplace !== undefined && validMove) {
             this.idToReplace = undefined;
         } else if (this.idToReplace !== undefined && !validMove) {
-            const changeSqr = boardData[this.idToReplace[0]][this.idToReplace[1]];
-            boardData[this.idToReplace[0]][this.idToReplace[1]] = boardData[this.idToDrag[0]][this.idToDrag[1]];
+            const changeSqr =
+                boardData[this.idToReplace[0]][this.idToReplace[1]];
+            boardData[this.idToReplace[0]][this.idToReplace[1]] =
+                boardData[this.idToDrag[0]][this.idToDrag[1]];
             boardData[this.idToDrag[0]][this.idToDrag[1]] = changeSqr;
-
         } else {
-            boardData[this.idToDrag[0]][this.idToDrag[1]] = boardData[this.idToDrag[0]][this.idToDrag[1]];
+            boardData[this.idToDrag[0]][this.idToDrag[1]] =
+                boardData[this.idToDrag[0]][this.idToDrag[1]];
         }
+
         this.idToReplace = undefined;
+
         this.setState({ boardData });
     }
 
@@ -131,13 +183,15 @@ class App extends React.Component {
         const { boardData } = this.state;
         boardData = boardData.map((row, rowId, arr) => {
             return row.map((sqr, sqrId) => {
-                if (rowId === 0 && sqr.type === 'empty') {
-                    const randColor = this.candies[Math.floor(Math.random() * 6)];
+                if (rowId === 0 && sqr.type === "empty") {
+                    const randColor = this.candies[
+                        Math.floor(Math.random() * 6)
+                    ];
                     sqr.type = this.candies.indexOf(randColor);
                     sqr.url = this.candies[randColor];
                     return sqr;
                 }
-                if (arr[rowId + 1] && arr[rowId + 1][sqrId].type === 'empty') {
+                if (arr[rowId + 1] && arr[rowId + 1][sqrId].type === "empty") {
                     const changeSqr = arr[rowId + 1][sqrId];
                     arr[rowId + 1][sqrId] = sqr;
                     return changeSqr;
