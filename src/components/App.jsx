@@ -54,7 +54,6 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        const that = this;
         // setInterval(() => {
         //     that.checkRow();
         //     that.checkRowForFour();
@@ -63,6 +62,92 @@ class App extends React.Component {
         //     that.checkColumnForThree();
         //     that.moveIntoSquareBelow();
         // }, 200);
+    }
+
+    checkRowForFour() {
+        const { boardData } = this.state;
+
+        const notValid = [5, 6, 7];
+
+        boardData.forEach((rowArray, indexRow) => {
+            rowArray.forEach((item, indexItem) => {
+                const rowOfFour = [
+                    indexItem,
+                    indexItem + 1,
+                    indexItem + 2,
+                    indexItem + 3,
+                ];
+                const isFirstCellRow = rowArray[indexItem - 1]
+                    ? rowArray[indexItem - 1].toDelete
+                    : null;
+                const isLastCellRow = rowArray[indexItem + 4]
+                    ? rowArray[indexItem + 4].toDelete
+                    : null;
+
+                if (!notValid.includes(indexItem)) {
+                    if (
+                        rowOfFour.every((index) => rowArray[index].toDelete) &&
+                        !isLastCellRow &&
+                        !isFirstCellRow
+                    ) {
+                        rowOfFour.forEach((index, id) => {
+                            if (id === 1) {
+                                rowArray[index] = {
+                                    // FIXME пофиксить url и type
+                                    url: "deleteRow.png",
+                                    type: "bangRow",
+                                    toDelete: false,
+                                };
+                            }
+                        });
+                    }
+                }
+            });
+        });
+        this.setState({ boardData });
+    }
+
+    checkColumnForFour() {
+        const { boardData } = this.state;
+
+        const notValid = [5, 6, 7];
+
+        boardData.forEach((rowArray, indexRow) => {
+            rowArray.forEach((item, indexItem) => {
+                const columnOfFour = [
+                    indexItem,
+                    indexItem + 1,
+                    indexItem + 2,
+                    indexItem + 3,
+                ];
+                const isFirstCellCol = boardData[indexRow - 1]
+                    ? boardData[indexRow - 1][indexItem].toDelete
+                    : null;
+                const isLastCellCol = boardData[indexRow + 4]
+                    ? boardData[indexRow + 4][indexItem].toDelete
+                    : null;
+
+                if (!notValid.includes(indexItem)) {
+                    if (
+                        columnOfFour.every(
+                            (index) => boardData[index][indexItem].toDelete
+                        ) &&
+                        !isLastCellCol &&
+                        !isFirstCellCol
+                    ) {
+                        columnOfFour.forEach((index) => {
+                            boardData[index][indexItem] = {
+                                // FIXME пофиксить url и type
+                                url: "deleteRow.png",
+                                type: "bangRow",
+                                toDelete: false,
+                            };
+                        });
+                    }
+                }
+            });
+        });
+        this.setState({ boardData });
     }
 
     checkGameField() {
@@ -95,6 +180,9 @@ class App extends React.Component {
                 }
             });
         });
+
+        this.checkRowForFour();
+        this.checkColumnForFour();
 
         const newBoardData = boardData.map((row) => {
             return row.map((cell) =>
