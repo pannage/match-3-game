@@ -1,7 +1,7 @@
-import React from "react";
-import PropTypes from "prop-types";
-import "../styles/App.css";
-import Board from "./Board.jsx";
+import React from 'react';
+import PropTypes from 'prop-types';
+import '../styles/App.css';
+import Board from './Board.jsx';
 
 function CreateScore(props) {
     const { score } = props;
@@ -31,20 +31,23 @@ class App extends React.Component {
 
         this.state = {
             score: 0,
-            boardData: new Array(8).fill(null).map(() =>
-                new Array(8).fill({ type: 1 }).map(() => {
-                    const randColor = this.candies[
-                        Math.floor(Math.random() * 6)
-                    ];
-                    return {
-                        url: randColor,
-                        type: this.candies.indexOf(randColor),
-                        toDelete: false,
-                    };
-                })
-            ),
+            boardData: new Array(8)
+                .fill(null)
+                .map(() => new Array(8)
+                    .fill({ type: 1 })
+                    .map(() => {
+                        const randColor = this.candies[
+                            Math.floor(Math.random() * 6)
+                        ];
+                        return {
+                            url: randColor,
+                            type: this.candies.indexOf(randColor),
+                            toDelete: false,
+                        };
+                    })),
         };
-
+        this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
+        this.checkGameField = this.checkGameField.bind(this);
         this.dragStart = this.dragStart.bind(this);
         this.dragOver = this.dragOver.bind(this);
         this.dragEnter = this.dragEnter.bind(this);
@@ -54,15 +57,101 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        const that = this;
-        // setInterval(() => {
-        //     that.checkRow();
-        //     that.checkRowForFour();
-        //     that.checkColumnForFour();
-        //     that.checkRowForThree();
-        //     that.checkColumnForThree();
-        //     that.moveIntoSquareBelow();
-        // }, 200);
+        this.checkGameField();
+    }
+
+
+    componentDidUpdate(prevProps, prevState) {
+        console.log(prevState.boardData, 'prev');
+        console.log(this.state.boardData, 'curr');
+        if (JSON.stringify(prevState.boardData) !== JSON.stringify(this.state.boardData)) {
+            setTimeout(this.moveIntoSquareBelow, 100);
+        }
+    };
+
+    dragStart(e) {
+        this.cellToDrag = {
+            y: e.target.dataset.rowIndex,
+            x: e.target.dataset.cellIndex
+        };
+    }
+
+    dragOver(e) {
+        e.preventDefault();
+    }
+
+    dragEnter(e) {
+        e.preventDefault();
+    }
+
+    dragLeave(e) {
+        e.preventDefault();
+    }
+
+    dragDrop(e) {
+        const { boardData } = this.state;
+
+        this.cellToReplace = {
+            y: e.target.dataset.rowIndex,
+            x: e.target.dataset.cellIndex
+        };
+
+        const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
+
+        boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
+        boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+
+        this.dragBoard = boardData;
+    }
+
+    dragEnd() {
+        const movementVector = {
+            x: this.cellToReplace.x - this.cellToDrag.x,
+            y: this.cellToReplace.y - this.cellToDrag.y,
+        };
+
+        const isMoveValid = Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
+
+        const boardData = this.dragBoard;
+
+        if (this.idToReplace !== undefined && isMoveValid) {
+            this.idToReplace = undefined;
+        } else if (this.idToReplace !== undefined && !isMoveValid) {
+            const changeSqr = boardData[this.idToReplace[0]][this.idToReplace[1]];
+            boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
+            boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+        }
+
+        this.idToReplace = undefined;
+
+        this.setState({ boardData });
+        this.checkGameField();
+    }
+
+    moveIntoSquareBelow() {
+        const { boardData } = this.state;
+        const result = boardData.map((row, rowIndex) => {
+            return row.map((cell, cellIndex) => {
+                if (rowIndex === 0 && cell.type === 'empty') {
+                    const randColor = this.candies[Math.floor(Math.random() * 6)];
+                    return {
+                        type: this.candies.indexOf(randColor),
+                        url: randColor
+                    };
+                }
+                if (boardData[rowIndex + 1] !== undefined && boardData[rowIndex + 1][cellIndex].type === 'empty') {
+                    const changecell = boardData[rowIndex + 1][cellIndex];
+                    boardData[rowIndex + 1][cellIndex] = cell;
+                    return changecell;
+                }
+                return cell;
+            });
+        });
+        if (JSON.stringify(boardData) !== JSON.stringify(result)) {
+            this.setState({ boardData: result });
+        } else {
+            setTimeout(this.checkGameField, 500);
+        }
     }
 
     checkGameField() {
@@ -97,124 +186,23 @@ class App extends React.Component {
         });
 
         const newBoardData = boardData.map((row) => {
-            return row.map((cell) =>
-                cell.toDelete
+            return row.map((cell) => {
+                return cell.toDelete
                     ? {
-                          url: "",
-                          type: "empty",
-                          toDelete: false,
-                      }
-                    : cell
-            );
+                        url: "",
+                        type: "empty",
+                        toDelete: false,
+                    }
+                    : cell;
+            });
         });
 
         this.setState({ boardData: newBoardData });
     }
 
-    dragStart(e) {
-        const id = parseInt(e.target.id, 10);
-        this.idToDrag = id < 10 ? [0, id] : [Math.floor(id / 10), id % 10];
-    }
-
-    dragOver(e) {
-        e.preventDefault();
-    }
-
-    dragEnter(e) {
-        e.preventDefault();
-    }
-
-    dragLeave(e) {
-        e.preventDefault();
-    }
-
-    dragDrop(e) {
-        const { boardData } = this.state;
-
-        const id = parseInt(e.target.id, 10);
-        this.idToReplace = id < 10 ? [0, id] : [Math.floor(id / 10), id % 10];
-
-        const changeSqr = boardData[this.idToReplace[0]][this.idToReplace[1]];
-
-        boardData[this.idToReplace[0]][this.idToReplace[1]] =
-            boardData[this.idToDrag[0]][this.idToDrag[1]];
-        boardData[this.idToDrag[0]][this.idToDrag[1]] = changeSqr;
-
-        this.checkGameField();
-        this.setState({ boardData });
-    }
-
-    dragEnd() {
-        const dragCheck = parseInt(this.idToDrag.join(""), 10);
-        const removeCheck = this.idToReplace
-            ? parseInt(this.idToReplace.join(""), 10)
-            : -1;
-
-        const validMoves = [
-            dragCheck + 1,
-            dragCheck - 1,
-            dragCheck + 10,
-            dragCheck - 10,
-        ];
-
-        let validMove = validMoves.includes(removeCheck);
-
-        const { boardData } = this.state;
-
-        if (this.idToReplace !== undefined && validMove) {
-            this.idToReplace = undefined;
-        } else if (this.idToReplace !== undefined && !validMove) {
-            const changeSqr =
-                boardData[this.idToReplace[0]][this.idToReplace[1]];
-            boardData[this.idToReplace[0]][this.idToReplace[1]] =
-                boardData[this.idToDrag[0]][this.idToDrag[1]];
-            boardData[this.idToDrag[0]][this.idToDrag[1]] = changeSqr;
-        } else {
-            boardData[this.idToDrag[0]][this.idToDrag[1]] =
-                boardData[this.idToDrag[0]][this.idToDrag[1]];
-        }
-
-        this.idToReplace = undefined;
-
-        this.setState({ boardData });
-    }
-
-    moveIntoSquareBelow() {
-        const { boardData } = this.state;
-        boardData = boardData.map((row, rowId, arr) => {
-            return row.map((sqr, sqrId) => {
-                if (rowId === 0 && sqr.type === "empty") {
-                    const randColor = this.candies[
-                        Math.floor(Math.random() * 6)
-                    ];
-                    sqr.type = this.candies.indexOf(randColor);
-                    sqr.url = this.candies[randColor];
-                    return sqr;
-                }
-                if (arr[rowId + 1] && arr[rowId + 1][sqrId].type === "empty") {
-                    const changeSqr = arr[rowId + 1][sqrId];
-                    arr[rowId + 1][sqrId] = sqr;
-                    return changeSqr;
-                }
-            });
-        });
-        this.setState({ boardData });
-    }
-
     render() {
         const { score } = this.state;
         const { boardData } = this.state;
-
-        // const doubledSquares = [];
-        // let rowIndex = 0;
-        // squares.forEach((item, index) => {
-        //     if (index % 8 !== 0) {
-        //         doubledSquares[rowIndex].push(item);
-        //     } else {
-        //         doubledSquares.push([item]);
-        //         if (index !== 0) { rowIndex += 1; }
-        //     }
-        // });
 
         return (
             <div className="app">
