@@ -33,13 +33,16 @@ class App extends React.Component {
             score: 0,
             boardData: new Array(8)
                 .fill(null)
-                .map(() => new Array(8).fill({ type: 1 })
+                .map(() => new Array(8)
+                    .fill({ type: 1 })
                     .map(() => {
-                        const randColor = this.candies[Math.floor(Math.random() * 6)];
+                        const randColor = this.candies[
+                            Math.floor(Math.random() * 6)
+                        ];
                         return {
                             url: randColor,
-                        type: this.candies.indexOf(randColor),
-                        toDelete: false,
+                            type: this.candies.indexOf(randColor),
+                            toDelete: false,
                         };
                     })),
         };
@@ -55,8 +58,6 @@ class App extends React.Component {
 
     componentDidMount() {
         this.checkGameField();
-        const that = this;
-
     }
 
 
@@ -69,9 +70,6 @@ class App extends React.Component {
     };
 
     dragStart(e) {
-        // const id = parseInt(e.target.id, 10);
-        // this.idToDrag = id < 10 ? [0, id] : [Math.floor(id / 10), id % 10];
-        // this.idToDrag = [e.target.dataset.rowIndex, e.target.dataset.cellIndex];
         this.cellToDrag = {
             y: e.target.dataset.rowIndex,
             x: e.target.dataset.cellIndex
@@ -93,16 +91,12 @@ class App extends React.Component {
     dragDrop(e) {
         const { boardData } = this.state;
 
-
-        //  const id = parseInt(e.target.id, 10);
-        // this.idToReplace = id < 10 ? [0, id] : [Math.floor(id / 10), id % 10];
-        this.idToReplace = [e.target.dataset.rowIndex, e.target.dataset.cellIndex];
         this.cellToReplace = {
             y: e.target.dataset.rowIndex,
             x: e.target.dataset.cellIndex
         };
 
-        const changeSqr = boardData[this.idToReplace[0]][this.idToReplace[1]];
+        const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
 
         boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
         boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
@@ -129,6 +123,7 @@ class App extends React.Component {
         }
 
         this.idToReplace = undefined;
+
         this.setState({ boardData });
         this.checkGameField();
     }
@@ -157,7 +152,6 @@ class App extends React.Component {
         } else {
             setTimeout(this.checkGameField, 500);
         }
-
     }
 
     checkGameField() {
@@ -192,15 +186,15 @@ class App extends React.Component {
         });
 
         const newBoardData = boardData.map((row) => {
-            return row.map((cell) =>
-                cell.toDelete
+            return row.map((cell) => {
+                return cell.toDelete
                     ? {
-                          url: "",
-                          type: "empty",
-                          toDelete: false,
-                      }
-                    : cell
-            );
+                        url: "",
+                        type: "empty",
+                        toDelete: false,
+                    }
+                    : cell;
+            });
         });
 
         this.setState({ boardData: newBoardData });
@@ -209,8 +203,6 @@ class App extends React.Component {
     render() {
         const { score } = this.state;
         const { boardData } = this.state;
-
-
 
         return (
             <div className="app">
