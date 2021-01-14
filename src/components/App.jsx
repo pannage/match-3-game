@@ -62,8 +62,6 @@ class App extends React.Component {
 
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(prevState.boardData, 'prev');
-        console.log(this.state.boardData, 'curr');
         if (JSON.stringify(prevState.boardData) !== JSON.stringify(this.state.boardData)) {
             setTimeout(this.moveIntoSquareBelow, 100);
         }
@@ -89,19 +87,20 @@ class App extends React.Component {
     }
 
     dragDrop(e) {
-        const { boardData } = this.state;
+        const safeBoard = JSON.parse(JSON.stringify(this.state.boardData));
 
+        this.idToReplace = [e.target.dataset.rowIndex, e.target.dataset.cellIndex];
         this.cellToReplace = {
             y: e.target.dataset.rowIndex,
             x: e.target.dataset.cellIndex
         };
 
-        const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
+        const changeSqr = safeBoard[this.idToReplace[0]][this.idToReplace[1]];
 
-        boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
-        boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+        safeBoard[this.cellToReplace.y][this.cellToReplace.x] = safeBoard[this.cellToDrag.y][this.cellToDrag.x];
+        safeBoard[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
 
-        this.dragBoard = boardData;
+        this.dragBoard = safeBoard;
     }
 
     dragEnd() {
@@ -112,20 +111,18 @@ class App extends React.Component {
 
         const isMoveValid = Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
 
-        const boardData = this.dragBoard;
+        const safeBoard = this.dragBoard;
 
         if (this.idToReplace !== undefined && isMoveValid) {
             this.idToReplace = undefined;
         } else if (this.idToReplace !== undefined && !isMoveValid) {
-            const changeSqr = boardData[this.idToReplace[0]][this.idToReplace[1]];
-            boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
-            boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+            const changeSqr = safeBoard[this.idToReplace[0]][this.idToReplace[1]];
+            safeBoard[this.cellToReplace.y][this.cellToReplace.x] = safeBoard[this.cellToDrag.y][this.cellToDrag.x];
+            safeBoard[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
         }
 
         this.idToReplace = undefined;
-
-        this.setState({ boardData });
-        this.checkGameField();
+        this.setState({ boardData: safeBoard });
     }
 
     moveIntoSquareBelow() {
