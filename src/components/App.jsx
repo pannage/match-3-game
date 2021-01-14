@@ -44,9 +44,11 @@ class App extends React.Component {
                 })
             ),
         };
+        // this.checkBoardData = [...this.state];
+        // console.log("this.checkBoardData", this.checkBoardData);
         this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
         this.checkGameField = this.checkGameField.bind(this);
-        this.checkForFour = this.checkForFour.bind(this);
+        this.checkForFourAndFive = this.checkForFourAndFive.bind(this);
         this.dragStart = this.dragStart.bind(this);
         this.dragOver = this.dragOver.bind(this);
         this.dragEnter = this.dragEnter.bind(this);
@@ -144,6 +146,7 @@ class App extends React.Component {
                     return {
                         type: this.candies.indexOf(randColor),
                         url: randColor,
+                        toDelete: false,
                     };
                 }
                 if (
@@ -164,30 +167,52 @@ class App extends React.Component {
         }
     }
 
-    checkForFour() {
+    checkForFourAndFive(sizeCheckRow) {
+        const dataForFourOrFive = {};
         const { boardData } = this.state;
-
-        const notValid = [5, 6, 7];
+        if (sizeCheckRow === 4) {
+            dataForFourOrFive.notValid = [5, 6, 7];
+            dataForFourOrFive.urlBackground =
+                'url("../images/explosion-row.png")';
+            dataForFourOrFive.keyBonus = 1;
+            dataForFourOrFive.type = "deleteRowOrColumn";
+        } else {
+            dataForFourOrFive.notValid = [4, 5, 6, 7];
+            dataForFourOrFive.urlBackground =
+                'url("../images/explosion-col.png")';
+            dataForFourOrFive.keyBonus = 2;
+            dataForFourOrFive.type = "deleteAllIdenticalColor";
+        }
+        const { notValid, urlBackground, keyBonus, type } = dataForFourOrFive;
 
         boardData.forEach((row, rowIndex) => {
             row.forEach((cell, cellIndex) => {
-                const rowOfFour = [
-                    cellIndex,
-                    cellIndex + 1,
-                    cellIndex + 2,
-                    cellIndex + 3,
-                ];
+                const rowOfFour =
+                    sizeCheckRow === 4
+                        ? [
+                              cellIndex,
+                              cellIndex + 1,
+                              cellIndex + 2,
+                              cellIndex + 3,
+                          ]
+                        : [
+                              cellIndex,
+                              cellIndex + 1,
+                              cellIndex + 2,
+                              cellIndex + 3,
+                              cellIndex + 4,
+                          ];
                 const isFirstCellRow = row[cellIndex - 1]
                     ? row[cellIndex - 1].toDelete
                     : null;
-                const isLastCellRow = row[cellIndex + 4]
-                    ? row[cellIndex + 4].toDelete
+                const isLastCellRow = row[cellIndex + sizeCheckRow]
+                    ? row[cellIndex + sizeCheckRow].toDelete
                     : null;
                 const isFirstCellCol = boardData[rowIndex - 1]
                     ? boardData[rowIndex - 1][cellIndex].toDelete
                     : null;
-                const isLastCellCol = boardData[rowIndex + 4]
-                    ? boardData[rowIndex + 4][cellIndex].toDelete
+                const isLastCellCol = boardData[rowIndex + sizeCheckRow]
+                    ? boardData[rowIndex + sizeCheckRow][cellIndex].toDelete
                     : null;
 
                 if (!notValid.includes(cellIndex)) {
@@ -196,17 +221,11 @@ class App extends React.Component {
                         !isLastCellRow &&
                         !isFirstCellRow
                     ) {
-                        rowOfFour.forEach((index, id) => {
-                            if (id === 1) {
-                                row[index] = {
-                                    // FIXME пофиксить url и type
-                                    url:
-                                        'url("https://e7.pngegg.com/pngimages/78/335/png-clipart-%E7%BA%A2%E8%89%B2bang%E7%88%86%E7%82%B8-gules-bang.png")',
-                                    type: "bangRow",
-                                    toDelete: false,
-                                };
-                            }
-                        });
+                        row[cellIndex + keyBonus] = {
+                            url: urlBackground,
+                            type: type,
+                            toDelete: false,
+                        };
                     }
 
                     if (
@@ -216,22 +235,15 @@ class App extends React.Component {
                         !isLastCellCol &&
                         !isFirstCellCol
                     ) {
-                        rowOfFour.forEach((index, id) => {
-                            if (id === 1) {
-                                boardData[index][cellIndex] = {
-                                    // FIXME пофиксить url и type
-                                    url:
-                                        'url("https://e7.pngegg.com/pngimages/78/335/png-clipart-%E7%BA%A2%E8%89%B2bang%E7%88%86%E7%82%B8-gules-bang.png")',
-                                    type: "bangRow",
-                                    toDelete: false,
-                                };
-                            }
-                        });
+                        boardData[cellIndex + keyBonus][cellIndex] = {
+                            url: urlBackground,
+                            type: type,
+                            toDelete: false,
+                        };
                     }
                 }
             });
         });
-
         this.setState({ boardData });
     }
 
@@ -266,9 +278,10 @@ class App extends React.Component {
             });
         });
 
-        this.checkForFour();
+        this.checkForFourAndFive(5);
+        this.checkForFourAndFive(4);
 
-        const newBoardData = boardData.map((row) => {
+        const result = boardData.map((row) => {
             return row.map((cell) => {
                 return cell.toDelete
                     ? {
@@ -280,7 +293,7 @@ class App extends React.Component {
             });
         });
 
-        this.setState({ boardData: newBoardData });
+        this.setState({ boardData: result });
     }
 
     render() {

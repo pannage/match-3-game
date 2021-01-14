@@ -45,6 +45,7 @@ body, .app {
 .board .cell {
     height: 70px;
     width: 70px;
+    background-size: 70px;
 }
 
 
