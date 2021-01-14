@@ -17,7 +17,14 @@ export default class Board extends React.Component {
                                     row.map((cell, cellIndex) => {
                                         const cellKey = `${rowIndex}${cellIndex}`;
                                         return (
-                                            <div draggable="true" id={cellKey} className="cell square" key={cellKey} style={{ backgroundImage: cell.url }} />
+                                            <div
+                                                draggable="true"
+                                                className="cell square"
+                                                key={cellKey}
+                                                data-row-index={rowIndex}
+                                                data-cell-index={cellIndex}
+                                                style={{ backgroundImage: cell.url }}
+                                            />
                                         );
                                     })
                                 }

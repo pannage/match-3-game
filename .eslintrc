@@ -10,6 +10,7 @@
         "react/jsx-indent-props": ["error", 4],
         "class-methods-use-this": "off",
         "arrow-body-style": "off",
-        "comma-dangle": "off"
+        "comma-dangle": "off",
+        "max-len": ["error", 140]
     }
   }
