@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import '../styles/App.css';
-import Board from './Board.jsx';
+import React from "react";
+import PropTypes from "prop-types";
+import "../styles/App.css";
+import Board from "./Board.jsx";
 
 function CreateScore(props) {
     const { score } = props;
@@ -31,23 +31,22 @@ class App extends React.Component {
 
         this.state = {
             score: 0,
-            boardData: new Array(8)
-                .fill(null)
-                .map(() => new Array(8)
-                    .fill({ type: 1 })
-                    .map(() => {
-                        const randColor = this.candies[
-                            Math.floor(Math.random() * 6)
-                        ];
-                        return {
-                            url: randColor,
-                            type: this.candies.indexOf(randColor),
-                            toDelete: false,
-                        };
-                    })),
+            boardData: new Array(8).fill(null).map(() =>
+                new Array(8).fill({ type: 1 }).map(() => {
+                    const randColor = this.candies[
+                        Math.floor(Math.random() * 6)
+                    ];
+                    return {
+                        url: randColor,
+                        type: this.candies.indexOf(randColor),
+                        toDelete: false,
+                    };
+                })
+            ),
         };
         this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
         this.checkGameField = this.checkGameField.bind(this);
+        this.checkForFour = this.checkForFour.bind(this);
         this.dragStart = this.dragStart.bind(this);
         this.dragOver = this.dragOver.bind(this);
         this.dragEnter = this.dragEnter.bind(this);
@@ -60,19 +59,21 @@ class App extends React.Component {
         this.checkGameField();
     }
 
-
     componentDidUpdate(prevProps, prevState) {
-        console.log(prevState.boardData, 'prev');
-        console.log(this.state.boardData, 'curr');
-        if (JSON.stringify(prevState.boardData) !== JSON.stringify(this.state.boardData)) {
+        console.log(prevState.boardData, "prev");
+        console.log(this.state.boardData, "curr");
+        if (
+            JSON.stringify(prevState.boardData) !==
+            JSON.stringify(this.state.boardData)
+        ) {
             setTimeout(this.moveIntoSquareBelow, 100);
         }
-    };
+    }
 
     dragStart(e) {
         this.cellToDrag = {
             y: e.target.dataset.rowIndex,
-            x: e.target.dataset.cellIndex
+            x: e.target.dataset.cellIndex,
         };
     }
 
@@ -93,12 +94,13 @@ class App extends React.Component {
 
         this.cellToReplace = {
             y: e.target.dataset.rowIndex,
-            x: e.target.dataset.cellIndex
+            x: e.target.dataset.cellIndex,
         };
 
         const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
 
-        boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
+        boardData[this.cellToReplace.y][this.cellToReplace.x] =
+            boardData[this.cellToDrag.y][this.cellToDrag.x];
         boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
 
         this.dragBoard = boardData;
@@ -110,15 +112,18 @@ class App extends React.Component {
             y: this.cellToReplace.y - this.cellToDrag.y,
         };
 
-        const isMoveValid = Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
+        const isMoveValid =
+            Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
 
         const boardData = this.dragBoard;
 
         if (this.idToReplace !== undefined && isMoveValid) {
             this.idToReplace = undefined;
         } else if (this.idToReplace !== undefined && !isMoveValid) {
-            const changeSqr = boardData[this.idToReplace[0]][this.idToReplace[1]];
-            boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
+            const changeSqr =
+                boardData[this.idToReplace[0]][this.idToReplace[1]];
+            boardData[this.cellToReplace.y][this.cellToReplace.x] =
+                boardData[this.cellToDrag.y][this.cellToDrag.x];
             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
         }
 
@@ -132,14 +137,19 @@ class App extends React.Component {
         const { boardData } = this.state;
         const result = boardData.map((row, rowIndex) => {
             return row.map((cell, cellIndex) => {
-                if (rowIndex === 0 && cell.type === 'empty') {
-                    const randColor = this.candies[Math.floor(Math.random() * 6)];
+                if (rowIndex === 0 && cell.type === "empty") {
+                    const randColor = this.candies[
+                        Math.floor(Math.random() * 6)
+                    ];
                     return {
                         type: this.candies.indexOf(randColor),
-                        url: randColor
+                        url: randColor,
                     };
                 }
-                if (boardData[rowIndex + 1] !== undefined && boardData[rowIndex + 1][cellIndex].type === 'empty') {
+                if (
+                    boardData[rowIndex + 1] !== undefined &&
+                    boardData[rowIndex + 1][cellIndex].type === "empty"
+                ) {
                     const changecell = boardData[rowIndex + 1][cellIndex];
                     boardData[rowIndex + 1][cellIndex] = cell;
                     return changecell;
@@ -154,37 +164,64 @@ class App extends React.Component {
         }
     }
 
-    checkRowForFour() {
+    checkForFour() {
         const { boardData } = this.state;
 
         const notValid = [5, 6, 7];
 
-        boardData.forEach((rowArray, indexRow) => {
-            rowArray.forEach((item, indexItem) => {
+        boardData.forEach((row, rowIndex) => {
+            row.forEach((cell, cellIndex) => {
                 const rowOfFour = [
-                    indexItem,
-                    indexItem + 1,
-                    indexItem + 2,
-                    indexItem + 3,
+                    cellIndex,
+                    cellIndex + 1,
+                    cellIndex + 2,
+                    cellIndex + 3,
                 ];
-                const isFirstCellRow = rowArray[indexItem - 1]
-                    ? rowArray[indexItem - 1].toDelete
+                const isFirstCellRow = row[cellIndex - 1]
+                    ? row[cellIndex - 1].toDelete
                     : null;
-                const isLastCellRow = rowArray[indexItem + 4]
-                    ? rowArray[indexItem + 4].toDelete
+                const isLastCellRow = row[cellIndex + 4]
+                    ? row[cellIndex + 4].toDelete
+                    : null;
+                const isFirstCellCol = boardData[rowIndex - 1]
+                    ? boardData[rowIndex - 1][cellIndex].toDelete
+                    : null;
+                const isLastCellCol = boardData[rowIndex + 4]
+                    ? boardData[rowIndex + 4][cellIndex].toDelete
                     : null;
 
-                if (!notValid.includes(indexItem)) {
+                if (!notValid.includes(cellIndex)) {
                     if (
-                        rowOfFour.every((index) => rowArray[index].toDelete) &&
+                        rowOfFour.every((index) => row[index].toDelete) &&
                         !isLastCellRow &&
                         !isFirstCellRow
                     ) {
                         rowOfFour.forEach((index, id) => {
                             if (id === 1) {
-                                rowArray[index] = {
+                                row[index] = {
                                     // FIXME пофиксить url и type
-                                    url: "deleteRow.png",
+                                    url:
+                                        'url("https://e7.pngegg.com/pngimages/78/335/png-clipart-%E7%BA%A2%E8%89%B2bang%E7%88%86%E7%82%B8-gules-bang.png")',
+                                    type: "bangRow",
+                                    toDelete: false,
+                                };
+                            }
+                        });
+                    }
+
+                    if (
+                        rowOfFour.every(
+                            (index) => boardData[index][cellIndex].toDelete
+                        ) &&
+                        !isLastCellCol &&
+                        !isFirstCellCol
+                    ) {
+                        rowOfFour.forEach((index, id) => {
+                            if (id === 1) {
+                                boardData[index][cellIndex] = {
+                                    // FIXME пофиксить url и type
+                                    url:
+                                        'url("https://e7.pngegg.com/pngimages/78/335/png-clipart-%E7%BA%A2%E8%89%B2bang%E7%88%86%E7%82%B8-gules-bang.png")',
                                     type: "bangRow",
                                     toDelete: false,
                                 };
@@ -194,91 +231,51 @@ class App extends React.Component {
                 }
             });
         });
-        this.setState({ boardData });
-    }
 
-    checkColumnForFour() {
-        const { boardData } = this.state;
-
-        const notValid = [5, 6, 7];
-
-        boardData.forEach((rowArray, indexRow) => {
-            rowArray.forEach((item, indexItem) => {
-                const columnOfFour = [
-                    indexItem,
-                    indexItem + 1,
-                    indexItem + 2,
-                    indexItem + 3,
-                ];
-                const isFirstCellCol = boardData[indexRow - 1]
-                    ? boardData[indexRow - 1][indexItem].toDelete
-                    : null;
-                const isLastCellCol = boardData[indexRow + 4]
-                    ? boardData[indexRow + 4][indexItem].toDelete
-                    : null;
-
-                if (!notValid.includes(indexItem)) {
-                    if (
-                        columnOfFour.every(
-                            (index) => boardData[index][indexItem].toDelete
-                        ) &&
-                        !isLastCellCol &&
-                        !isFirstCellCol
-                    ) {
-                        columnOfFour.forEach((index) => {
-                            boardData[index][indexItem] = {
-                                // FIXME пофиксить url и type
-                                url: "deleteRow.png",
-                                type: "bangRow",
-                                toDelete: false,
-                            };
-                        });
-                    }
-                }
-            });
-        });
         this.setState({ boardData });
     }
 
     checkGameField() {
         const { boardData } = this.state;
 
-        boardData.forEach((rowArray, indexRow) => {
-            rowArray.forEach((item, indexItem) => {
-                const leftCellType = rowArray[indexItem - 1]
-                    ? rowArray[indexItem - 1].type
+        boardData.forEach((row, rowIndex) => {
+            row.forEach((cell, cellIndex) => {
+                const leftCellType = row[cellIndex - 1]
+                    ? row[cellIndex - 1].type
                     : null;
-                const rightCellType = rowArray[indexItem + 1]
-                    ? rowArray[indexItem + 1].type
+                const rightCellType = row[cellIndex + 1]
+                    ? row[cellIndex + 1].type
                     : null;
-                const topCellType = boardData[indexRow + 1]
-                    ? boardData[indexRow + 1][indexItem].type
+                const topCellType = boardData[rowIndex + 1]
+                    ? boardData[rowIndex + 1][cellIndex].type
                     : null;
-                const bottomCellType = boardData[indexRow - 1]
-                    ? boardData[indexRow - 1][indexItem].type
+                const bottomCellType = boardData[rowIndex - 1]
+                    ? boardData[rowIndex - 1][cellIndex].type
                     : null;
-                if (item.type === leftCellType && item.type === rightCellType) {
-                    item.toDelete = true;
-                    rowArray[indexItem - 1].toDelete = true;
-                    rowArray[indexItem + 1].toDelete = true;
+                if (cell.type === leftCellType && cell.type === rightCellType) {
+                    cell.toDelete = true;
+                    row[cellIndex - 1].toDelete = true;
+                    row[cellIndex + 1].toDelete = true;
                 }
 
-                if (item.type === bottomCellType && item.type === topCellType) {
-                    item.toDelete = true;
-                    boardData[indexRow + 1][indexItem].toDelete = true;
-                    boardData[indexRow - 1][indexItem].toDelete = true;
+                if (cell.type === bottomCellType && cell.type === topCellType) {
+                    cell.toDelete = true;
+                    boardData[rowIndex + 1][cellIndex].toDelete = true;
+                    boardData[rowIndex - 1][cellIndex].toDelete = true;
                 }
             });
         });
+
+        this.checkForFour();
 
         const newBoardData = boardData.map((row) => {
             return row.map((cell) => {
                 return cell.toDelete
                     ? {
-                        url: "",
-                        type: "empty",
-                        toDelete: false,
-                    }
+                          url: "",
+                          type: "empty",
+                          toDelete: false,
+                      }
                     : cell;
             });
         });
