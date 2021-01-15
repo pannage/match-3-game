@@ -96,10 +96,10 @@ class App extends React.Component {
             x: e.target.dataset.cellIndex
         };
 
-        const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
+        // const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
 
-        boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
-        boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+        // boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
+        // boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
 
         this.dragBoard = boardData;
     }
@@ -114,18 +114,25 @@ class App extends React.Component {
 
         const boardData = this.dragBoard;
 
-        if (this.idToReplace !== undefined && isMoveValid) {
-            this.idToReplace = undefined;
-        } else if (this.idToReplace !== undefined && !isMoveValid) {
-            const changeSqr = boardData[this.idToReplace[0]][this.idToReplace[1]];
+        if (this.cellToReplace !== undefined && isMoveValid) {
+            const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
             boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
         }
 
-        this.idToReplace = undefined;
+        const isMatch3 = this.checkGameField(false);
+        if (!isMatch3) {
+            if (this.cellToReplace !== undefined && isMoveValid) {
+                const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
+                boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
+                boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+            }
+        } else {
+            this.checkGameField();
+        }
 
-        this.setState({ boardData });
-        this.checkGameField();
+        this.cellToReplace = undefined;
+
     }
 
     moveIntoSquareBelow() {
@@ -154,8 +161,9 @@ class App extends React.Component {
         }
     }
 
-    checkGameField() {
+    checkGameField(redraw = true) {
         const { boardData } = this.state;
+        let someCellMarkedAsDeleted = false;
 
         boardData.forEach((rowArray, indexRow) => {
             rowArray.forEach((item, indexItem) => {
@@ -172,12 +180,14 @@ class App extends React.Component {
                     ? boardData[indexRow - 1][indexItem].type
                     : null;
                 if (item.type === leftCellType && item.type === rightCellType) {
+                    someCellMarkedAsDeleted = true;
                     item.toDelete = true;
                     rowArray[indexItem - 1].toDelete = true;
                     rowArray[indexItem + 1].toDelete = true;
                 }
 
                 if (item.type === bottomCellType && item.type === topCellType) {
+                    someCellMarkedAsDeleted = true;
                     item.toDelete = true;
                     boardData[indexRow + 1][indexItem].toDelete = true;
                     boardData[indexRow - 1][indexItem].toDelete = true;
@@ -197,7 +207,12 @@ class App extends React.Component {
             });
         });
 
-        this.setState({ boardData: newBoardData });
+        if (redraw) {
+            this.setState({ boardData: newBoardData });
+        }
+
+
+        return someCellMarkedAsDeleted;
     }
 
     render() {
