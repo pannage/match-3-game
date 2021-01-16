@@ -44,6 +44,7 @@ class App extends React.Component {
                 })
             ),
         };
+
         // this.checkBoardData = [...this.state];
         // console.log("this.checkBoardData", this.checkBoardData);
         this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
@@ -62,8 +63,6 @@ class App extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(prevState.boardData, "prev");
-        console.log(this.state.boardData, "curr");
         if (
             JSON.stringify(prevState.boardData) !==
             JSON.stringify(this.state.boardData)
@@ -167,88 +166,91 @@ class App extends React.Component {
         }
     }
 
-    checkForFourAndFive(sizeCheckRow) {
-        const dataForFourOrFive = {};
-        const { boardData } = this.state;
-        if (sizeCheckRow === 4) {
-            dataForFourOrFive.notValid = [5, 6, 7];
-            dataForFourOrFive.urlBackground =
-                'url("../images/explosion-row.png")';
-            dataForFourOrFive.keyBonus = 1;
-            dataForFourOrFive.type = "deleteRowOrColumn";
-        } else {
-            dataForFourOrFive.notValid = [4, 5, 6, 7];
-            dataForFourOrFive.urlBackground =
-                'url("../images/explosion-col.png")';
-            dataForFourOrFive.keyBonus = 2;
-            dataForFourOrFive.type = "deleteAllIdenticalColor";
-        }
-        const { notValid, urlBackground, keyBonus, type } = dataForFourOrFive;
-
+    checkForFourAndFive(sizeCheckRow, boardData) {
         boardData.forEach((row, rowIndex) => {
             row.forEach((cell, cellIndex) => {
-                const rowOfFour =
-                    sizeCheckRow === 4
-                        ? [
-                              cellIndex,
-                              cellIndex + 1,
-                              cellIndex + 2,
-                              cellIndex + 3,
-                          ]
-                        : [
-                              cellIndex,
-                              cellIndex + 1,
-                              cellIndex + 2,
-                              cellIndex + 3,
-                              cellIndex + 4,
-                          ];
-                const isFirstCellRow = row[cellIndex - 1]
-                    ? row[cellIndex - 1].toDelete
-                    : null;
-                const isLastCellRow = row[cellIndex + sizeCheckRow]
-                    ? row[cellIndex + sizeCheckRow].toDelete
-                    : null;
-                const isFirstCellCol = boardData[rowIndex - 1]
-                    ? boardData[rowIndex - 1][cellIndex].toDelete
-                    : null;
-                const isLastCellCol = boardData[rowIndex + sizeCheckRow]
-                    ? boardData[rowIndex + sizeCheckRow][cellIndex].toDelete
+                const indexBonus = sizeCheckRow === 4 ? 1 : 2;
+                let arrayRowOfFourOrFive = row[cellIndex + sizeCheckRow - 1]
+                    ? row.slice(cellIndex, cellIndex + sizeCheckRow)
                     : null;
 
-                if (!notValid.includes(cellIndex)) {
-                    if (
-                        rowOfFour.every((index) => row[index].toDelete) &&
-                        !isLastCellRow &&
-                        !isFirstCellRow
-                    ) {
-                        row[cellIndex + keyBonus] = {
-                            url: urlBackground,
-                            type: type,
-                            toDelete: false,
-                        };
+                let arrayColumnOfFourOrFive = [];
+                if (boardData[rowIndex + sizeCheckRow - 1]) {
+                    for (let index = 0; index < sizeCheckRow; index += 1) {
+                        arrayColumnOfFourOrFive[index] =
+                            boardData[rowIndex + index][cellIndex];
                     }
+                } else {
+                    arrayColumnOfFourOrFive = null;
+                }
+                const urlImageTorpedaRow =
+                    'url("https://www.flaticon.com/svg/vstatic/svg/30/30999.svg?token=exp=1610827343~hmac=b8ad65644121896d6a887e0af05d0d83")';
+                const urlImageTorpedaColumn =
+                    'url("../images/explosion-col.png")';
 
-                    if (
-                        rowOfFour.every(
-                            (index) => boardData[index][cellIndex].toDelete
-                        ) &&
-                        !isLastCellCol &&
-                        !isFirstCellCol
-                    ) {
-                        boardData[cellIndex + keyBonus][cellIndex] = {
-                            url: urlBackground,
-                            type: type,
-                            toDelete: false,
-                        };
+                function getCheckArray(checkArray, urlImage) {
+                    if (checkArray) {
+                        const isCheckOfFourAndFive = checkArray.every(
+                            (cell, index, arr) => {
+                                if (index !== arr.length - 1) {
+                                    return (
+                                        cell.type === checkArray[index + 1].type
+                                    );
+                                }
+                                return true;
+                            }
+                        );
+
+                        if (isCheckOfFourAndFive) {
+                            checkArray.forEach((cell, index) => {
+                                if (indexBonus !== index) {
+                                    cell.url = "";
+                                    cell.type = "empty";
+                                    cell.toDelete = false;
+                                } else {
+                                    cell.url =
+                                        sizeCheckRow === 4
+                                            ? urlImage
+                                            : 'url( "https://www.flaticon.com/svg/vstatic/svg/112/112683.svg?token=exp=1610827293~hmac=ab51b4a6fd02c42e1f5d2ad373b28498")';
+                                    cell.type =
+                                        sizeCheckRow === 4
+                                            ? "torpedoOfColumn"
+                                            : "rainbow";
+                                    cell.toDelete = false;
+                                }
+                            });
+                        }
+                    }
+                    return checkArray;
+                }
+
+                if (arrayRowOfFourOrFive) {
+                    arrayRowOfFourOrFive = getCheckArray(
+                        arrayRowOfFourOrFive,
+                        urlImageTorpedaRow
+                    );
+
+                    for (let index = 0; index < sizeCheckRow; index += 1) {
+                        row[cellIndex + index] = arrayRowOfFourOrFive[index];
+                    }
+                }
+                if (arrayColumnOfFourOrFive) {
+                    arrayColumnOfFourOrFive = getCheckArray(
+                        arrayColumnOfFourOrFive,
+                        urlImageTorpedaColumn
+                    );
+                    for (let index = 0; index < sizeCheckRow; index += 1) {
+                        boardData[rowIndex + index][cellIndex] =
+                            arrayColumnOfFourOrFive[index];
                     }
                 }
             });
         });
-        this.setState({ boardData });
+        return boardData;
     }
 
     checkGameField() {
-        const { boardData } = this.state;
+        let boardData = JSON.parse(JSON.stringify(this.state.boardData));
 
         boardData.forEach((row, rowIndex) => {
             row.forEach((cell, cellIndex) => {
@@ -278,8 +280,8 @@ class App extends React.Component {
             });
         });
 
-        this.checkForFourAndFive(5);
-        this.checkForFourAndFive(4);
+        boardData = this.checkForFourAndFive(5, boardData);
+        boardData = this.checkForFourAndFive(4, boardData);
 
         const result = boardData.map((row) => {
             return row.map((cell) => {
