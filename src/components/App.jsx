@@ -119,27 +119,27 @@ class App extends React.Component {
         const boardData = this.dragBoard;
 
         if (this.cellToReplace !== undefined && isMoveValid) {
-            const changeSqr =
-                boardData[this.cellToReplace.y][this.cellToReplace.x];
-            boardData[this.cellToReplace.y][this.cellToReplace.x] =
-                boardData[this.cellToDrag.y][this.cellToDrag.x];
+
+            const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
+            boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
         }
 
         const isMatch3 = this.checkGameField(false);
         if (!isMatch3) {
             if (this.cellToReplace !== undefined && isMoveValid) {
-                const changeSqr =
-                    boardData[this.cellToReplace.y][this.cellToReplace.x];
-                boardData[this.cellToReplace.y][this.cellToReplace.x] =
-                    boardData[this.cellToDrag.y][this.cellToDrag.x];
+
+                const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
+                boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
                 boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
             }
         } else {
             this.checkGameField();
         }
 
+
         this.cellToReplace = undefined;
+
     }
 
     moveIntoSquareBelow() {
@@ -172,6 +172,7 @@ class App extends React.Component {
             setTimeout(this.checkGameField, 500);
         }
     }
+
 
     checkForFourAndFive(sizeCheckRow, boardData) {
         boardData.forEach((row, rowIndex) => {
@@ -308,6 +309,7 @@ class App extends React.Component {
         if (redraw) {
             this.setState({ boardData: newBoardData });
         }
+        return someCellMarkedAsDeleted;
     }
 
     render() {
