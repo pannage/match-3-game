@@ -57,12 +57,13 @@ class App extends React.Component {
         this.dragDrop = this.dragDrop.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
     }
-
     componentDidMount() {
         this.checkGameField();
     }
 
     componentDidUpdate(prevProps, prevState) {
+        console.log(prevState.boardData, "prev");
+        console.log(this.state.boardData, "curr");
         if (
             JSON.stringify(prevState.boardData) !==
             JSON.stringify(this.state.boardData)
@@ -98,11 +99,10 @@ class App extends React.Component {
             x: e.target.dataset.cellIndex,
         };
 
-        const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
+        // const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
 
-        boardData[this.cellToReplace.y][this.cellToReplace.x] =
-            boardData[this.cellToDrag.y][this.cellToDrag.x];
-        boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+        // boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
+        // boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
 
         this.dragBoard = boardData;
     }
@@ -118,20 +118,28 @@ class App extends React.Component {
 
         const boardData = this.dragBoard;
 
-        if (this.idToReplace !== undefined && isMoveValid) {
-            this.idToReplace = undefined;
-        } else if (this.idToReplace !== undefined && !isMoveValid) {
+        if (this.cellToReplace !== undefined && isMoveValid) {
             const changeSqr =
-                boardData[this.idToReplace[0]][this.idToReplace[1]];
+                boardData[this.cellToReplace.y][this.cellToReplace.x];
             boardData[this.cellToReplace.y][this.cellToReplace.x] =
                 boardData[this.cellToDrag.y][this.cellToDrag.x];
             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
         }
 
-        this.idToReplace = undefined;
+        const isMatch3 = this.checkGameField(false);
+        if (!isMatch3) {
+            if (this.cellToReplace !== undefined && isMoveValid) {
+                const changeSqr =
+                    boardData[this.cellToReplace.y][this.cellToReplace.x];
+                boardData[this.cellToReplace.y][this.cellToReplace.x] =
+                    boardData[this.cellToDrag.y][this.cellToDrag.x];
+                boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+            }
+        } else {
+            this.checkGameField();
+        }
 
-        this.setState({ boardData });
-        this.checkGameField();
+        this.cellToReplace = undefined;
     }
 
     moveIntoSquareBelow() {
@@ -145,7 +153,6 @@ class App extends React.Component {
                     return {
                         type: this.candies.indexOf(randColor),
                         url: randColor,
-                        toDelete: false,
                     };
                 }
                 if (
@@ -249,33 +256,36 @@ class App extends React.Component {
         return boardData;
     }
 
-    checkGameField() {
+    checkGameField(redraw = true) {
         let boardData = JSON.parse(JSON.stringify(this.state.boardData));
+        let someCellMarkedAsDeleted = false;
 
-        boardData.forEach((row, rowIndex) => {
-            row.forEach((cell, cellIndex) => {
-                const leftCellType = row[cellIndex - 1]
-                    ? row[cellIndex - 1].type
+        boardData.forEach((rowArray, indexRow) => {
+            rowArray.forEach((item, indexItem) => {
+                const leftCellType = rowArray[indexItem - 1]
+                    ? rowArray[indexItem - 1].type
                     : null;
-                const rightCellType = row[cellIndex + 1]
-                    ? row[cellIndex + 1].type
+                const rightCellType = rowArray[indexItem + 1]
+                    ? rowArray[indexItem + 1].type
                     : null;
-                const topCellType = boardData[rowIndex + 1]
-                    ? boardData[rowIndex + 1][cellIndex].type
+                const topCellType = boardData[indexRow + 1]
+                    ? boardData[indexRow + 1][indexItem].type
                     : null;
-                const bottomCellType = boardData[rowIndex - 1]
-                    ? boardData[rowIndex - 1][cellIndex].type
+                const bottomCellType = boardData[indexRow - 1]
+                    ? boardData[indexRow - 1][indexItem].type
                     : null;
-                if (cell.type === leftCellType && cell.type === rightCellType) {
-                    cell.toDelete = true;
-                    row[cellIndex - 1].toDelete = true;
-                    row[cellIndex + 1].toDelete = true;
+                if (item.type === leftCellType && item.type === rightCellType) {
+                    someCellMarkedAsDeleted = true;
+                    item.toDelete = true;
+                    rowArray[indexItem - 1].toDelete = true;
+                    rowArray[indexItem + 1].toDelete = true;
                 }
 
-                if (cell.type === bottomCellType && cell.type === topCellType) {
-                    cell.toDelete = true;
-                    boardData[rowIndex + 1][cellIndex].toDelete = true;
-                    boardData[rowIndex - 1][cellIndex].toDelete = true;
+                if (item.type === bottomCellType && item.type === topCellType) {
+                    someCellMarkedAsDeleted = true;
+                    item.toDelete = true;
+                    boardData[indexRow + 1][indexItem].toDelete = true;
+                    boardData[indexRow - 1][indexItem].toDelete = true;
                 }
             });
         });
@@ -283,7 +293,7 @@ class App extends React.Component {
         boardData = this.checkForFourAndFive(5, boardData);
         boardData = this.checkForFourAndFive(4, boardData);
 
-        const result = boardData.map((row) => {
+        const newBoardData = boardData.map((row) => {
             return row.map((cell) => {
                 return cell.toDelete
                     ? {
@@ -295,7 +305,9 @@ class App extends React.Component {
             });
         });
 
-        this.setState({ boardData: result });
+        if (redraw) {
+            this.setState({ boardData: newBoardData });
+        }
     }
 
     render() {
