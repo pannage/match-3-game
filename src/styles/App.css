@@ -29,9 +29,13 @@ h1 {
 }
 
 body, .app {
-  background-color: pink;
+
   max-width: 100vh;
   display: flex;
+}
+
+body {
+    background-image: url('../images/fw3.jpg');
 }
 
 .board {
@@ -42,12 +46,22 @@ body, .app {
     display: flex;
 }
 
-.board .cell {
+.board .cell, .cell.fake {
     height: 70px;
     width: 70px;
     background-size: 70px;
 }
 
+.cell.fake {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+}
+
+.cell-hidden {
+    opacity: 0;
+}
 
 
 .score-board {

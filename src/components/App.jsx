@@ -1,14 +1,14 @@
-import React from "react";
-import PropTypes from "prop-types";
-import "../styles/App.css";
-import Board from "./Board.jsx";
+import React from 'react';
+import PropTypes from 'prop-types';
+import '../styles/App.css';
+import Board from './Board.jsx';
 
 function CreateScore(props) {
     const { score } = props;
     return (
         <div className="score-board">
             <h3>score</h3>
-            <h1 id="score">{score}</h1>
+            <h1 id='score'>{score}</h1>
         </div>
     );
 }
@@ -31,8 +31,8 @@ class App extends React.Component {
 
         this.state = {
             score: 0,
-            boardData: new Array(8).fill(null).map(() =>
-                new Array(8).fill({ type: 1 }).map(() => {
+            boardData: new Array(8).fill(null)
+                .map(() => new Array(8).fill({ type: 1 }).map(() => {
                     const randColor = this.candies[
                         Math.floor(Math.random() * 6)
                     ];
@@ -41,29 +41,21 @@ class App extends React.Component {
                         type: this.candies.indexOf(randColor),
                         toDelete: false,
                     };
-                })
-            ),
+                })),
         };
 
-        // this.checkBoardData = [...this.state];
-        // console.log("this.checkBoardData", this.checkBoardData);
         this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
         this.checkGameField = this.checkGameField.bind(this);
         this.checkForFourAndFive = this.checkForFourAndFive.bind(this);
-        this.dragStart = this.dragStart.bind(this);
-        this.dragOver = this.dragOver.bind(this);
-        this.dragEnter = this.dragEnter.bind(this);
-        this.dragLeave = this.dragLeave.bind(this);
-        this.dragDrop = this.dragDrop.bind(this);
-        this.dragEnd = this.dragEnd.bind(this);
     }
+
     componentDidMount() {
         this.checkGameField();
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(prevState.boardData, "prev");
-        console.log(this.state.boardData, "curr");
+        console.log(prevState.boardData, 'prev');
+        console.log(this.state.boardData, 'curr');
         if (
             JSON.stringify(prevState.boardData) !==
             JSON.stringify(this.state.boardData)
@@ -72,39 +64,48 @@ class App extends React.Component {
         }
     }
 
-    dragStart(e) {
-        this.cellToDrag = {
-            y: e.target.dataset.rowIndex,
-            x: e.target.dataset.cellIndex,
-        };
+
+
+    onMouseDown(e) {
+        if (e.target.classList.contains('cell')) {
+
+            this.cellToDrag = {
+                y: e.target.dataset.rowIndex,
+                x: e.target.dataset.cellIndex,
+            };
+            let fakeCell = document.querySelector('.cell.square.fake');
+            fakeCell.classList.remove('cell-hidden');
+            e.target.classList.add('cell-hidden')
+            fakeCell.style.left = `${e.clientX}px`;
+            fakeCell.style.top = `${e.clientY}px`;
+            fakeCell.style.backgroundImage = e.target.style.backgroundImage;
+        }
     }
 
-    dragOver(e) {
-        e.preventDefault();
+    onMouseMove(e) {
+
+        if (this.cellToDrag) {
+            let fakeCell = document.querySelector('.cell.square.fake')
+            fakeCell.style.left = `${e.clientX}px`;
+            fakeCell.style.top = `${e.clientY}px`;
+        }
     }
 
-    dragEnter(e) {
-        e.preventDefault();
-    }
-
-    dragLeave(e) {
-        e.preventDefault();
-    }
-
-    dragDrop(e) {
-        const { boardData } = this.state;
-
-        this.cellToReplace = {
-            y: e.target.dataset.rowIndex,
-            x: e.target.dataset.cellIndex,
-        };
-
-        // const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
-
-        // boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
-        // boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
-
-        this.dragBoard = boardData;
+    onMouseUp(e) {
+        let fakeCell = document.querySelector('.cell.square.fake')
+        fakeCell.style.left = 0;
+        fakeCell.style.top = 0;
+        if (e.target.classList.contains('cell')) {
+            this.cellToReplace = {
+                y: e.target.dataset.rowIndex,
+                x: e.target.dataset.cellIndex,
+            };
+            fakeCell.style.backgroundImage = e.target.style.backgroundImage;
+            this.dragEnd()
+            this.cellToDrag = null;
+        }
+        document.querySelector('.cell-hidden').classList.remove('cell-hidden')
+        fakeCell.classList.add('cell-hidden');
     }
 
     dragEnd() {
@@ -116,7 +117,7 @@ class App extends React.Component {
         const isMoveValid =
             Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
 
-        const boardData = this.dragBoard;
+            const { boardData } = this.state;
 
         if (this.cellToReplace !== undefined && isMoveValid) {
 
@@ -146,7 +147,7 @@ class App extends React.Component {
         const { boardData } = this.state;
         const result = boardData.map((row, rowIndex) => {
             return row.map((cell, cellIndex) => {
-                if (rowIndex === 0 && cell.type === "empty") {
+                if (rowIndex === 0 && cell.type === 'empty') {
                     const randColor = this.candies[
                         Math.floor(Math.random() * 6)
                     ];
@@ -157,7 +158,7 @@ class App extends React.Component {
                 }
                 if (
                     boardData[rowIndex + 1] !== undefined &&
-                    boardData[rowIndex + 1][cellIndex].type === "empty"
+                    boardData[rowIndex + 1][cellIndex].type === 'empty'
                 ) {
                     const changecell = boardData[rowIndex + 1][cellIndex];
                     boardData[rowIndex + 1][cellIndex] = cell;
@@ -192,9 +193,9 @@ class App extends React.Component {
                     arrayColumnOfFourOrFive = null;
                 }
                 const urlImageTorpedaRow =
-                    'url("https://www.flaticon.com/svg/vstatic/svg/30/30999.svg?token=exp=1610827343~hmac=b8ad65644121896d6a887e0af05d0d83")';
+                    'url("../images/torpedo-row.png")';
                 const urlImageTorpedaColumn =
-                    'url("../images/explosion-col.png")';
+                    'url("../images/torpedo-col.png")';
 
                 function getCheckArray(checkArray, urlImage) {
                     if (checkArray) {
@@ -212,18 +213,17 @@ class App extends React.Component {
                         if (isCheckOfFourAndFive) {
                             checkArray.forEach((cell, index) => {
                                 if (indexBonus !== index) {
-                                    cell.url = "";
-                                    cell.type = "empty";
+                                    cell.url = '';
+                                    cell.type = 'empty';
                                     cell.toDelete = false;
                                 } else {
-                                    cell.url =
-                                        sizeCheckRow === 4
-                                            ? urlImage
-                                            : 'url( "https://www.flaticon.com/svg/vstatic/svg/112/112683.svg?token=exp=1610827293~hmac=ab51b4a6fd02c42e1f5d2ad373b28498")';
+                                    cell.url = sizeCheckRow === 4
+                                        ? urlImage
+                                        : 'url("../images/torpedo-col.png")';
                                     cell.type =
                                         sizeCheckRow === 4
-                                            ? "torpedoOfColumn"
-                                            : "rainbow";
+                                            ? 'torpedoOfColumn'
+                                            : 'rainbow';
                                     cell.toDelete = false;
                                 }
                             });
@@ -298,10 +298,10 @@ class App extends React.Component {
             return row.map((cell) => {
                 return cell.toDelete
                     ? {
-                          url: "",
-                          type: "empty",
-                          toDelete: false,
-                      }
+                        url: '',
+                        type: 'empty',
+                        toDelete: false,
+                    }
                     : cell;
             });
         });
@@ -317,19 +317,29 @@ class App extends React.Component {
         const { boardData } = this.state;
 
         return (
-            <div className="app">
+            <div
+                className='app'
+                onMouseMove={event => this.onMouseMove(event)}
+                onMouseDown={event => this.onMouseDown(event)}
+                onMouseUp={event => this.onMouseUp(event)}
+            >
                 <CreateScore score={score} />
                 <div
-                    className="grid"
-                    onDragStart={this.dragStart}
-                    onDragEnd={this.dragEnd}
-                    onDragOver={this.dragOver}
-                    onDragEnter={this.dragEnter}
-                    onDragLeave={this.dragLeave}
-                    onDrop={this.dragDrop}
+                    className='grid'
+                    onDragStart={e => e.preventDefault()}
+                    // onDragEnd={this.dragEnd}
+                    // onDragOver={this.dragOver}
+                    // onDragEnter={this.dragEnter}
+                    // onDragLeave={this.dragLeave}
+                    // onDrop={this.dragDrop}
                 >
                     <Board squares={boardData} />
                 </div>
+                <div
+                    className="cell square fake cell-hidden"
+                    style={{ backgroundImage: 'url("../images/yellow-candy.png")' }}
+
+                />
             </div>
         );
     }
