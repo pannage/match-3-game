@@ -8,7 +8,7 @@ function CreateScore(props) {
     return (
         <div className="score-board">
             <h3>score</h3>
-            <h1 id='score'>{score}</h1>
+            <h1 id="score">{score}</h1>
         </div>
     );
 }
@@ -21,12 +21,12 @@ class App extends React.Component {
         super(props);
         this.width = 8;
         this.candies = [
-            'url("../images/red-candy.png")',
-            'url("../images/yellow-candy.png")',
-            'url("../images/orange-candy.png")',
-            'url("../images/purple-candy.png")',
-            'url("../images/green-candy.png")',
-            'url("../images/blue-candy.png")',
+            'url(../images/red-candy.png)',
+            'url(../images/yellow-candy.png)',
+            'url(../images/orange-candy.png)',
+            'url(../images/purple-candy.png)',
+            'url(../images/green-candy.png)',
+            'url(../images/blue-candy.png)',
         ];
 
         this.state = {
@@ -45,7 +45,12 @@ class App extends React.Component {
         };
 
         this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
+        this.handleDoubleClick = this.handleDoubleClick.bind(this);
         this.checkGameField = this.checkGameField.bind(this);
+        this.checkThreeRow = this.checkThreeRow.bind(this);
+        this.checkXMine = this.checkXMine.bind(this);
+        this.checkFirstMine = this.checkFirstMine.bind(this);
+        this.checkSecondMine = this.checkSecondMine.bind(this);
         this.checkForFourAndFive = this.checkForFourAndFive.bind(this);
     }
 
@@ -54,28 +59,24 @@ class App extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(prevState.boardData, 'prev');
-        console.log(this.state.boardData, 'curr');
+        console.log(prevState);
         if (
-            JSON.stringify(prevState.boardData) !==
-            JSON.stringify(this.state.boardData)
+            JSON.stringify(prevState.boardData)
+            !== JSON.stringify(this.state.boardData)
         ) {
             setTimeout(this.moveIntoSquareBelow, 100);
         }
     }
 
-
-
     onMouseDown(e) {
         if (e.target.classList.contains('cell')) {
-
             this.cellToDrag = {
                 y: e.target.dataset.rowIndex,
                 x: e.target.dataset.cellIndex,
             };
-            let fakeCell = document.querySelector('.cell.square.fake');
+            const fakeCell = document.querySelector('.cell.square.fake');
             fakeCell.classList.remove('cell-hidden');
-            e.target.classList.add('cell-hidden')
+            e.target.classList.add('cell-hidden');
             fakeCell.style.left = `${e.clientX}px`;
             fakeCell.style.top = `${e.clientY}px`;
             fakeCell.style.backgroundImage = e.target.style.backgroundImage;
@@ -83,16 +84,15 @@ class App extends React.Component {
     }
 
     onMouseMove(e) {
-
         if (this.cellToDrag) {
-            let fakeCell = document.querySelector('.cell.square.fake')
+            const fakeCell = document.querySelector('.cell.square.fake');
             fakeCell.style.left = `${e.clientX}px`;
             fakeCell.style.top = `${e.clientY}px`;
         }
     }
 
     onMouseUp(e) {
-        let fakeCell = document.querySelector('.cell.square.fake')
+        const fakeCell = document.querySelector('.cell.square.fake');
         fakeCell.style.left = 0;
         fakeCell.style.top = 0;
         if (e.target.classList.contains('cell')) {
@@ -101,10 +101,10 @@ class App extends React.Component {
                 x: e.target.dataset.cellIndex,
             };
             fakeCell.style.backgroundImage = e.target.style.backgroundImage;
-            this.dragEnd()
+            this.dragEnd();
             this.cellToDrag = null;
         }
-        document.querySelector('.cell-hidden').classList.remove('cell-hidden')
+        document.querySelector('.cell-hidden').classList.remove('cell-hidden');
         fakeCell.classList.add('cell-hidden');
     }
 
@@ -114,13 +114,11 @@ class App extends React.Component {
             y: this.cellToReplace.y - this.cellToDrag.y,
         };
 
-        const isMoveValid =
-            Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
+        const isMoveValid = Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
 
-            const { boardData } = this.state;
+        const { boardData } = this.state;
 
         if (this.cellToReplace !== undefined && isMoveValid) {
-
             const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
             boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
@@ -129,7 +127,6 @@ class App extends React.Component {
         const isMatch3 = this.checkGameField(false);
         if (!isMatch3) {
             if (this.cellToReplace !== undefined && isMoveValid) {
-
                 const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
                 boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
                 boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
@@ -138,13 +135,12 @@ class App extends React.Component {
             this.checkGameField();
         }
 
-
         this.cellToReplace = undefined;
-
     }
 
     moveIntoSquareBelow() {
         const { boardData } = this.state;
+        debugger;
         const result = boardData.map((row, rowIndex) => {
             return row.map((cell, cellIndex) => {
                 if (rowIndex === 0 && cell.type === 'empty') {
@@ -152,13 +148,15 @@ class App extends React.Component {
                         Math.floor(Math.random() * 6)
                     ];
                     return {
-                        type: this.candies.indexOf(randColor),
                         url: randColor,
+                        type: this.candies.indexOf(randColor),
+                        toDelete: false,
+
                     };
                 }
                 if (
-                    boardData[rowIndex + 1] !== undefined &&
-                    boardData[rowIndex + 1][cellIndex].type === 'empty'
+                    boardData[rowIndex + 1] !== undefined
+                    && boardData[rowIndex + 1][cellIndex].type === 'empty'
                 ) {
                     const changecell = boardData[rowIndex + 1][cellIndex];
                     boardData[rowIndex + 1][cellIndex] = cell;
@@ -174,8 +172,305 @@ class App extends React.Component {
         }
     }
 
+    handleDoubleClick(e) {
+        const cell = {
+            y: parseInt(e.target.dataset.rowIndex, 10),
+            x: parseInt(e.target.dataset.cellIndex, 10),
+        };
+        const empty = {
+            url: '',
+            type: 'empty',
+            toDelete: false,
+        };
+        const boardData = JSON.parse(JSON.stringify(this.state.boardData));
+        switch (boardData[cell.y][cell.x].type) {
+        case 'torpedoOfColumn':
+            for (let i = 0; i < 8; i += 1) {
+                boardData[i][cell.x] = empty;
+            }
+            break;
+        case 'mine':
+            boardData[cell.y][cell.x] = empty;
+            if (boardData[cell.y][cell.x + 1]) { boardData[cell.y][cell.x + 1] = empty; }
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x + 1]) { boardData[cell.y + 1][cell.x + 1] = empty; }
+            if (boardData[cell.y + 1]) { boardData[cell.y + 1][cell.x] = empty; }
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x - 1]) { boardData[cell.y + 1][cell.x - 1] = empty; }
+            if (boardData[cell.y][cell.x - 1]) { boardData[cell.y][cell.x - 1] = empty; }
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x - 1]) { boardData[cell.y - 1][cell.x - 1] = empty; }
+            if (boardData[cell.y - 1]) { boardData[cell.y - 1][cell.x] = empty; }
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x + 1]) { boardData[cell.y - 1][cell.x + 1] = empty; }
+            break;
+        case 'x-mine':
+            for (let i = 0; i < 8; i += 1) {
+                boardData[i][cell.x] = empty;
+                boardData[cell.y][i] = empty;
+            }
+            break;
+        case 'three-row':
+            for (let i = 0; i < 8; i += 1) {
+                boardData[i][cell.x] = empty;
+                boardData[cell.y][i] = empty;
+                if (boardData[cell.y + 1]) boardData[cell.y + 1][i] = empty;
+                if (boardData[cell.y - 1]) boardData[cell.y - 1][i] = empty;
+                if (boardData[cell.y][cell.x + 1]) boardData[i][cell.x + 1] = empty;
+                if (boardData[cell.y][cell.x - 1]) boardData[i][cell.x - 1] = empty;
+            }
+            break;
+        default:
+            e.preventDefault();
+            break;
+        }
+        this.setState({ boardData });
+    }
 
-    checkForFourAndFive(sizeCheckRow, boardData) {
+    checkFirstMine() {
+        const accumBoard = new Array(8).fill(null).map(() => new Array(8).fill(null));
+        const bd = this.checkBoardData;
+        bd.forEach((row, rowId) => {
+            row.forEach((cell, cellIndex) => {
+                if (!bd[rowId][cellIndex].toDelete) {
+                    accumBoard[rowId][cellIndex] = { ...cell };
+                    return;
+                }
+                const checkVertical = bd[rowId + 1] && bd[rowId - 1]
+                && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type;
+
+                const checkHorizontal = bd[rowId][cellIndex + 1] && bd[rowId][cellIndex - 1]
+                && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type
+                && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type;
+
+                if (checkVertical) {
+                    const checkRight = bd[rowId][cellIndex + 1]
+                    && bd[rowId][cellIndex + 2]
+                    && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex + 2].type === bd[rowId][cellIndex].type;
+
+                    const checkLeft = bd[rowId][cellIndex - 1]
+                    && bd[rowId][cellIndex - 2]
+                    && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
+
+                    if (checkRight || checkLeft) {
+                        accumBoard[rowId][cellIndex] = {
+                            url: 'url(../images/mine.png)',
+                            type: 'mine',
+                            toDelete: false,
+                        };
+                    } else accumBoard[rowId][cellIndex] = { ...cell };
+                } else if (checkHorizontal) {
+                    const checkBot = bd[rowId + 1] && bd[rowId + 2]
+                && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type;
+
+                    const checkTop = bd[rowId - 1] && bd[rowId - 2]
+                && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
+
+                    if (checkBot || checkTop) {
+                        accumBoard[rowId][cellIndex] = {
+                            url: 'url(../images/mine.png)',
+                            type: 'mine',
+                            toDelete: false,
+                        };
+                    } else accumBoard[rowId][cellIndex] = { ...cell };
+                } else accumBoard[rowId][cellIndex] = { ...cell };
+            });
+        });
+
+        this.checkBoardData = accumBoard;
+    }
+
+    checkSecondMine() {
+        const accumBoard = new Array(8).fill(null).map(() => new Array(8).fill(null));
+        const bd = this.checkBoardData;
+        bd.forEach((row, rowId) => {
+            row.forEach((cell, cellIndex) => {
+                if (!bd[rowId][cellIndex].toDelete) {
+                    accumBoard[rowId][cellIndex] = { ...cell };
+                    return;
+                }
+                const checkBot = bd[rowId + 1] && bd[rowId + 2]
+                && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type;
+
+                const checkTop = bd[rowId - 1] && bd[rowId - 2]
+                && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
+
+                if (checkBot || checkTop) {
+                    const checkRight = bd[rowId][cellIndex + 1]
+                    && bd[rowId][cellIndex + 2]
+                    && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex + 2].type === bd[rowId][cellIndex].type;
+
+                    const checkLeft = bd[rowId][cellIndex - 1]
+                    && bd[rowId][cellIndex - 2]
+                    && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
+
+                    if (checkRight || checkLeft) {
+                        accumBoard[rowId][cellIndex] = {
+                            url: 'url(../images/mine.png)',
+                            type: 'mine',
+                            toDelete: false,
+                        };
+                    } else accumBoard[rowId][cellIndex] = { ...cell };
+                } else accumBoard[rowId][cellIndex] = { ...cell };
+            });
+        });
+
+        this.checkBoardData = accumBoard;
+    }
+
+    checkXMine() {
+        const accumBoard = new Array(8).fill(null).map(() => new Array(8).fill(null));
+        const bd = this.checkBoardData;
+        bd.forEach((row, rowId) => {
+            row.forEach((cell, cellIndex) => {
+                if (!bd[rowId][cellIndex].toDelete) {
+                    accumBoard[rowId][cellIndex] = { ...cell };
+                    return;
+                }
+                const checkVerticalBot = bd[rowId + 1] && bd[rowId + 2] && bd[rowId - 1]
+                && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type;
+
+                const checkVerticalTop = bd[rowId - 1] && bd[rowId - 2] && bd[rowId + 1]
+                && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type;
+
+                const checkHorizontalLeft = bd[rowId][cellIndex + 1] && bd[rowId][cellIndex + 2]
+                && bd[rowId][cellIndex - 1] && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type
+                && bd[rowId][cellIndex + 2].type === bd[rowId][cellIndex].type
+                && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type;
+
+                const checkHorizontalRight = bd[rowId][cellIndex - 1] && bd[rowId][cellIndex - 2]
+                && bd[rowId][cellIndex + 1] && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type
+                && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type
+                && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type;
+
+                if (checkVerticalBot || checkVerticalTop) {
+                    const checkPositionLeft = bd[rowId][cellIndex + 1] && bd[rowId][cellIndex + 2]
+                    && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex + 2].type === bd[rowId][cellIndex].type;
+
+                    const checkPositionMiddle = bd[rowId][cellIndex - 1] && bd[rowId][cellIndex + 1]
+                    && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type;
+
+                    const checkPositionRight = bd[rowId][cellIndex - 1] && bd[rowId][cellIndex - 2]
+                    && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
+
+                    if (checkPositionLeft || checkPositionMiddle || checkPositionRight) {
+                        accumBoard[rowId][cellIndex] = {
+                            url: 'url(../images/x-mine.png)',
+                            type: 'x-mine',
+                            toDelete: false,
+                        };
+                    } else accumBoard[rowId][cellIndex] = { ...cell };
+                } else if (checkHorizontalLeft || checkHorizontalRight) {
+                    const checkPositionTop = bd[rowId - 1] && bd[rowId - 2]
+                    && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type
+                    && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
+
+                    const checkPositionMiddle = bd[rowId + 1] && bd[rowId - 1]
+                    && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type
+                    && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type;
+
+                    const checkPositionBot = bd[rowId + 1] && bd[rowId + 2]
+                    && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type
+                    && bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type;
+
+                    if (checkPositionTop || checkPositionMiddle || checkPositionBot) {
+                        accumBoard[rowId][cellIndex] = {
+                            url: 'url(../images/x-mine.png)',
+                            type: 'x-mine',
+                            toDelete: false,
+                        };
+                    } else accumBoard[rowId][cellIndex] = { ...cell };
+                } else accumBoard[rowId][cellIndex] = { ...cell };
+            });
+        });
+
+        this.checkBoardData = accumBoard;
+    }
+
+    checkThreeRow() {
+        const accumBoard = new Array(8).fill(null).map(() => new Array(8).fill(null));
+        const bd = this.checkBoardData;
+        bd.forEach((row, rowId) => {
+            row.forEach((cell, cellIndex) => {
+                if (!bd[rowId][cellIndex].toDelete) {
+                    accumBoard[rowId][cellIndex] = { ...cell };
+                    return;
+                }
+                const checkVertical = bd[rowId + 1] && bd[rowId + 2] // top
+                && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId - 1] && bd[rowId - 2] // bottom
+                && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
+
+                const checkHorizontal = bd[rowId][cellIndex + 1] && bd[rowId][cellIndex + 2] // right
+                && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type
+                && bd[rowId][cellIndex + 2].type === bd[rowId][cellIndex].type
+                && bd[rowId][cellIndex - 1] && bd[rowId][cellIndex - 2] // left
+                && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type
+                && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
+
+                if (checkVertical) {
+                    const checkPositionLeft = bd[rowId][cellIndex + 1] && bd[rowId][cellIndex + 2]
+                    && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex + 2].type === bd[rowId][cellIndex].type;
+
+                    const checkPositionMiddle = bd[rowId][cellIndex - 1] && bd[rowId][cellIndex + 1]
+                    && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type;
+
+                    const checkPositionRight = bd[rowId][cellIndex - 1] && bd[rowId][cellIndex - 2]
+                    && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
+
+                    if (checkPositionLeft || checkPositionMiddle || checkPositionRight) {
+                        accumBoard[rowId][cellIndex] = {
+                            url: 'url(../images/three-line.png)',
+                            type: 'three-row',
+                            toDelete: false,
+                        };
+                    } else accumBoard[rowId][cellIndex] = { ...cell };
+                } else if (checkHorizontal) {
+                    const checkPositionTop = bd[rowId - 1] && bd[rowId - 2]
+                && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
+
+                    const checkPositionMiddle = bd[rowId + 1] && bd[rowId - 1]
+                && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type;
+
+                    const checkPositionBot = bd[rowId + 1] && bd[rowId + 2]
+                && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type
+                && bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type;
+
+                    if (checkPositionTop || checkPositionMiddle || checkPositionBot) {
+                        accumBoard[rowId][cellIndex] = {
+                            url: 'url(../images/three-line.png)',
+                            type: 'three-row',
+                            toDelete: false,
+                        };
+                    } else accumBoard[rowId][cellIndex] = { ...cell };
+                } else accumBoard[rowId][cellIndex] = { ...cell };
+            });
+        });
+
+        this.checkBoardData = accumBoard;
+    }
+
+    checkForFourAndFive(sizeCheckRow) {
+        const boardData = this.checkBoardData;
         boardData.forEach((row, rowIndex) => {
             row.forEach((cell, cellIndex) => {
                 const indexBonus = sizeCheckRow === 4 ? 1 : 2;
@@ -186,16 +481,13 @@ class App extends React.Component {
                 let arrayColumnOfFourOrFive = [];
                 if (boardData[rowIndex + sizeCheckRow - 1]) {
                     for (let index = 0; index < sizeCheckRow; index += 1) {
-                        arrayColumnOfFourOrFive[index] =
-                            boardData[rowIndex + index][cellIndex];
+                        arrayColumnOfFourOrFive[index] = boardData[rowIndex + index][cellIndex];
                     }
                 } else {
                     arrayColumnOfFourOrFive = null;
                 }
-                const urlImageTorpedaRow =
-                    'url("../images/torpedo-row.png")';
-                const urlImageTorpedaColumn =
-                    'url("../images/torpedo-col.png")';
+                const urlImageTorpedaRow = 'url(../images/torpedo-row.png)';
+                const urlImageTorpedaColumn = 'url(../images/torpedo-col.png)';
 
                 function getCheckArray(checkArray, urlImage) {
                     if (checkArray) {
@@ -219,11 +511,10 @@ class App extends React.Component {
                                 } else {
                                     cell.url = sizeCheckRow === 4
                                         ? urlImage
-                                        : 'url("../images/torpedo-col.png")';
-                                    cell.type =
-                                        sizeCheckRow === 4
-                                            ? 'torpedoOfColumn'
-                                            : 'rainbow';
+                                        : 'url(../images/torpedo-col.png)';
+                                    cell.type = sizeCheckRow === 4
+                                        ? 'torpedoOfColumn'
+                                        : 'rainbow';
                                     cell.toDelete = false;
                                 }
                             });
@@ -248,13 +539,12 @@ class App extends React.Component {
                         urlImageTorpedaColumn
                     );
                     for (let index = 0; index < sizeCheckRow; index += 1) {
-                        boardData[rowIndex + index][cellIndex] =
-                            arrayColumnOfFourOrFive[index];
+                        boardData[rowIndex + index][cellIndex] = arrayColumnOfFourOrFive[index];
                     }
                 }
             });
         });
-        return boardData;
+        this.checkBoardData = boardData;
     }
 
     checkGameField(redraw = true) {
@@ -291,8 +581,14 @@ class App extends React.Component {
             });
         });
 
-        boardData = this.checkForFourAndFive(5, boardData);
-        boardData = this.checkForFourAndFive(4, boardData);
+        this.checkBoardData = boardData;
+        this.checkThreeRow();
+        this.checkXMine();
+        this.checkFirstMine();
+        this.checkSecondMine();
+        this.checkForFourAndFive(5);
+        this.checkForFourAndFive(4);
+        boardData = this.checkBoardData;
 
         const newBoardData = boardData.map((row) => {
             return row.map((cell) => {
@@ -318,26 +614,22 @@ class App extends React.Component {
 
         return (
             <div
-                className='app'
-                onMouseMove={event => this.onMouseMove(event)}
-                onMouseDown={event => this.onMouseDown(event)}
-                onMouseUp={event => this.onMouseUp(event)}
+                className="app"
+                onMouseMove={(event) => this.onMouseMove(event)}
+                onMouseDown={(event) => this.onMouseDown(event)}
+                onMouseUp={(event) => this.onMouseUp(event)}
             >
                 <CreateScore score={score} />
                 <div
-                    className='grid'
-                    onDragStart={e => e.preventDefault()}
-                    // onDragEnd={this.dragEnd}
-                    // onDragOver={this.dragOver}
-                    // onDragEnter={this.dragEnter}
-                    // onDragLeave={this.dragLeave}
-                    // onDrop={this.dragDrop}
+                    className="grid"
+                    onDragStart={(e) => e.preventDefault()}
+                    onDoubleClick={this.handleDoubleClick}
                 >
                     <Board squares={boardData} />
                 </div>
                 <div
                     className="cell square fake cell-hidden"
-                    style={{ backgroundImage: 'url("../images/yellow-candy.png")' }}
+                    style={{ backgroundImage: 'url(../images/yellow-candy.png)' }}
 
                 />
             </div>
