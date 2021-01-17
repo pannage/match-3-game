@@ -18,7 +18,6 @@ export default class Board extends React.Component {
                                         const cellKey = `${rowIndex}${cellIndex}`;
                                         return (
                                             <div
-                                                draggable="true"
                                                 className="cell square"
                                                 key={cellKey}
                                                 data-row-index={rowIndex}
