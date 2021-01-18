@@ -99,6 +99,52 @@ class App extends React.Component {
         }
     }
 
+    handleDoubleClick(e) {
+        const cell = {
+            y: parseInt(e.target.dataset.rowIndex, 10),
+            x: parseInt(e.target.dataset.cellIndex, 10),
+        };
+        const boardData = JSON.parse(JSON.stringify(this.state.boardData));
+        switch (boardData[cell.y][cell.x].type) {
+        case 'torpedoOfColumn':
+            for (let i = 0; i < 8; i += 1) {
+                boardData[i][cell.x].toDelete = true;
+            }
+            break;
+        case 'mine':
+            boardData[cell.y][cell.x].toDelete = true;
+            if (boardData[cell.y][cell.x + 1]) { boardData[cell.y][cell.x + 1].toDelete = true; }
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x + 1]) { boardData[cell.y + 1][cell.x + 1].toDelete = true; }
+            if (boardData[cell.y + 1]) { boardData[cell.y + 1][cell.x].toDelete = true; }
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x - 1]) { boardData[cell.y + 1][cell.x - 1].toDelete = true; }
+            if (boardData[cell.y][cell.x - 1]) { boardData[cell.y][cell.x - 1].toDelete = true; }
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x - 1]) { boardData[cell.y - 1][cell.x - 1].toDelete = true; }
+            if (boardData[cell.y - 1]) { boardData[cell.y - 1][cell.x].toDelete = true; }
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x + 1]) { boardData[cell.y - 1][cell.x + 1].toDelete = true; }
+            break;
+        case 'x-mine':
+            for (let i = 0; i < 8; i += 1) {
+                boardData[i][cell.x].toDelete = true;
+                boardData[cell.y][i].toDelete = true;
+            }
+            break;
+        case 'three-row':
+            for (let i = 0; i < 8; i += 1) {
+                boardData[i][cell.x].toDelete = true;
+                boardData[cell.y][i].toDelete = true;
+                if (boardData[cell.y + 1]) boardData[cell.y + 1][i].toDelete = true;
+                if (boardData[cell.y - 1]) boardData[cell.y - 1][i].toDelete = true;
+                if (boardData[cell.y][cell.x + 1]) boardData[i][cell.x + 1].toDelete = true;
+                if (boardData[cell.y][cell.x - 1]) boardData[i][cell.x - 1].toDelete = true;
+            }
+            break;
+        default:
+            e.preventDefault();
+            break;
+        }
+        this.setState({ boardData });
+    }
+
     onMouseDown(e) {
         if (e.target.classList.contains('cell')) {
             this.cellToDrag = {
@@ -127,13 +173,10 @@ class App extends React.Component {
     }
 
     onMouseUp(e) {
-        if (this.state.boardData[e.target.dataset.rowIndex][e.target.dataset.cellIndex].type === 'ground') {
-            return;
-        }
         const fakeCell = document.querySelector('.cell.square.fake');
         fakeCell.style.left = 0;
         fakeCell.style.top = 0;
-        if (e.target.classList.contains('cell')) {
+        if (e.target.classList.contains('cell') && this.state.boardData[e.target.dataset.rowIndex][e.target.dataset.cellIndex].type !== 'ground') {
             this.cellToReplace = {
                 y: e.target.dataset.rowIndex,
                 x: e.target.dataset.cellIndex,
@@ -223,52 +266,6 @@ class App extends React.Component {
         } else {
             setTimeout(this.checkGameField, 100);
         }
-    }
-
-    handleDoubleClick(e) {
-        const cell = {
-            y: parseInt(e.target.dataset.rowIndex, 10),
-            x: parseInt(e.target.dataset.cellIndex, 10),
-        };
-        const boardData = JSON.parse(JSON.stringify(this.state.boardData));
-        switch (boardData[cell.y][cell.x].type) {
-        case 'torpedoOfColumn':
-            for (let i = 0; i < 8; i += 1) {
-                boardData[i][cell.x].toDelete = true;
-            }
-            break;
-        case 'mine':
-            boardData[cell.y][cell.x].toDelete = true;
-            if (boardData[cell.y][cell.x + 1]) { boardData[cell.y][cell.x + 1].toDelete = true; }
-            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x + 1]) { boardData[cell.y + 1][cell.x + 1].toDelete = true; }
-            if (boardData[cell.y + 1]) { boardData[cell.y + 1][cell.x].toDelete = true; }
-            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x - 1]) { boardData[cell.y + 1][cell.x - 1].toDelete = true; }
-            if (boardData[cell.y][cell.x - 1]) { boardData[cell.y][cell.x - 1].toDelete = true; }
-            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x - 1]) { boardData[cell.y - 1][cell.x - 1].toDelete = true; }
-            if (boardData[cell.y - 1]) { boardData[cell.y - 1][cell.x].toDelete = true; }
-            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x + 1]) { boardData[cell.y - 1][cell.x + 1].toDelete = true; }
-            break;
-        case 'x-mine':
-            for (let i = 0; i < 8; i += 1) {
-                boardData[i][cell.x].toDelete = true;
-                boardData[cell.y][i].toDelete = true;
-            }
-            break;
-        case 'three-row':
-            for (let i = 0; i < 8; i += 1) {
-                boardData[i][cell.x].toDelete = true;
-                boardData[cell.y][i].toDelete = true;
-                if (boardData[cell.y + 1]) boardData[cell.y + 1][i].toDelete = true;
-                if (boardData[cell.y - 1]) boardData[cell.y - 1][i].toDelete = true;
-                if (boardData[cell.y][cell.x + 1]) boardData[i][cell.x + 1].toDelete = true;
-                if (boardData[cell.y][cell.x - 1]) boardData[i][cell.x - 1].toDelete = true;
-            }
-            break;
-        default:
-            e.preventDefault();
-            break;
-        }
-        this.setState({ boardData });
     }
 
     checkFirstMine() {
