@@ -16,6 +16,47 @@ CreateScore.propTypes = {
     score: PropTypes.number.isRequired,
 };
 
+const candies = [
+    'url(../images/red-candy.png)',
+    'url(../images/yellow-candy.png)',
+    'url(../images/orange-candy.png)',
+    'url(../images/purple-candy.png)',
+    'url(../images/green-candy.png)',
+    'url(../images/blue-candy.png)',
+];
+
+let boardArray = new Array(8).fill(null)
+.map(() => new Array(8).fill({ type: 1 }).map(() => {
+    const randColor = candies[
+        Math.floor(Math.random() * 6)
+    ];
+    return {
+        url: randColor,
+        type: candies.indexOf(randColor),
+        toDelete: false,
+    };
+}))
+
+boardArray = boardArray.map((row, rowId) => {
+    return row.map((cell, cellId) => {
+        if (rowId === 2 || rowId === 5) {
+            if (cellId === 3 || cellId === 4) return {
+                url: 'url(../images/ground.png)',
+                type: 'ground',
+                toDelete: false,
+            }
+        }
+        if (rowId === 3 || rowId === 4) {
+            if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5) return {
+                url: 'url(../images/ground.png)',
+                type: 'ground',
+                toDelete: false,
+            }
+        }
+        return cell;
+    })
+})
+
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -31,17 +72,7 @@ class App extends React.Component {
 
         this.state = {
             score: 0,
-            boardData: new Array(8).fill(null)
-                .map(() => new Array(8).fill({ type: 1 }).map(() => {
-                    const randColor = this.candies[
-                        Math.floor(Math.random() * 6)
-                    ];
-                    return {
-                        url: randColor,
-                        type: this.candies.indexOf(randColor),
-                        toDelete: false,
-                    };
-                })),
+            boardData: boardArray,
         };
 
         this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
@@ -74,24 +105,31 @@ class App extends React.Component {
                 y: e.target.dataset.rowIndex,
                 x: e.target.dataset.cellIndex,
             };
-            const fakeCell = document.querySelector('.cell.square.fake');
-            fakeCell.classList.remove('cell-hidden');
-            e.target.classList.add('cell-hidden');
-            fakeCell.style.left = `${e.clientX}px`;
-            fakeCell.style.top = `${e.clientY}px`;
-            fakeCell.style.backgroundImage = e.target.style.backgroundImage;
+            if (this.state.boardData[this.cellToDrag.y][this.cellToDrag.x].type === 'ground') {
+                this.cellToDrag = false;
+            } else {
+                const fakeCell = document.querySelector('.cell.square.fake');
+                fakeCell.classList.remove('cell-hidden');
+                e.target.classList.add('cell-hidden');
+                fakeCell.style.left = `${e.pageX - fakeCell.offsetWidth / 2}px`;
+                fakeCell.style.top = `${e.pageY - fakeCell.offsetHeight / 2}px`;
+                fakeCell.style.backgroundImage = e.target.style.backgroundImage;
+            }
         }
     }
 
     onMouseMove(e) {
         if (this.cellToDrag) {
             const fakeCell = document.querySelector('.cell.square.fake');
-            fakeCell.style.left = `${e.clientX}px`;
-            fakeCell.style.top = `${e.clientY}px`;
+            fakeCell.style.left = `${e.pageX - fakeCell.offsetWidth / 2}px`;
+            fakeCell.style.top = `${e.pageY - fakeCell.offsetHeight / 2}px`;
         }
     }
 
     onMouseUp(e) {
+        if (this.state.boardData[e.target.dataset.rowIndex][e.target.dataset.cellIndex].type === 'ground') {
+            return;
+        }
         const fakeCell = document.querySelector('.cell.square.fake');
         fakeCell.style.left = 0;
         fakeCell.style.top = 0;
@@ -109,6 +147,7 @@ class App extends React.Component {
     }
 
     dragEnd() {
+        if (!this.cellToDrag) return;
         const movementVector = {
             x: this.cellToReplace.x - this.cellToDrag.x,
             y: this.cellToReplace.y - this.cellToDrag.y,
@@ -140,7 +179,6 @@ class App extends React.Component {
 
     moveIntoSquareBelow() {
         const { boardData } = this.state;
-        debugger;
         const result = boardData.map((row, rowIndex) => {
             return row.map((cell, cellIndex) => {
                 if (rowIndex === 0 && cell.type === 'empty') {
@@ -155,11 +193,26 @@ class App extends React.Component {
                     };
                 }
                 if (
-                    boardData[rowIndex + 1] !== undefined
+                    boardData[rowIndex + 1]
                     && boardData[rowIndex + 1][cellIndex].type === 'empty'
+                    && cell.type !== 'ground'
                 ) {
                     const changecell = boardData[rowIndex + 1][cellIndex];
                     boardData[rowIndex + 1][cellIndex] = cell;
+                    return changecell;
+                } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex + 1]
+                    && boardData[rowIndex + 1][cellIndex + 1].type === 'empty'
+                    && boardData[rowIndex][cellIndex + 1].type === 'ground'
+                    && cell.type !== 'ground') {
+                    const changecell = boardData[rowIndex + 1][cellIndex + 1];
+                    boardData[rowIndex + 1][cellIndex + 1] = cell;
+                    return changecell;
+                } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex - 1]
+                    && boardData[rowIndex + 1][cellIndex - 1].type === 'empty'
+                    && boardData[rowIndex][cellIndex - 1].type === 'ground'
+                    && cell.type !== 'ground') {
+                    const changecell = boardData[rowIndex + 1][cellIndex - 1];
+                    boardData[rowIndex + 1][cellIndex - 1] = cell;
                     return changecell;
                 }
                 return cell;
@@ -168,7 +221,7 @@ class App extends React.Component {
         if (JSON.stringify(boardData) !== JSON.stringify(result)) {
             this.setState({ boardData: result });
         } else {
-            setTimeout(this.checkGameField, 500);
+            setTimeout(this.checkGameField, 100);
         }
     }
 
@@ -177,43 +230,38 @@ class App extends React.Component {
             y: parseInt(e.target.dataset.rowIndex, 10),
             x: parseInt(e.target.dataset.cellIndex, 10),
         };
-        const empty = {
-            url: '',
-            type: 'empty',
-            toDelete: false,
-        };
         const boardData = JSON.parse(JSON.stringify(this.state.boardData));
         switch (boardData[cell.y][cell.x].type) {
         case 'torpedoOfColumn':
             for (let i = 0; i < 8; i += 1) {
-                boardData[i][cell.x] = empty;
+                boardData[i][cell.x].toDelete = true;
             }
             break;
         case 'mine':
-            boardData[cell.y][cell.x] = empty;
-            if (boardData[cell.y][cell.x + 1]) { boardData[cell.y][cell.x + 1] = empty; }
-            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x + 1]) { boardData[cell.y + 1][cell.x + 1] = empty; }
-            if (boardData[cell.y + 1]) { boardData[cell.y + 1][cell.x] = empty; }
-            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x - 1]) { boardData[cell.y + 1][cell.x - 1] = empty; }
-            if (boardData[cell.y][cell.x - 1]) { boardData[cell.y][cell.x - 1] = empty; }
-            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x - 1]) { boardData[cell.y - 1][cell.x - 1] = empty; }
-            if (boardData[cell.y - 1]) { boardData[cell.y - 1][cell.x] = empty; }
-            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x + 1]) { boardData[cell.y - 1][cell.x + 1] = empty; }
+            boardData[cell.y][cell.x].toDelete = true;
+            if (boardData[cell.y][cell.x + 1]) { boardData[cell.y][cell.x + 1].toDelete = true; }
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x + 1]) { boardData[cell.y + 1][cell.x + 1].toDelete = true; }
+            if (boardData[cell.y + 1]) { boardData[cell.y + 1][cell.x].toDelete = true; }
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x - 1]) { boardData[cell.y + 1][cell.x - 1].toDelete = true; }
+            if (boardData[cell.y][cell.x - 1]) { boardData[cell.y][cell.x - 1].toDelete = true; }
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x - 1]) { boardData[cell.y - 1][cell.x - 1].toDelete = true; }
+            if (boardData[cell.y - 1]) { boardData[cell.y - 1][cell.x].toDelete = true; }
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x + 1]) { boardData[cell.y - 1][cell.x + 1].toDelete = true; }
             break;
         case 'x-mine':
             for (let i = 0; i < 8; i += 1) {
-                boardData[i][cell.x] = empty;
-                boardData[cell.y][i] = empty;
+                boardData[i][cell.x].toDelete = true;
+                boardData[cell.y][i].toDelete = true;
             }
             break;
         case 'three-row':
             for (let i = 0; i < 8; i += 1) {
-                boardData[i][cell.x] = empty;
-                boardData[cell.y][i] = empty;
-                if (boardData[cell.y + 1]) boardData[cell.y + 1][i] = empty;
-                if (boardData[cell.y - 1]) boardData[cell.y - 1][i] = empty;
-                if (boardData[cell.y][cell.x + 1]) boardData[i][cell.x + 1] = empty;
-                if (boardData[cell.y][cell.x - 1]) boardData[i][cell.x - 1] = empty;
+                boardData[i][cell.x].toDelete = true;
+                boardData[cell.y][i].toDelete = true;
+                if (boardData[cell.y + 1]) boardData[cell.y + 1][i].toDelete = true;
+                if (boardData[cell.y - 1]) boardData[cell.y - 1][i].toDelete = true;
+                if (boardData[cell.y][cell.x + 1]) boardData[i][cell.x + 1].toDelete = true;
+                if (boardData[cell.y][cell.x - 1]) boardData[i][cell.x - 1].toDelete = true;
             }
             break;
         default:
@@ -228,7 +276,7 @@ class App extends React.Component {
         const bd = this.checkBoardData;
         bd.forEach((row, rowId) => {
             row.forEach((cell, cellIndex) => {
-                if (!bd[rowId][cellIndex].toDelete) {
+                if (!bd[rowId][cellIndex].toDelete || bd[rowId][cellIndex].type === 'ground') {
                     accumBoard[rowId][cellIndex] = { ...cell };
                     return;
                 }
@@ -286,7 +334,7 @@ class App extends React.Component {
         const bd = this.checkBoardData;
         bd.forEach((row, rowId) => {
             row.forEach((cell, cellIndex) => {
-                if (!bd[rowId][cellIndex].toDelete) {
+                if (!bd[rowId][cellIndex].toDelete || bd[rowId][cellIndex].type === 'ground') {
                     accumBoard[rowId][cellIndex] = { ...cell };
                     return;
                 }
@@ -328,7 +376,7 @@ class App extends React.Component {
         const bd = this.checkBoardData;
         bd.forEach((row, rowId) => {
             row.forEach((cell, cellIndex) => {
-                if (!bd[rowId][cellIndex].toDelete) {
+                if (!bd[rowId][cellIndex].toDelete || bd[rowId][cellIndex].type === 'ground') {
                     accumBoard[rowId][cellIndex] = { ...cell };
                     return;
                 }
@@ -404,7 +452,7 @@ class App extends React.Component {
         const bd = this.checkBoardData;
         bd.forEach((row, rowId) => {
             row.forEach((cell, cellIndex) => {
-                if (!bd[rowId][cellIndex].toDelete) {
+                if (!bd[rowId][cellIndex].toDelete || bd[rowId][cellIndex].type === 'ground') {
                     accumBoard[rowId][cellIndex] = { ...cell };
                     return;
                 }
@@ -493,6 +541,7 @@ class App extends React.Component {
                     if (checkArray) {
                         const isCheckOfFourAndFive = checkArray.every(
                             (cell, index, arr) => {
+                                if (cell.type === 'ground') return false;
                                 if (index !== arr.length - 1) {
                                     return (
                                         cell.type === checkArray[index + 1].type
@@ -547,12 +596,44 @@ class App extends React.Component {
         this.checkBoardData = boardData;
     }
 
+    handleDelete(boardData) {
+
+        const newBoardData = boardData.map((row, rowId) => {
+            return row.map((cell, cellId) => {
+                const condition = cell.type === 'ground'
+                && ((boardData[rowId - 1] && boardData[rowId - 1][cellId].toDelete && boardData[rowId - 1][cellId].type !== 'ground')
+                || (boardData[rowId + 1] && boardData[rowId + 1][cellId].toDelete && boardData[rowId + 1][cellId].type !== 'ground')
+                || (boardData[rowId][cellId + 1] && boardData[rowId][cellId + 1].toDelete && boardData[rowId][cellId + 1].type !== 'ground')
+                || (boardData[rowId][cellId - 1] && boardData[rowId][cellId - 1].toDelete && boardData[rowId][cellId - 1].type !== 'ground'))
+                if (condition) {
+                    cell.toDelete = true;
+                }
+                return cell;
+            });
+        });
+
+        boardData = newBoardData.map((row) => {
+            return row.map((cell) => {
+                if (cell.toDelete) {
+                    return {
+                        url: '',
+                        type: 'empty',
+                        toDelete: false,
+                    };
+                } else return cell;
+            });
+        });
+
+        return boardData;
+    }
+
     checkGameField(redraw = true) {
         let boardData = JSON.parse(JSON.stringify(this.state.boardData));
         let someCellMarkedAsDeleted = false;
 
         boardData.forEach((rowArray, indexRow) => {
             rowArray.forEach((item, indexItem) => {
+                if (item.type === 'ground') return;
                 const leftCellType = rowArray[indexItem - 1]
                     ? rowArray[indexItem - 1].type
                     : null;
@@ -588,22 +669,12 @@ class App extends React.Component {
         this.checkSecondMine();
         this.checkForFourAndFive(5);
         this.checkForFourAndFive(4);
-        boardData = this.checkBoardData;
 
-        const newBoardData = boardData.map((row) => {
-            return row.map((cell) => {
-                return cell.toDelete
-                    ? {
-                        url: '',
-                        type: 'empty',
-                        toDelete: false,
-                    }
-                    : cell;
-            });
-        });
+        boardData = this.handleDelete(this.checkBoardData);
+
 
         if (redraw) {
-            this.setState({ boardData: newBoardData });
+            this.setState({ boardData });
         }
         return someCellMarkedAsDeleted;
     }
