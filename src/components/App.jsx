@@ -39,24 +39,42 @@ let boardArray = new Array(8).fill(null).map(() =>
 boardArray = boardArray.map((row, rowId) => {
     return row.map((cell, cellId) => {
         if (rowId === 2 || rowId === 5) {
-            if (cellId === 3 || cellId === 4)
-                return {
-                    url: "url(../images/ground.png)",
-                    type: "ground",
-                    toDelete: false,
-                };
+            if (cellId === 3 || cellId === 4) {
+                cell.isFrozen = true;
+                cell.url = cell.url.replace(/candy.png/, "candy--frozen.jpg");
+            }
         }
         if (rowId === 3 || rowId === 4) {
-            if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5)
-                return {
-                    url: "url(../images/ground.png)",
-                    type: "ground",
-                    toDelete: false,
-                };
+            if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5) {
+                cell.isFrozen = true;
+                cell.url = cell.url.replace(/candy.png/, "candy--frozen.jpg");
+            }
         }
         return cell;
     });
 });
+
+// boardArray = boardArray.map((row, rowId) => {
+//     return row.map((cell, cellId) => {
+//         if (rowId === 2 || rowId === 5) {
+//             if (cellId === 3 || cellId === 4)
+//                 return {
+//                     url: "url(../images/ground.png)",
+//                     type: "ground",
+//                     toDelete: false,
+//                 };
+//         }
+//         if (rowId === 3 || rowId === 4) {
+//             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5)
+//                 return {
+//                     url: "url(../images/ground.png)",
+//                     type: "ground",
+//                     toDelete: false,
+//                 };
+//         }
+//         return cell;
+//     });
+// });
 
 class App extends React.Component {
     constructor(props) {
@@ -84,6 +102,7 @@ class App extends React.Component {
         this.checkFirstMine = this.checkFirstMine.bind(this);
         this.checkSecondMine = this.checkSecondMine.bind(this);
         this.checkForFourAndFive = this.checkForFourAndFive.bind(this);
+        this.startBonusRainbow = this.startBonusRainbow.bind(this);
     }
 
     componentDidMount() {
@@ -91,7 +110,6 @@ class App extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(prevState);
         if (
             JSON.stringify(prevState.boardData) !==
             JSON.stringify(this.state.boardData)
@@ -106,9 +124,35 @@ class App extends React.Component {
             x: parseInt(e.target.dataset.cellIndex, 10),
         };
         const boardData = JSON.parse(JSON.stringify(this.state.boardData));
+        const colorCell = boardData[cell.y][cell.x]
+            ? boardData[cell.y][cell.x].colorDelete
+            : null;
+
         switch (boardData[cell.y][cell.x].type) {
+            case "torpedoOfRow":
+                for (let i = 0; i < 8; i += 1) {
+                    if (boardData[cell.y][i].isFrozen) {
+                        const newUrlCell = boardData[cell.y][i].url.replace(
+                            /candy--frozen.jpg/,
+                            "candy.png"
+                        );
+                        boardData[cell.y][i].isFrozen = false;
+                        boardData[cell.y][i].url = newUrlCell;
+                    }
+                    boardData[cell.y][i].toDelete = true;
+                }
+                break;
             case "torpedoOfColumn":
                 for (let i = 0; i < 8; i += 1) {
+                    console.log("i :>> ", i);
+                    if (boardData[i][cell.x].isFrozen) {
+                        const newUrlCell = boardData[i][cell.x].url.replace(
+                            /candy--frozen.jpg/,
+                            "candy.png"
+                        );
+                        boardData[cell.y][i].isFrozen = false;
+                        boardData[cell.y][i].url = newUrlCell;
+                    }
                     boardData[i][cell.x].toDelete = true;
                 }
                 break;
@@ -186,7 +230,9 @@ class App extends React.Component {
             };
             if (
                 this.state.boardData[this.cellToDrag.y][this.cellToDrag.x]
-                    .type === "ground"
+                    .type === "ground" ||
+                this.state.boardData[this.cellToDrag.y][this.cellToDrag.x]
+                    .isFrozen
             ) {
                 this.cellToDrag = false;
             } else {
@@ -232,39 +278,87 @@ class App extends React.Component {
 
     dragEnd() {
         if (!this.cellToDrag) return;
-        const movementVector = {
-            x: this.cellToReplace.x - this.cellToDrag.x,
-            y: this.cellToReplace.y - this.cellToDrag.y,
-        };
 
-        const isMoveValid =
-            Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
+        let { boardData } = this.state;
 
-        const { boardData } = this.state;
-
-        if (this.cellToReplace !== undefined && isMoveValid) {
-            const changeSqr =
-                boardData[this.cellToReplace.y][this.cellToReplace.x];
-            boardData[this.cellToReplace.y][this.cellToReplace.x] =
-                boardData[this.cellToDrag.y][this.cellToDrag.x];
-            boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
-        }
-
-        const isMatch3 = this.checkGameField(false);
-        if (!isMatch3) {
-            if (this.cellToReplace !== undefined && isMoveValid) {
+        if (this.cellToReplace !== undefined) {
+            if (
+                boardData[this.cellToDrag.y][this.cellToDrag.x].type ===
+                "rainbow"
+            ) {
+                boardData = this.startBonusRainbow(boardData);
+            } else {
                 const changeSqr =
                     boardData[this.cellToReplace.y][this.cellToReplace.x];
                 boardData[this.cellToReplace.y][this.cellToReplace.x] =
                     boardData[this.cellToDrag.y][this.cellToDrag.x];
                 boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
             }
-        } else {
-            this.checkGameField();
         }
-
+        this.setState({ boardData }, () => this.checkGameField());
         this.cellToReplace = undefined;
     }
+
+    startBonusRainbow(boardData) {
+        const colorCell =
+            boardData[this.cellToReplace.y][this.cellToReplace.x].type;
+
+        const newBoardData = boardData.map((row, rowIndex) => {
+            return row.map((item, cellIndex) => {
+                if (colorCell === item.type) {
+                    return {
+                        url: "",
+                        type: "empty",
+                        toDelete: false,
+                    };
+                }
+                return item;
+            });
+        });
+
+        newBoardData[this.cellToDrag.y][this.cellToDrag.x] = {
+            url: "",
+            type: "empty",
+            toDelete: false,
+        };
+
+        return newBoardData;
+    }
+    // dragEnd() {
+    //     if (!this.cellToDrag) return;
+    //     const movementVector = {
+    //         x: this.cellToReplace.x - this.cellToDrag.x,
+    //         y: this.cellToReplace.y - this.cellToDrag.y,
+    //     };
+
+    //     const isMoveValid =
+    //         Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
+
+    //     const { boardData } = this.state;
+
+    //     if (this.cellToReplace !== undefined && isMoveValid) {
+    //         const changeSqr =
+    //             boardData[this.cellToReplace.y][this.cellToReplace.x];
+    //         boardData[this.cellToReplace.y][this.cellToReplace.x] =
+    //             boardData[this.cellToDrag.y][this.cellToDrag.x];
+    //         boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+    //     }
+
+    //     const isMatch3 = this.checkGameField(false);
+    //     if (!isMatch3) {
+    //         if (this.cellToReplace !== undefined && isMoveValid) {
+    //             const changeSqr =
+    //                 boardData[this.cellToReplace.y][this.cellToReplace.x];
+    //             boardData[this.cellToReplace.y][this.cellToReplace.x] =
+    //                 boardData[this.cellToDrag.y][this.cellToDrag.x];
+    //             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+    //         }
+    //     } else {
+    //         this.checkGameField();
+    //     }
+
+    //     this.cellToReplace = undefined;
+    // }
 
     moveIntoSquareBelow() {
         const { boardData } = this.state;
@@ -757,16 +851,19 @@ class App extends React.Component {
                                     cell.type = "empty";
                                     cell.toDelete = false;
                                 } else {
+                                    if (sizeCheckRow === 5) {
+                                        cell.colorDelete = cell.type;
+                                        console.log("cell :>> ", cell);
+                                    }
                                     cell.url =
                                         sizeCheckRow === 4
                                             ? urlImage
-                                            : "url(../images/torpedo-col.png)";
+                                            : "url(../images/rainbow.jpg)";
                                     cell.type =
                                         sizeCheckRow === 4
                                             ? typeBonus
                                             : "rainbow";
                                     cell.toDelete = false;
-                                    console.log("cell :>> ", cell);
                                 }
                             });
                         }
@@ -828,6 +925,18 @@ class App extends React.Component {
         boardData = newBoardData.map((row) => {
             return row.map((cell) => {
                 if (cell.toDelete) {
+                    if (cell.isFrozen) {
+                        const newUrlCell = cell.url.replace(
+                            /candy--frozen.jpg/,
+                            "candy.png"
+                        );
+                        return {
+                            url: newUrlCell,
+                            type: cell.type,
+                            toDelete: false,
+                            isFrozen: false,
+                        };
+                    }
                     return {
                         url: "",
                         type: "empty",
