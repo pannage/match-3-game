@@ -2,19 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/App.css';
 import Board from './Board.jsx';
+import LevelRoad from './levels.jsx'
 
-function CreateScore(props) {
-    const { score } = props;
-    return (
-        <div className="score-board">
-            <h3>score</h3>
-            <h1 id="score">{score}</h1>
-        </div>
-    );
-}
-CreateScore.propTypes = {
-    score: PropTypes.number.isRequired,
-};
+// function CreateScore(props) {
+//     const { score } = props;
+//     return (
+//         <div className="score-board">
+//             <h3>score</h3>
+//             <h1 id="score">{score}</h1>
+//         </div>
+//     );
+// }
+// CreateScore.propTypes = {
+//     score: PropTypes.number.isRequired,
+// };
 
 const candies = [
     'url(../images/red-candy.png)',
@@ -690,12 +691,14 @@ class App extends React.Component {
                 onMouseDown={(event) => this.onMouseDown(event)}
                 onMouseUp={(event) => this.onMouseUp(event)}
             >
-                <CreateScore score={score} />
+                <LevelRoad/>
+                {/* <CreateScore score={score} /> */}
                 <div
                     className="grid"
                     onDragStart={(e) => e.preventDefault()}
                     onDoubleClick={this.handleDoubleClick}
                 >
+
                     <Board squares={boardData} />
                 </div>
                 <div
