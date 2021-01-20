@@ -91,3 +91,55 @@ body {
  border-radius: 20px;
 
 }
+
+.level-wrapper {
+    height: 43vh;
+    width: 5vw;
+    margin: 0 auto;
+}
+
+.level-7 {
+    background-image: url('../images/level7.png');
+    width: 4vw;
+    height: 3.9vw;
+    margin-bottom: 3vh;
+
+}
+
+.level-6 {
+    background-image: url('../images/level6.png');
+    width: 4vw;
+    height: 2.7vw;
+    margin-bottom: 7.5vh;
+}
+.level-5 {
+    background-image: url('../images/level5.png');
+    width: 4vw;
+    height: 3.9vw;
+    margin-bottom: 1vh;
+}
+.level-4 {
+    background-image: url('../images/level4.png');
+    width: 4vw;
+    height: 3.9vw;
+
+}
+.level-3 {
+    background-image: url('../images/level3.png');
+    width: 4vw;
+    height: 3.9vw;
+    margin-bottom: 2vh;
+}
+.level-2 {
+    background-image: url('../images/level2.png');
+    width: 4vw;
+    height: 3.9vw;
+    margin-bottom: 3vh;
+}
+.level-1 {
+    background-image: url('../images/level1.png');
+    width: 4vw;
+    height: 3.9vw;
+}
+
+
