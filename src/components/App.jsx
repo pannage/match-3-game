@@ -1,7 +1,7 @@
-import React from "react";
-import PropTypes from "prop-types";
-import "../styles/App.css";
-import Board from "./Board.jsx";
+import React from 'react';
+import PropTypes from 'prop-types';
+import '../styles/App.css';
+import Board from './Board.jsx';
 
 function CreateScore(props) {
     const { score } = props;
@@ -17,43 +17,44 @@ CreateScore.propTypes = {
 };
 
 const candies = [
-    "url(../images/red-candy.png)",
-    "url(../images/yellow-candy.png)",
-    "url(../images/orange-candy.png)",
-    "url(../images/purple-candy.png)",
-    "url(../images/green-candy.png)",
-    "url(../images/blue-candy.png)",
+    'url(../images/red-candy.png)',
+    'url(../images/yellow-candy.png)',
+    'url(../images/orange-candy.png)',
+    'url(../images/purple-candy.png)',
+    'url(../images/green-candy.png)',
+    'url(../images/blue-candy.png)',
 ];
 
-let boardArray = new Array(8).fill(null).map(() =>
-    new Array(8).fill({ type: 1 }).map(() => {
-        const randColor = candies[Math.floor(Math.random() * 6)];
-        return {
-            url: randColor,
-            type: candies.indexOf(randColor),
-            toDelete: false,
-        };
-    })
-);
+let boardArray = new Array(8).fill(null).map(() => new Array(8).fill({ type: 1 }).map(() => {
+    const randColor = candies[Math.floor(Math.random() * 6)];
+    return {
+        url: randColor,
+        type: candies.indexOf(randColor),
+        toDelete: false,
+    };
+}));
 
+// TODO здесь создаётся массив для замороженных ячеек
 boardArray = boardArray.map((row, rowId) => {
     return row.map((cell, cellId) => {
         if (rowId === 2 || rowId === 5) {
             if (cellId === 3 || cellId === 4) {
                 cell.isFrozen = true;
-                cell.url = cell.url.replace(/candy.png/, "candy--frozen.jpg");
+                cell.url = cell.url.replace(/candy.png/, 'candy--frozen.jpg');
             }
         }
         if (rowId === 3 || rowId === 4) {
             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5) {
                 cell.isFrozen = true;
-                cell.url = cell.url.replace(/candy.png/, "candy--frozen.jpg");
+                cell.url = cell.url.replace(/candy.png/, 'candy--frozen.jpg');
             }
         }
         return cell;
     });
 });
 
+
+// TODO здесь создаётся массив для земли
 // boardArray = boardArray.map((row, rowId) => {
 //     return row.map((cell, cellId) => {
 //         if (rowId === 2 || rowId === 5) {
@@ -81,12 +82,12 @@ class App extends React.Component {
         super(props);
         this.width = 8;
         this.candies = [
-            "url(../images/red-candy.png)",
-            "url(../images/yellow-candy.png)",
-            "url(../images/orange-candy.png)",
-            "url(../images/purple-candy.png)",
-            "url(../images/green-candy.png)",
-            "url(../images/blue-candy.png)",
+            'url(../images/red-candy.png)',
+            'url(../images/yellow-candy.png)',
+            'url(../images/orange-candy.png)',
+            'url(../images/purple-candy.png)',
+            'url(../images/green-candy.png)',
+            'url(../images/blue-candy.png)',
         ];
 
         this.state = {
@@ -111,8 +112,8 @@ class App extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (
-            JSON.stringify(prevState.boardData) !==
-            JSON.stringify(this.state.boardData)
+            JSON.stringify(prevState.boardData)
+            !== JSON.stringify(this.state.boardData)
         ) {
             setTimeout(this.moveIntoSquareBelow, 100);
         }
@@ -124,121 +125,114 @@ class App extends React.Component {
             x: parseInt(e.target.dataset.cellIndex, 10),
         };
         const boardData = JSON.parse(JSON.stringify(this.state.boardData));
-        const colorCell = boardData[cell.y][cell.x]
-            ? boardData[cell.y][cell.x].colorDelete
-            : null;
-
         switch (boardData[cell.y][cell.x].type) {
-            case "torpedoOfRow":
-                for (let i = 0; i < 8; i += 1) {
-                    if (boardData[cell.y][i].isFrozen) {
-                        const newUrlCell = boardData[cell.y][i].url.replace(
-                            /candy--frozen.jpg/,
-                            "candy.png"
-                        );
-                        boardData[cell.y][i].isFrozen = false;
-                        boardData[cell.y][i].url = newUrlCell;
-                    }
+        case 'torpedoOfRow':
+            for (let i = 0; i < 8; i += 1) {
+                if (boardData[cell.y][i].isFrozen) {
+                    const newUrlCell = boardData[cell.y][i].url.replace(
+                        /candy--frozen.jpg/,
+                        'candy.png'
+                    );
+                    boardData[cell.y][i].isFrozen = false;
+                    boardData[cell.y][i].url = newUrlCell;
+                } else {
                     boardData[cell.y][i].toDelete = true;
                 }
-                break;
-            case "torpedoOfColumn":
-                for (let i = 0; i < 8; i += 1) {
-                    console.log("i :>> ", i);
-                    if (boardData[i][cell.x].isFrozen) {
-                        const newUrlCell = boardData[i][cell.x].url.replace(
-                            /candy--frozen.jpg/,
-                            "candy.png"
-                        );
-                        boardData[cell.y][i].isFrozen = false;
-                        boardData[cell.y][i].url = newUrlCell;
-                    }
+            }
+            break;
+        case 'torpedoOfColumn':
+            for (let i = 0; i < 8; i += 1) {
+                if (boardData[i][cell.x].isFrozen) {
+                    const newUrlCell = boardData[i][cell.x].url.replace(
+                        /candy--frozen.jpg/,
+                        'candy.png'
+                    );
+                    boardData[i][cell.x].isFrozen = false;
+                    boardData[i][cell.x].url = newUrlCell;
+                } else {
                     boardData[i][cell.x].toDelete = true;
                 }
-                break;
-            case "mine":
-                boardData[cell.y][cell.x].toDelete = true;
-                if (boardData[cell.y][cell.x + 1]) {
-                    boardData[cell.y][cell.x + 1].toDelete = true;
-                }
-                if (
-                    boardData[cell.y + 1] &&
-                    boardData[cell.y + 1][cell.x + 1]
-                ) {
-                    boardData[cell.y + 1][cell.x + 1].toDelete = true;
-                }
-                if (boardData[cell.y + 1]) {
-                    boardData[cell.y + 1][cell.x].toDelete = true;
-                }
-                if (
-                    boardData[cell.y + 1] &&
-                    boardData[cell.y + 1][cell.x - 1]
-                ) {
-                    boardData[cell.y + 1][cell.x - 1].toDelete = true;
-                }
-                if (boardData[cell.y][cell.x - 1]) {
-                    boardData[cell.y][cell.x - 1].toDelete = true;
-                }
-                if (
-                    boardData[cell.y - 1] &&
-                    boardData[cell.y - 1][cell.x - 1]
-                ) {
-                    boardData[cell.y - 1][cell.x - 1].toDelete = true;
-                }
-                if (boardData[cell.y - 1]) {
-                    boardData[cell.y - 1][cell.x].toDelete = true;
-                }
-                if (
-                    boardData[cell.y - 1] &&
-                    boardData[cell.y - 1][cell.x + 1]
-                ) {
-                    boardData[cell.y - 1][cell.x + 1].toDelete = true;
-                }
-                break;
-            case "x-mine":
-                for (let i = 0; i < 8; i += 1) {
-                    boardData[i][cell.x].toDelete = true;
-                    boardData[cell.y][i].toDelete = true;
-                }
-                break;
-            case "three-row":
-                for (let i = 0; i < 8; i += 1) {
-                    boardData[i][cell.x].toDelete = true;
-                    boardData[cell.y][i].toDelete = true;
-                    if (boardData[cell.y + 1])
-                        boardData[cell.y + 1][i].toDelete = true;
-                    if (boardData[cell.y - 1])
-                        boardData[cell.y - 1][i].toDelete = true;
-                    if (boardData[cell.y][cell.x + 1])
-                        boardData[i][cell.x + 1].toDelete = true;
-                    if (boardData[cell.y][cell.x - 1])
-                        boardData[i][cell.x - 1].toDelete = true;
-                }
-                break;
-            default:
-                e.preventDefault();
-                break;
+            }
+            break;
+        case 'mine':
+            boardData[cell.y][cell.x].toDelete = true;
+            if (boardData[cell.y][cell.x + 1]) {
+                boardData[cell.y][cell.x + 1].toDelete = true;
+            }
+            if (
+                boardData[cell.y + 1]
+                    && boardData[cell.y + 1][cell.x + 1]
+            ) {
+                boardData[cell.y + 1][cell.x + 1].toDelete = true;
+            }
+            if (boardData[cell.y + 1]) {
+                boardData[cell.y + 1][cell.x].toDelete = true;
+            }
+            if (
+                boardData[cell.y + 1]
+                    && boardData[cell.y + 1][cell.x - 1]
+            ) {
+                boardData[cell.y + 1][cell.x - 1].toDelete = true;
+            }
+            if (boardData[cell.y][cell.x - 1]) {
+                boardData[cell.y][cell.x - 1].toDelete = true;
+            }
+            if (
+                boardData[cell.y - 1]
+                    && boardData[cell.y - 1][cell.x - 1]
+            ) {
+                boardData[cell.y - 1][cell.x - 1].toDelete = true;
+            }
+            if (boardData[cell.y - 1]) {
+                boardData[cell.y - 1][cell.x].toDelete = true;
+            }
+            if (
+                boardData[cell.y - 1]
+                    && boardData[cell.y - 1][cell.x + 1]
+            ) {
+                boardData[cell.y - 1][cell.x + 1].toDelete = true;
+            }
+            break;
+        case 'x-mine':
+            for (let i = 0; i < 8; i += 1) {
+                boardData[i][cell.x].toDelete = true;
+                boardData[cell.y][i].toDelete = true;
+            }
+            break;
+        case 'three-row':
+            for (let i = 0; i < 8; i += 1) {
+                boardData[i][cell.x].toDelete = true;
+                boardData[cell.y][i].toDelete = true;
+                if (boardData[cell.y + 1]) boardData[cell.y + 1][i].toDelete = true;
+                if (boardData[cell.y - 1]) boardData[cell.y - 1][i].toDelete = true;
+                if (boardData[cell.y][cell.x + 1]) boardData[i][cell.x + 1].toDelete = true;
+                if (boardData[cell.y][cell.x - 1]) boardData[i][cell.x - 1].toDelete = true;
+            }
+            break;
+        default:
+            e.preventDefault();
+            break;
         }
         this.setState({ boardData });
     }
 
     onMouseDown(e) {
-        if (e.target.classList.contains("cell")) {
+        if (e.target.classList.contains('cell')) {
             this.cellToDrag = {
                 y: e.target.dataset.rowIndex,
                 x: e.target.dataset.cellIndex,
             };
             if (
                 this.state.boardData[this.cellToDrag.y][this.cellToDrag.x]
-                    .type === "ground" ||
-                this.state.boardData[this.cellToDrag.y][this.cellToDrag.x]
+                    .type === 'ground'
+                || this.state.boardData[this.cellToDrag.y][this.cellToDrag.x]
                     .isFrozen
             ) {
                 this.cellToDrag = false;
             } else {
-                const fakeCell = document.querySelector(".cell.square.fake");
-                fakeCell.classList.remove("cell-hidden");
-                e.target.classList.add("cell-hidden");
+                const fakeCell = document.querySelector('.cell.square.fake');
+                fakeCell.classList.remove('cell-hidden');
+                e.target.classList.add('cell-hidden');
                 fakeCell.style.left = `${e.pageX - fakeCell.offsetWidth / 2}px`;
                 fakeCell.style.top = `${e.pageY - fakeCell.offsetHeight / 2}px`;
                 fakeCell.style.backgroundImage = e.target.style.backgroundImage;
@@ -248,21 +242,21 @@ class App extends React.Component {
 
     onMouseMove(e) {
         if (this.cellToDrag) {
-            const fakeCell = document.querySelector(".cell.square.fake");
+            const fakeCell = document.querySelector('.cell.square.fake');
             fakeCell.style.left = `${e.pageX - fakeCell.offsetWidth / 2}px`;
             fakeCell.style.top = `${e.pageY - fakeCell.offsetHeight / 2}px`;
         }
     }
 
     onMouseUp(e) {
-        const fakeCell = document.querySelector(".cell.square.fake");
+        const fakeCell = document.querySelector('.cell.square.fake');
         fakeCell.style.left = 0;
         fakeCell.style.top = 0;
         if (
-            e.target.classList.contains("cell") &&
-            this.state.boardData[e.target.dataset.rowIndex][
+            e.target.classList.contains('cell')
+            && this.state.boardData[e.target.dataset.rowIndex][
                 e.target.dataset.cellIndex
-            ].type !== "ground"
+            ].type !== 'ground'
         ) {
             this.cellToReplace = {
                 y: e.target.dataset.rowIndex,
@@ -272,8 +266,8 @@ class App extends React.Component {
             this.dragEnd();
             this.cellToDrag = null;
         }
-        document.querySelector(".cell-hidden").classList.remove("cell-hidden");
-        fakeCell.classList.add("cell-hidden");
+        document.querySelector('.cell-hidden').classList.remove('cell-hidden');
+        fakeCell.classList.add('cell-hidden');
     }
 
     dragEnd() {
@@ -283,46 +277,18 @@ class App extends React.Component {
 
         if (this.cellToReplace !== undefined) {
             if (
-                boardData[this.cellToDrag.y][this.cellToDrag.x].type ===
-                "rainbow"
+                boardData[this.cellToDrag.y][this.cellToDrag.x].type
+                === 'rainbow'
             ) {
                 boardData = this.startBonusRainbow(boardData);
             } else {
-                const changeSqr =
-                    boardData[this.cellToReplace.y][this.cellToReplace.x];
-                boardData[this.cellToReplace.y][this.cellToReplace.x] =
-                    boardData[this.cellToDrag.y][this.cellToDrag.x];
+                const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
+                boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
                 boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
             }
         }
         this.setState({ boardData }, () => this.checkGameField());
         this.cellToReplace = undefined;
-    }
-
-    startBonusRainbow(boardData) {
-        const colorCell =
-            boardData[this.cellToReplace.y][this.cellToReplace.x].type;
-
-        const newBoardData = boardData.map((row, rowIndex) => {
-            return row.map((item, cellIndex) => {
-                if (colorCell === item.type) {
-                    return {
-                        url: "",
-                        type: "empty",
-                        toDelete: false,
-                    };
-                }
-                return item;
-            });
-        });
-
-        newBoardData[this.cellToDrag.y][this.cellToDrag.x] = {
-            url: "",
-            type: "empty",
-            toDelete: false,
-        };
-
-        return newBoardData;
     }
     // dragEnd() {
     //     if (!this.cellToDrag) return;
@@ -360,11 +326,40 @@ class App extends React.Component {
     //     this.cellToReplace = undefined;
     // }
 
+    startBonusRainbow(boardData) {
+        const colorCell = boardData[this.cellToReplace.y][this.cellToReplace.x].type;
+
+        const newBoardData = boardData.map((row, rowIndex) => {
+            return row.map((item, cellIndex) => {
+                if (colorCell === item.type && item.isFrozen) {
+                    return {
+                        url: item.url.replace(/candy--frozen.jpg/, 'candy.png'),
+                        type: item.type,
+                        toDelete: false,
+                    };
+                }
+                if (colorCell === item.type) {
+                    item.toDelete = true;
+                    return item;
+                }
+                return item;
+            });
+        });
+
+        newBoardData[this.cellToDrag.y][this.cellToDrag.x] = {
+            url: '',
+            type: 'empty',
+            toDelete: false,
+        };
+
+        return newBoardData;
+    }
+
     moveIntoSquareBelow() {
         const { boardData } = this.state;
         const result = boardData.map((row, rowIndex) => {
             return row.map((cell, cellIndex) => {
-                if (rowIndex === 0 && cell.type === "empty") {
+                if (rowIndex === 0 && cell.type === 'empty') {
                     const randColor = this.candies[
                         Math.floor(Math.random() * 6)
                     ];
@@ -375,29 +370,31 @@ class App extends React.Component {
                     };
                 }
                 if (
-                    boardData[rowIndex + 1] &&
-                    boardData[rowIndex + 1][cellIndex].type === "empty" &&
-                    cell.type !== "ground"
+                    boardData[rowIndex + 1]
+                    && boardData[rowIndex + 1][cellIndex].type === 'empty'
+                    && cell.type !== 'ground'
                 ) {
                     const changecell = boardData[rowIndex + 1][cellIndex];
                     boardData[rowIndex + 1][cellIndex] = cell;
                     return changecell;
-                } else if (
-                    boardData[rowIndex + 1] &&
-                    boardData[rowIndex + 1][cellIndex + 1] &&
-                    boardData[rowIndex + 1][cellIndex + 1].type === "empty" &&
-                    boardData[rowIndex][cellIndex + 1].type === "ground" &&
-                    cell.type !== "ground"
+                }
+                if (
+                    boardData[rowIndex + 1]
+                    && boardData[rowIndex + 1][cellIndex + 1]
+                    && boardData[rowIndex + 1][cellIndex + 1].type === 'empty'
+                    && boardData[rowIndex][cellIndex + 1].type === 'ground'
+                    && cell.type !== 'ground'
                 ) {
                     const changecell = boardData[rowIndex + 1][cellIndex + 1];
                     boardData[rowIndex + 1][cellIndex + 1] = cell;
                     return changecell;
-                } else if (
-                    boardData[rowIndex + 1] &&
-                    boardData[rowIndex + 1][cellIndex - 1] &&
-                    boardData[rowIndex + 1][cellIndex - 1].type === "empty" &&
-                    boardData[rowIndex][cellIndex - 1].type === "ground" &&
-                    cell.type !== "ground"
+                }
+                if (
+                    boardData[rowIndex + 1]
+                    && boardData[rowIndex + 1][cellIndex - 1]
+                    && boardData[rowIndex + 1][cellIndex - 1].type === 'empty'
+                    && boardData[rowIndex][cellIndex - 1].type === 'ground'
+                    && cell.type !== 'ground'
                 ) {
                     const changecell = boardData[rowIndex + 1][cellIndex - 1];
                     boardData[rowIndex + 1][cellIndex - 1] = cell;
@@ -421,71 +418,65 @@ class App extends React.Component {
         bd.forEach((row, rowId) => {
             row.forEach((cell, cellIndex) => {
                 if (
-                    !bd[rowId][cellIndex].toDelete ||
-                    bd[rowId][cellIndex].type === "ground"
+                    !bd[rowId][cellIndex].toDelete
+                    || bd[rowId][cellIndex].type === 'ground'
                 ) {
                     accumBoard[rowId][cellIndex] = { ...cell };
                     return;
                 }
-                const checkVertical =
-                    bd[rowId + 1] &&
-                    bd[rowId - 1] &&
-                    bd[rowId + 1][cellIndex].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type;
+                const checkVertical = bd[rowId + 1]
+                    && bd[rowId - 1]
+                    && bd[rowId + 1][cellIndex].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type;
 
-                const checkHorizontal =
-                    bd[rowId][cellIndex + 1] &&
-                    bd[rowId][cellIndex - 1] &&
-                    bd[rowId][cellIndex + 1].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type;
+                const checkHorizontal = bd[rowId][cellIndex + 1]
+                    && bd[rowId][cellIndex - 1]
+                    && bd[rowId][cellIndex + 1].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type;
 
                 if (checkVertical) {
-                    const checkRight =
-                        bd[rowId][cellIndex + 1] &&
-                        bd[rowId][cellIndex + 2] &&
-                        bd[rowId][cellIndex + 1].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId][cellIndex + 2].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkRight = bd[rowId][cellIndex + 1]
+                        && bd[rowId][cellIndex + 2]
+                        && bd[rowId][cellIndex + 1].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId][cellIndex + 2].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkLeft =
-                        bd[rowId][cellIndex - 1] &&
-                        bd[rowId][cellIndex - 2] &&
-                        bd[rowId][cellIndex - 1].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId][cellIndex - 2].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkLeft = bd[rowId][cellIndex - 1]
+                        && bd[rowId][cellIndex - 2]
+                        && bd[rowId][cellIndex - 1].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId][cellIndex - 2].type
+                            === bd[rowId][cellIndex].type;
 
                     if (checkRight || checkLeft) {
                         accumBoard[rowId][cellIndex] = {
-                            url: "url(../images/mine.png)",
-                            type: "mine",
+                            url: 'url(../images/mine.png)',
+                            type: 'mine',
                             toDelete: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
                 } else if (checkHorizontal) {
-                    const checkBot =
-                        bd[rowId + 1] &&
-                        bd[rowId + 2] &&
-                        bd[rowId + 1][cellIndex].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId + 2][cellIndex].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkBot = bd[rowId + 1]
+                        && bd[rowId + 2]
+                        && bd[rowId + 1][cellIndex].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId + 2][cellIndex].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkTop =
-                        bd[rowId - 1] &&
-                        bd[rowId - 2] &&
-                        bd[rowId - 1][cellIndex].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId - 2][cellIndex].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkTop = bd[rowId - 1]
+                        && bd[rowId - 2]
+                        && bd[rowId - 1][cellIndex].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId - 2][cellIndex].type
+                            === bd[rowId][cellIndex].type;
 
                     if (checkBot || checkTop) {
                         accumBoard[rowId][cellIndex] = {
-                            url: "url(../images/mine.png)",
-                            type: "mine",
+                            url: 'url(../images/mine.png)',
+                            type: 'mine',
                             toDelete: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
@@ -504,47 +495,43 @@ class App extends React.Component {
         bd.forEach((row, rowId) => {
             row.forEach((cell, cellIndex) => {
                 if (
-                    !bd[rowId][cellIndex].toDelete ||
-                    bd[rowId][cellIndex].type === "ground"
+                    !bd[rowId][cellIndex].toDelete
+                    || bd[rowId][cellIndex].type === 'ground'
                 ) {
                     accumBoard[rowId][cellIndex] = { ...cell };
                     return;
                 }
-                const checkBot =
-                    bd[rowId + 1] &&
-                    bd[rowId + 2] &&
-                    bd[rowId + 1][cellIndex].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type;
+                const checkBot = bd[rowId + 1]
+                    && bd[rowId + 2]
+                    && bd[rowId + 1][cellIndex].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type;
 
-                const checkTop =
-                    bd[rowId - 1] &&
-                    bd[rowId - 2] &&
-                    bd[rowId - 1][cellIndex].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
+                const checkTop = bd[rowId - 1]
+                    && bd[rowId - 2]
+                    && bd[rowId - 1][cellIndex].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
 
                 if (checkBot || checkTop) {
-                    const checkRight =
-                        bd[rowId][cellIndex + 1] &&
-                        bd[rowId][cellIndex + 2] &&
-                        bd[rowId][cellIndex + 1].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId][cellIndex + 2].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkRight = bd[rowId][cellIndex + 1]
+                        && bd[rowId][cellIndex + 2]
+                        && bd[rowId][cellIndex + 1].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId][cellIndex + 2].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkLeft =
-                        bd[rowId][cellIndex - 1] &&
-                        bd[rowId][cellIndex - 2] &&
-                        bd[rowId][cellIndex - 1].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId][cellIndex - 2].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkLeft = bd[rowId][cellIndex - 1]
+                        && bd[rowId][cellIndex - 2]
+                        && bd[rowId][cellIndex - 1].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId][cellIndex - 2].type
+                            === bd[rowId][cellIndex].type;
 
                     if (checkRight || checkLeft) {
                         accumBoard[rowId][cellIndex] = {
-                            url: "url(../images/mine.png)",
-                            type: "mine",
+                            url: 'url(../images/mine.png)',
+                            type: 'mine',
                             toDelete: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
@@ -563,121 +550,111 @@ class App extends React.Component {
         bd.forEach((row, rowId) => {
             row.forEach((cell, cellIndex) => {
                 if (
-                    !bd[rowId][cellIndex].toDelete ||
-                    bd[rowId][cellIndex].type === "ground"
+                    !bd[rowId][cellIndex].toDelete
+                    || bd[rowId][cellIndex].type === 'ground'
                 ) {
                     accumBoard[rowId][cellIndex] = { ...cell };
                     return;
                 }
-                const checkVerticalBot =
-                    bd[rowId + 1] &&
-                    bd[rowId + 2] &&
-                    bd[rowId - 1] &&
-                    bd[rowId + 1][cellIndex].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId + 2][cellIndex].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type;
+                const checkVerticalBot = bd[rowId + 1]
+                    && bd[rowId + 2]
+                    && bd[rowId - 1]
+                    && bd[rowId + 1][cellIndex].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId + 2][cellIndex].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type;
 
-                const checkVerticalTop =
-                    bd[rowId - 1] &&
-                    bd[rowId - 2] &&
-                    bd[rowId + 1] &&
-                    bd[rowId - 1][cellIndex].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId - 2][cellIndex].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type;
+                const checkVerticalTop = bd[rowId - 1]
+                    && bd[rowId - 2]
+                    && bd[rowId + 1]
+                    && bd[rowId - 1][cellIndex].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId - 2][cellIndex].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type;
 
-                const checkHorizontalLeft =
-                    bd[rowId][cellIndex + 1] &&
-                    bd[rowId][cellIndex + 2] &&
-                    bd[rowId][cellIndex - 1] &&
-                    bd[rowId][cellIndex + 1].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId][cellIndex + 2].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type;
+                const checkHorizontalLeft = bd[rowId][cellIndex + 1]
+                    && bd[rowId][cellIndex + 2]
+                    && bd[rowId][cellIndex - 1]
+                    && bd[rowId][cellIndex + 1].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex + 2].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type;
 
-                const checkHorizontalRight =
-                    bd[rowId][cellIndex - 1] &&
-                    bd[rowId][cellIndex - 2] &&
-                    bd[rowId][cellIndex + 1] &&
-                    bd[rowId][cellIndex - 1].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId][cellIndex - 2].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type;
+                const checkHorizontalRight = bd[rowId][cellIndex - 1]
+                    && bd[rowId][cellIndex - 2]
+                    && bd[rowId][cellIndex + 1]
+                    && bd[rowId][cellIndex - 1].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex - 2].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type;
 
                 if (checkVerticalBot || checkVerticalTop) {
-                    const checkPositionLeft =
-                        bd[rowId][cellIndex + 1] &&
-                        bd[rowId][cellIndex + 2] &&
-                        bd[rowId][cellIndex + 1].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId][cellIndex + 2].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionLeft = bd[rowId][cellIndex + 1]
+                        && bd[rowId][cellIndex + 2]
+                        && bd[rowId][cellIndex + 1].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId][cellIndex + 2].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkPositionMiddle =
-                        bd[rowId][cellIndex - 1] &&
-                        bd[rowId][cellIndex + 1] &&
-                        bd[rowId][cellIndex - 1].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId][cellIndex + 1].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionMiddle = bd[rowId][cellIndex - 1]
+                        && bd[rowId][cellIndex + 1]
+                        && bd[rowId][cellIndex - 1].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId][cellIndex + 1].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkPositionRight =
-                        bd[rowId][cellIndex - 1] &&
-                        bd[rowId][cellIndex - 2] &&
-                        bd[rowId][cellIndex - 1].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId][cellIndex - 2].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionRight = bd[rowId][cellIndex - 1]
+                        && bd[rowId][cellIndex - 2]
+                        && bd[rowId][cellIndex - 1].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId][cellIndex - 2].type
+                            === bd[rowId][cellIndex].type;
 
                     if (
-                        checkPositionLeft ||
-                        checkPositionMiddle ||
-                        checkPositionRight
+                        checkPositionLeft
+                        || checkPositionMiddle
+                        || checkPositionRight
                     ) {
                         accumBoard[rowId][cellIndex] = {
-                            url: "url(../images/x-mine.png)",
-                            type: "x-mine",
+                            url: 'url(../images/x-mine.png)',
+                            type: 'x-mine',
                             toDelete: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
                 } else if (checkHorizontalLeft || checkHorizontalRight) {
-                    const checkPositionTop =
-                        bd[rowId - 1] &&
-                        bd[rowId - 2] &&
-                        bd[rowId - 1][cellIndex].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId - 2][cellIndex].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionTop = bd[rowId - 1]
+                        && bd[rowId - 2]
+                        && bd[rowId - 1][cellIndex].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId - 2][cellIndex].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkPositionMiddle =
-                        bd[rowId + 1] &&
-                        bd[rowId - 1] &&
-                        bd[rowId + 1][cellIndex].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId - 1][cellIndex].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionMiddle = bd[rowId + 1]
+                        && bd[rowId - 1]
+                        && bd[rowId + 1][cellIndex].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId - 1][cellIndex].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkPositionBot =
-                        bd[rowId + 1] &&
-                        bd[rowId + 2] &&
-                        bd[rowId + 1][cellIndex].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId + 2][cellIndex].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionBot = bd[rowId + 1]
+                        && bd[rowId + 2]
+                        && bd[rowId + 1][cellIndex].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId + 2][cellIndex].type
+                            === bd[rowId][cellIndex].type;
 
                     if (
-                        checkPositionTop ||
-                        checkPositionMiddle ||
-                        checkPositionBot
+                        checkPositionTop
+                        || checkPositionMiddle
+                        || checkPositionBot
                     ) {
                         accumBoard[rowId][cellIndex] = {
-                            url: "url(../images/x-mine.png)",
-                            type: "x-mine",
+                            url: 'url(../images/x-mine.png)',
+                            type: 'x-mine',
                             toDelete: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
@@ -696,107 +673,99 @@ class App extends React.Component {
         bd.forEach((row, rowId) => {
             row.forEach((cell, cellIndex) => {
                 if (
-                    !bd[rowId][cellIndex].toDelete ||
-                    bd[rowId][cellIndex].type === "ground"
+                    !bd[rowId][cellIndex].toDelete
+                    || bd[rowId][cellIndex].type === 'ground'
                 ) {
                     accumBoard[rowId][cellIndex] = { ...cell };
                     return;
                 }
-                const checkVertical =
-                    bd[rowId + 1] &&
-                    bd[rowId + 2] && // top
-                    bd[rowId + 1][cellIndex].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId + 2][cellIndex].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId - 1] &&
-                    bd[rowId - 2] && // bottom
-                    bd[rowId - 1][cellIndex].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
+                const checkVertical = bd[rowId + 1]
+                    && bd[rowId + 2] // top
+                    && bd[rowId + 1][cellIndex].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId + 2][cellIndex].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId - 1]
+                    && bd[rowId - 2] // bottom
+                    && bd[rowId - 1][cellIndex].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
 
-                const checkHorizontal =
-                    bd[rowId][cellIndex + 1] &&
-                    bd[rowId][cellIndex + 2] && // right
-                    bd[rowId][cellIndex + 1].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId][cellIndex + 2].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId][cellIndex - 1] &&
-                    bd[rowId][cellIndex - 2] && // left
-                    bd[rowId][cellIndex - 1].type ===
-                        bd[rowId][cellIndex].type &&
-                    bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
+                const checkHorizontal = bd[rowId][cellIndex + 1]
+                    && bd[rowId][cellIndex + 2] // right
+                    && bd[rowId][cellIndex + 1].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex + 2].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex - 1]
+                    && bd[rowId][cellIndex - 2] // left
+                    && bd[rowId][cellIndex - 1].type
+                        === bd[rowId][cellIndex].type
+                    && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
 
                 if (checkVertical) {
-                    const checkPositionLeft =
-                        bd[rowId][cellIndex + 1] &&
-                        bd[rowId][cellIndex + 2] &&
-                        bd[rowId][cellIndex + 1].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId][cellIndex + 2].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionLeft = bd[rowId][cellIndex + 1]
+                        && bd[rowId][cellIndex + 2]
+                        && bd[rowId][cellIndex + 1].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId][cellIndex + 2].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkPositionMiddle =
-                        bd[rowId][cellIndex - 1] &&
-                        bd[rowId][cellIndex + 1] &&
-                        bd[rowId][cellIndex - 1].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId][cellIndex + 1].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionMiddle = bd[rowId][cellIndex - 1]
+                        && bd[rowId][cellIndex + 1]
+                        && bd[rowId][cellIndex - 1].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId][cellIndex + 1].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkPositionRight =
-                        bd[rowId][cellIndex - 1] &&
-                        bd[rowId][cellIndex - 2] &&
-                        bd[rowId][cellIndex - 1].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId][cellIndex - 2].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionRight = bd[rowId][cellIndex - 1]
+                        && bd[rowId][cellIndex - 2]
+                        && bd[rowId][cellIndex - 1].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId][cellIndex - 2].type
+                            === bd[rowId][cellIndex].type;
 
                     if (
-                        checkPositionLeft ||
-                        checkPositionMiddle ||
-                        checkPositionRight
+                        checkPositionLeft
+                        || checkPositionMiddle
+                        || checkPositionRight
                     ) {
                         accumBoard[rowId][cellIndex] = {
-                            url: "url(../images/three-line.png)",
-                            type: "three-row",
+                            url: 'url(../images/three-line.png)',
+                            type: 'three-row',
                             toDelete: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
                 } else if (checkHorizontal) {
-                    const checkPositionTop =
-                        bd[rowId - 1] &&
-                        bd[rowId - 2] &&
-                        bd[rowId - 1][cellIndex].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId - 2][cellIndex].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionTop = bd[rowId - 1]
+                        && bd[rowId - 2]
+                        && bd[rowId - 1][cellIndex].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId - 2][cellIndex].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkPositionMiddle =
-                        bd[rowId + 1] &&
-                        bd[rowId - 1] &&
-                        bd[rowId + 1][cellIndex].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId - 1][cellIndex].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionMiddle = bd[rowId + 1]
+                        && bd[rowId - 1]
+                        && bd[rowId + 1][cellIndex].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId - 1][cellIndex].type
+                            === bd[rowId][cellIndex].type;
 
-                    const checkPositionBot =
-                        bd[rowId + 1] &&
-                        bd[rowId + 2] &&
-                        bd[rowId + 1][cellIndex].type ===
-                            bd[rowId][cellIndex].type &&
-                        bd[rowId + 2][cellIndex].type ===
-                            bd[rowId][cellIndex].type;
+                    const checkPositionBot = bd[rowId + 1]
+                        && bd[rowId + 2]
+                        && bd[rowId + 1][cellIndex].type
+                            === bd[rowId][cellIndex].type
+                        && bd[rowId + 2][cellIndex].type
+                            === bd[rowId][cellIndex].type;
 
                     if (
-                        checkPositionTop ||
-                        checkPositionMiddle ||
-                        checkPositionBot
+                        checkPositionTop
+                        || checkPositionMiddle
+                        || checkPositionBot
                     ) {
                         accumBoard[rowId][cellIndex] = {
-                            url: "url(../images/three-line.png)",
-                            type: "three-row",
+                            url: 'url(../images/three-line.png)',
+                            type: 'three-row',
                             toDelete: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
@@ -819,22 +788,21 @@ class App extends React.Component {
                 let arrayColumnOfFourOrFive = [];
                 if (boardData[rowIndex + sizeCheckRow - 1]) {
                     for (let index = 0; index < sizeCheckRow; index += 1) {
-                        arrayColumnOfFourOrFive[index] =
-                            boardData[rowIndex + index][cellIndex];
+                        arrayColumnOfFourOrFive[index] = boardData[rowIndex + index][cellIndex];
                     }
                 } else {
                     arrayColumnOfFourOrFive = null;
                 }
-                const urlImageTorpedaRow = "url(../images/torpedo-row.png)";
-                const urlImageTorpedaColumn = "url(../images/torpedo-col.png)";
-                const typeBonusOfColumn = "torpedoOfColumn";
-                const typeBonusOfRow = "torpedoOfRow";
+                const urlImageTorpedaRow = 'url(../images/torpedo-row.png)';
+                const urlImageTorpedaColumn = 'url(../images/torpedo-col.png)';
+                const typeBonusOfColumn = 'torpedoOfColumn';
+                const typeBonusOfRow = 'torpedoOfRow';
 
                 function getCheckArray(checkArray, urlImage, typeBonus) {
                     if (checkArray) {
                         const isCheckOfFourAndFive = checkArray.every(
                             (cell, index, arr) => {
-                                if (cell.type === "ground") return false;
+                                if (cell.type === 'ground') return false;
                                 if (index !== arr.length - 1) {
                                     return (
                                         cell.type === checkArray[index + 1].type
@@ -847,22 +815,19 @@ class App extends React.Component {
                         if (isCheckOfFourAndFive) {
                             checkArray.forEach((cell, index) => {
                                 if (indexBonus !== index) {
-                                    cell.url = "";
-                                    cell.type = "empty";
-                                    cell.toDelete = false;
+                                    // cell.url = '';
+                                    // cell.type = 'empty';
+                                    cell.toDelete = true;
                                 } else {
                                     if (sizeCheckRow === 5) {
                                         cell.colorDelete = cell.type;
-                                        console.log("cell :>> ", cell);
                                     }
-                                    cell.url =
-                                        sizeCheckRow === 4
-                                            ? urlImage
-                                            : "url(../images/rainbow.jpg)";
-                                    cell.type =
-                                        sizeCheckRow === 4
-                                            ? typeBonus
-                                            : "rainbow";
+                                    cell.url = sizeCheckRow === 4
+                                        ? urlImage
+                                        : 'url(../images/rainbow.jpg)';
+                                    cell.type = sizeCheckRow === 4
+                                        ? typeBonus
+                                        : 'rainbow';
                                     cell.toDelete = false;
                                 }
                             });
@@ -889,8 +854,7 @@ class App extends React.Component {
                         typeBonusOfColumn
                     );
                     for (let index = 0; index < sizeCheckRow; index += 1) {
-                        boardData[rowIndex + index][cellIndex] =
-                            arrayColumnOfFourOrFive[index];
+                        boardData[rowIndex + index][cellIndex] = arrayColumnOfFourOrFive[index];
                     }
                 }
             });
@@ -901,20 +865,19 @@ class App extends React.Component {
     handleDelete(boardData) {
         const newBoardData = boardData.map((row, rowId) => {
             return row.map((cell, cellId) => {
-                const condition =
-                    cell.type === "ground" &&
-                    ((boardData[rowId - 1] &&
-                        boardData[rowId - 1][cellId].toDelete &&
-                        boardData[rowId - 1][cellId].type !== "ground") ||
-                        (boardData[rowId + 1] &&
-                            boardData[rowId + 1][cellId].toDelete &&
-                            boardData[rowId + 1][cellId].type !== "ground") ||
-                        (boardData[rowId][cellId + 1] &&
-                            boardData[rowId][cellId + 1].toDelete &&
-                            boardData[rowId][cellId + 1].type !== "ground") ||
-                        (boardData[rowId][cellId - 1] &&
-                            boardData[rowId][cellId - 1].toDelete &&
-                            boardData[rowId][cellId - 1].type !== "ground"));
+                const condition = cell.type === 'ground'
+                    && ((boardData[rowId - 1]
+                        && boardData[rowId - 1][cellId].toDelete
+                        && boardData[rowId - 1][cellId].type !== 'ground')
+                        || (boardData[rowId + 1]
+                            && boardData[rowId + 1][cellId].toDelete
+                            && boardData[rowId + 1][cellId].type !== 'ground')
+                        || (boardData[rowId][cellId + 1]
+                            && boardData[rowId][cellId + 1].toDelete
+                            && boardData[rowId][cellId + 1].type !== 'ground')
+                        || (boardData[rowId][cellId - 1]
+                            && boardData[rowId][cellId - 1].toDelete
+                            && boardData[rowId][cellId - 1].type !== 'ground'));
                 if (condition) {
                     cell.toDelete = true;
                 }
@@ -926,23 +889,23 @@ class App extends React.Component {
             return row.map((cell) => {
                 if (cell.toDelete) {
                     if (cell.isFrozen) {
-                        const newUrlCell = cell.url.replace(
-                            /candy--frozen.jpg/,
-                            "candy.png"
-                        );
                         return {
-                            url: newUrlCell,
+                            url: cell.url.replace(
+                                /candy--frozen.jpg/,
+                                'candy.png'
+                            ),
                             type: cell.type,
                             toDelete: false,
                             isFrozen: false,
                         };
                     }
                     return {
-                        url: "",
-                        type: "empty",
+                        url: '',
+                        type: 'empty',
                         toDelete: false,
                     };
-                } else return cell;
+                }
+                return cell;
             });
         });
 
@@ -955,7 +918,7 @@ class App extends React.Component {
 
         boardData.forEach((rowArray, indexRow) => {
             rowArray.forEach((item, indexItem) => {
-                if (item.type === "ground") return;
+                if (item.type === 'ground') return;
                 const leftCellType = rowArray[indexItem - 1]
                     ? rowArray[indexItem - 1].type
                     : null;
@@ -1022,7 +985,7 @@ class App extends React.Component {
                 <div
                     className="cell square fake cell-hidden"
                     style={{
-                        backgroundImage: "url(../images/yellow-candy.png)",
+                        backgroundImage: 'url(../images/yellow-candy.png)',
                     }}
                 />
             </div>
