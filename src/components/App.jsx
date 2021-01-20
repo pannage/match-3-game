@@ -31,51 +31,54 @@ let boardArray = new Array(8).fill(null).map(() => new Array(8).fill({ type: 1 }
         url: randColor,
         type: candies.indexOf(randColor),
         toDelete: false,
+        isFrozen: false,
     };
 }));
 
 // TODO здесь создаётся массив для замороженных ячеек
-boardArray = boardArray.map((row, rowId) => {
-    return row.map((cell, cellId) => {
-        if (rowId === 2 || rowId === 5) {
-            if (cellId === 3 || cellId === 4) {
-                cell.isFrozen = true;
-                cell.url = cell.url.replace(/candy.png/, 'candy--frozen.jpg');
-            }
-        }
-        if (rowId === 3 || rowId === 4) {
-            if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5) {
-                cell.isFrozen = true;
-                cell.url = cell.url.replace(/candy.png/, 'candy--frozen.jpg');
-            }
-        }
-        return cell;
-    });
-});
-
-
-// TODO здесь создаётся массив для земли
 // boardArray = boardArray.map((row, rowId) => {
 //     return row.map((cell, cellId) => {
 //         if (rowId === 2 || rowId === 5) {
-//             if (cellId === 3 || cellId === 4)
-//                 return {
-//                     url: "url(../images/ground.png)",
-//                     type: "ground",
-//                     toDelete: false,
-//                 };
+//             if (cellId === 3 || cellId === 4) {
+//                 cell.isFrozen = true;
+//                 cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
+//             }
 //         }
 //         if (rowId === 3 || rowId === 4) {
-//             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5)
-//                 return {
-//                     url: "url(../images/ground.png)",
-//                     type: "ground",
-//                     toDelete: false,
-//                 };
+//             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5) {
+//                 cell.isFrozen = true;
+//                 cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
+//             }
 //         }
 //         return cell;
 //     });
 // });
+
+
+// TODO здесь создаётся массив для земли
+boardArray = boardArray.map((row, rowId) => {
+    return row.map((cell, cellId) => {
+        if (rowId === 2 || rowId === 5) {
+            if (cellId === 3 || cellId === 4)
+                return {
+                    url: "url(../images/ground.png)",
+                    type: "ground",
+                    toDelete: false,
+                    isFrozen: false,
+                };
+        }
+        if (rowId === 3 || rowId === 4) {
+            if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5)
+                return {
+                    url: "url(../images/ground.png)",
+                    type: "ground",
+                    toDelete: false,
+                    isFrozen: false,
+                };
+        }
+        return cell;
+    });
+});
 
 class App extends React.Component {
     constructor(props) {
@@ -119,94 +122,96 @@ class App extends React.Component {
         }
     }
 
+    checkColumn(cell, boardData) {
+        for (let i = cell.y; i < 8; i += 1) {
+            if (boardData[i][cell.x].type === 'ground'){
+                boardData[i][cell.x].toDelete = true;
+                i = 8;
+            } else {
+                boardData[i][cell.x].toDelete = true;
+            }
+        }
+        for (let i = cell.y; i >= 0; i -= 1) {
+            if (boardData[i][cell.x].type === 'ground'){
+                boardData[i][cell.x].toDelete = true;
+                i = -1;
+            } else {
+                boardData[i][cell.x].toDelete = true;
+            }
+        }
+        return boardData;
+    }
+
+    checkRow(cell, boardData) {
+        for (let i = cell.x; i < 8; i += 1) {
+            if (boardData[cell.y][i].type === 'ground'){
+                boardData[cell.y][i].toDelete = true;
+                i = 8;
+            } else {
+                boardData[cell.y][i].toDelete = true;
+            }
+        }
+        for (let i = cell.x; i >= 0; i -= 1) {
+            if (boardData[cell.y][i].type === 'ground'){
+                boardData[cell.y][i].toDelete = true;
+                i = -1;
+            } else {
+                boardData[cell.y][i].toDelete = true;
+            }
+        }
+        return boardData;
+    }
+
     handleDoubleClick(e) {
         const cell = {
             y: parseInt(e.target.dataset.rowIndex, 10),
             x: parseInt(e.target.dataset.cellIndex, 10),
         };
-        const boardData = JSON.parse(JSON.stringify(this.state.boardData));
+        let boardData = JSON.parse(JSON.stringify(this.state.boardData));
         switch (boardData[cell.y][cell.x].type) {
-        case 'torpedoOfRow':
-            for (let i = 0; i < 8; i += 1) {
-                if (boardData[cell.y][i].isFrozen) {
-                    const newUrlCell = boardData[cell.y][i].url.replace(
-                        /candy--frozen.jpg/,
-                        'candy.png'
-                    );
-                    boardData[cell.y][i].isFrozen = false;
-                    boardData[cell.y][i].url = newUrlCell;
-                } else {
-                    boardData[cell.y][i].toDelete = true;
-                }
-            }
-            break;
         case 'torpedoOfColumn':
-            for (let i = 0; i < 8; i += 1) {
-                if (boardData[i][cell.x].isFrozen) {
-                    const newUrlCell = boardData[i][cell.x].url.replace(
-                        /candy--frozen.jpg/,
-                        'candy.png'
-                    );
-                    boardData[i][cell.x].isFrozen = false;
-                    boardData[i][cell.x].url = newUrlCell;
-                } else {
-                    boardData[i][cell.x].toDelete = true;
-                }
-            }
+            boardData = this.checkColumn(cell, boardData);
+            break;
+        case 'torpedoOfRow':
+            boardData = this.checkRow(cell, boardData);
             break;
         case 'mine':
             boardData[cell.y][cell.x].toDelete = true;
-            if (boardData[cell.y][cell.x + 1]) {
-                boardData[cell.y][cell.x + 1].toDelete = true;
-            }
-            if (
-                boardData[cell.y + 1]
-                    && boardData[cell.y + 1][cell.x + 1]
-            ) {
-                boardData[cell.y + 1][cell.x + 1].toDelete = true;
-            }
-            if (boardData[cell.y + 1]) {
-                boardData[cell.y + 1][cell.x].toDelete = true;
-            }
-            if (
-                boardData[cell.y + 1]
-                    && boardData[cell.y + 1][cell.x - 1]
-            ) {
-                boardData[cell.y + 1][cell.x - 1].toDelete = true;
-            }
-            if (boardData[cell.y][cell.x - 1]) {
-                boardData[cell.y][cell.x - 1].toDelete = true;
-            }
-            if (
-                boardData[cell.y - 1]
-                    && boardData[cell.y - 1][cell.x - 1]
-            ) {
-                boardData[cell.y - 1][cell.x - 1].toDelete = true;
-            }
-            if (boardData[cell.y - 1]) {
-                boardData[cell.y - 1][cell.x].toDelete = true;
-            }
-            if (
-                boardData[cell.y - 1]
-                    && boardData[cell.y - 1][cell.x + 1]
-            ) {
-                boardData[cell.y - 1][cell.x + 1].toDelete = true;
-            }
+            if (boardData[cell.y][cell.x + 1]) { boardData[cell.y][cell.x + 1].toDelete = true; }
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x + 1]) { boardData[cell.y + 1][cell.x + 1].toDelete = true; }
+            if (boardData[cell.y + 1]) { boardData[cell.y + 1][cell.x].toDelete = true; }
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x - 1]) { boardData[cell.y + 1][cell.x - 1].toDelete = true; }
+            if (boardData[cell.y][cell.x - 1]) { boardData[cell.y][cell.x - 1].toDelete = true; }
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x - 1]) { boardData[cell.y - 1][cell.x - 1].toDelete = true; }
+            if (boardData[cell.y - 1]) { boardData[cell.y - 1][cell.x].toDelete = true; }
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x + 1]) { boardData[cell.y - 1][cell.x + 1].toDelete = true; }
             break;
         case 'x-mine':
-            for (let i = 0; i < 8; i += 1) {
-                boardData[i][cell.x].toDelete = true;
-                boardData[cell.y][i].toDelete = true;
-            }
+            boardData = this.checkRow(cell, boardData);
+            boardData = this.checkColumn(cell, boardData);
             break;
         case 'three-row':
-            for (let i = 0; i < 8; i += 1) {
-                boardData[i][cell.x].toDelete = true;
-                boardData[cell.y][i].toDelete = true;
-                if (boardData[cell.y + 1]) boardData[cell.y + 1][i].toDelete = true;
-                if (boardData[cell.y - 1]) boardData[cell.y - 1][i].toDelete = true;
-                if (boardData[cell.y][cell.x + 1]) boardData[i][cell.x + 1].toDelete = true;
-                if (boardData[cell.y][cell.x - 1]) boardData[i][cell.x - 1].toDelete = true;
+            boardData = this.checkColumn(cell, boardData);
+            boardData = this.checkRow(cell, boardData);
+            if (boardData[cell.y + 1]) {
+                cell.y += 1;
+                boardData = this.checkRow(cell, boardData);
+                cell.y -= 1;
+                }
+            if (boardData[cell.y - 1]) {
+                cell.y -= 1;
+                boardData = this.checkRow(cell, boardData);
+                cell.y += 1;
+            }
+            if (boardData[cell.y][cell.x + 1]) {
+                cell.x += 1;
+                boardData = this.checkRow(cell, boardData);
+                cell.x -= 1;
+            }
+            if (boardData[cell.y][cell.x - 1]) {
+                cell.x -= 1;
+                boardData = this.checkRow(cell, boardData);
+                cell.x += 1;
             }
             break;
         default:
@@ -333,9 +338,10 @@ class App extends React.Component {
             return row.map((item, cellIndex) => {
                 if (colorCell === item.type && item.isFrozen) {
                     return {
-                        url: item.url.replace(/candy--frozen.jpg/, 'candy.png'),
+                        url: item.url.replace(/candy-ice.png/, 'candy.png'),
                         type: item.type,
                         toDelete: false,
+                        isFrozen: false,
                     };
                 }
                 if (colorCell === item.type) {
@@ -346,11 +352,7 @@ class App extends React.Component {
             });
         });
 
-        newBoardData[this.cellToDrag.y][this.cellToDrag.x] = {
-            url: '',
-            type: 'empty',
-            toDelete: false,
-        };
+        newBoardData[this.cellToDrag.y][this.cellToDrag.x].toDelete = true;
 
         return newBoardData;
     }
@@ -367,6 +369,7 @@ class App extends React.Component {
                         url: randColor,
                         type: this.candies.indexOf(randColor),
                         toDelete: false,
+                        isFrozen: false,
                     };
                 }
                 if (
@@ -374,31 +377,60 @@ class App extends React.Component {
                     && boardData[rowIndex + 1][cellIndex].type === 'empty'
                     && cell.type !== 'ground'
                 ) {
-                    const changecell = boardData[rowIndex + 1][cellIndex];
-                    boardData[rowIndex + 1][cellIndex] = cell;
-                    return changecell;
-                }
-                if (
-                    boardData[rowIndex + 1]
-                    && boardData[rowIndex + 1][cellIndex + 1]
-                    && boardData[rowIndex + 1][cellIndex + 1].type === 'empty'
-                    && boardData[rowIndex][cellIndex + 1].type === 'ground'
-                    && cell.type !== 'ground'
-                ) {
-                    const changecell = boardData[rowIndex + 1][cellIndex + 1];
-                    boardData[rowIndex + 1][cellIndex + 1] = cell;
-                    return changecell;
-                }
-                if (
-                    boardData[rowIndex + 1]
-                    && boardData[rowIndex + 1][cellIndex - 1]
+                    let changeCell;
+                    if (cell.isFrozen && !boardData[rowIndex + 1][cellIndex].isFrozen) {
+                        changeCell = {...boardData[rowIndex + 1][cellIndex]};
+                        changeCell.isFrozen = true;
+                        boardData[rowIndex + 1][cellIndex] = {...cell};
+                        boardData[rowIndex + 1][cellIndex].isFrozen = false;
+                        boardData[rowIndex + 1][cellIndex].url = boardData[rowIndex + 1][cellIndex].url.replace(
+                            /candy-ice.png/,
+                            'candy.png'
+                        );
+                    } else if (!cell.isFrozen && boardData[rowIndex + 1][cellIndex].isFrozen) {
+                        changeCell = {...boardData[rowIndex + 1][cellIndex]};
+                        changeCell.isFrozen = false;
+                        boardData[rowIndex + 1][cellIndex] = {...cell};
+                        boardData[rowIndex + 1][cellIndex].isFrozen = true;
+                        boardData[rowIndex + 1][cellIndex].url = boardData[rowIndex + 1][cellIndex].url.replace(
+                            /candy.png/,
+                            'candy-ice.png'
+                        );
+                    } else {
+                        changeCell = boardData[rowIndex + 1][cellIndex];
+                        boardData[rowIndex + 1][cellIndex] = cell;
+                    }
+                    return changeCell;
+                } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex - 1]
                     && boardData[rowIndex + 1][cellIndex - 1].type === 'empty'
                     && boardData[rowIndex][cellIndex - 1].type === 'ground'
-                    && cell.type !== 'ground'
-                ) {
-                    const changecell = boardData[rowIndex + 1][cellIndex - 1];
+                    && cell.type !== 'ground') {
+                    const changeCell = boardData[rowIndex + 1][cellIndex - 1];
                     boardData[rowIndex + 1][cellIndex - 1] = cell;
-                    return changecell;
+                    return changeCell;
+                } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex + 1]
+                    && boardData[rowIndex + 1][cellIndex + 1].type === 'empty'
+                    && boardData[rowIndex][cellIndex + 1].type === 'ground'
+                    && cell.type !== 'ground') {
+                    const changeCell = boardData[rowIndex + 1][cellIndex + 1];
+                    boardData[rowIndex + 1][cellIndex + 1] = cell;
+                    return changeCell;
+                } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex - 1]
+                    && boardData[rowIndex + 1][cellIndex - 1].type === 'empty' && cell.type !== 'ground'
+                    && boardData[rowIndex][cellIndex - 1].type === 'empty' && boardData[rowIndex - 1]
+                    && boardData[rowIndex - 1][cellIndex - 1].type === 'ground'
+                ) {
+                    const changeCell = boardData[rowIndex + 1][cellIndex - 1];
+                    boardData[rowIndex + 1][cellIndex - 1] = cell;
+                    return changeCell;
+                } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex + 1]
+                        && boardData[rowIndex + 1][cellIndex + 1].type === 'empty' && cell.type !== 'ground'
+                        && boardData[rowIndex][cellIndex + 1].type === 'empty' && boardData[rowIndex - 1]
+                        && boardData[rowIndex - 1][cellIndex + 1].type === 'ground'
+                ) {
+                    const changeCell = boardData[rowIndex + 1][cellIndex + 1];
+                    boardData[rowIndex + 1][cellIndex + 1] = cell;
+                    return changeCell;
                 }
                 return cell;
             });
@@ -456,6 +488,7 @@ class App extends React.Component {
                             url: 'url(../images/mine.png)',
                             type: 'mine',
                             toDelete: false,
+                            isFrozen: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
                 } else if (checkHorizontal) {
@@ -478,6 +511,7 @@ class App extends React.Component {
                             url: 'url(../images/mine.png)',
                             type: 'mine',
                             toDelete: false,
+                            isFrozen: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
                 } else accumBoard[rowId][cellIndex] = { ...cell };
@@ -533,6 +567,7 @@ class App extends React.Component {
                             url: 'url(../images/mine.png)',
                             type: 'mine',
                             toDelete: false,
+                            isFrozen: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
                 } else accumBoard[rowId][cellIndex] = { ...cell };
@@ -620,9 +655,10 @@ class App extends React.Component {
                         || checkPositionRight
                     ) {
                         accumBoard[rowId][cellIndex] = {
-                            url: 'url(../images/x-mine.png)',
+                            url: 'url(../images/x-bomb.png)',
                             type: 'x-mine',
                             toDelete: false,
+                            isFrozen: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
                 } else if (checkHorizontalLeft || checkHorizontalRight) {
@@ -653,9 +689,10 @@ class App extends React.Component {
                         || checkPositionBot
                     ) {
                         accumBoard[rowId][cellIndex] = {
-                            url: 'url(../images/x-mine.png)',
+                            url: 'url(../images/x-bomb.png)',
                             type: 'x-mine',
                             toDelete: false,
+                            isFrozen: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
                 } else accumBoard[rowId][cellIndex] = { ...cell };
@@ -731,9 +768,10 @@ class App extends React.Component {
                         || checkPositionRight
                     ) {
                         accumBoard[rowId][cellIndex] = {
-                            url: 'url(../images/three-line.png)',
+                            url: 'url(../images/xx-bomb.png)',
                             type: 'three-row',
                             toDelete: false,
+                            isFrozen: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
                 } else if (checkHorizontal) {
@@ -764,9 +802,10 @@ class App extends React.Component {
                         || checkPositionBot
                     ) {
                         accumBoard[rowId][cellIndex] = {
-                            url: 'url(../images/three-line.png)',
+                            url: 'url(../images/xx-bomb.png)',
                             type: 'three-row',
                             toDelete: false,
+                            isFrozen: false,
                         };
                     } else accumBoard[rowId][cellIndex] = { ...cell };
                 } else accumBoard[rowId][cellIndex] = { ...cell };
@@ -815,8 +854,6 @@ class App extends React.Component {
                         if (isCheckOfFourAndFive) {
                             checkArray.forEach((cell, index) => {
                                 if (indexBonus !== index) {
-                                    // cell.url = '';
-                                    // cell.type = 'empty';
                                     cell.toDelete = true;
                                 } else {
                                     if (sizeCheckRow === 5) {
@@ -824,7 +861,7 @@ class App extends React.Component {
                                     }
                                     cell.url = sizeCheckRow === 4
                                         ? urlImage
-                                        : 'url(../images/rainbow.jpg)';
+                                        : 'url(../images/rainbow.png)';
                                     cell.type = sizeCheckRow === 4
                                         ? typeBonus
                                         : 'rainbow';
@@ -891,7 +928,7 @@ class App extends React.Component {
                     if (cell.isFrozen) {
                         return {
                             url: cell.url.replace(
-                                /candy--frozen.jpg/,
+                                /candy-ice.png/,
                                 'candy.png'
                             ),
                             type: cell.type,
@@ -903,6 +940,7 @@ class App extends React.Component {
                         url: '',
                         type: 'empty',
                         toDelete: false,
+                        isFrozen: false,
                     };
                 }
                 return cell;
