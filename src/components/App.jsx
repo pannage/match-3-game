@@ -41,13 +41,13 @@ boardArray = boardArray.map((row, rowId) => {
         if (rowId === 2 || rowId === 5) {
             if (cellId === 3 || cellId === 4) {
                 cell.isFrozen = true;
-                cell.url = cell.url.replace(/candy.png/, 'candy--frozen.jpg');
+                cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
             }
         }
         if (rowId === 3 || rowId === 4) {
             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5) {
                 cell.isFrozen = true;
-                cell.url = cell.url.replace(/candy.png/, 'candy--frozen.jpg');
+                cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
             }
         }
         return cell;
@@ -131,7 +131,7 @@ class App extends React.Component {
             for (let i = 0; i < 8; i += 1) {
                 if (boardData[cell.y][i].isFrozen) {
                     const newUrlCell = boardData[cell.y][i].url.replace(
-                        /candy--frozen.jpg/,
+                        /candy-ice.png/,
                         'candy.png'
                     );
                     boardData[cell.y][i].isFrozen = false;
@@ -145,7 +145,7 @@ class App extends React.Component {
             for (let i = 0; i < 8; i += 1) {
                 if (boardData[i][cell.x].isFrozen) {
                     const newUrlCell = boardData[i][cell.x].url.replace(
-                        /candy--frozen.jpg/,
+                        /candy-ice.png/,
                         'candy.png'
                     );
                     boardData[i][cell.x].isFrozen = false;
@@ -334,7 +334,7 @@ class App extends React.Component {
             return row.map((item, cellIndex) => {
                 if (colorCell === item.type && item.isFrozen) {
                     return {
-                        url: item.url.replace(/candy--frozen.jpg/, 'candy.png'),
+                        url: item.url.replace(/candy-ice.png/, 'candy.png'),
                         type: item.type,
                         toDelete: false,
                     };
@@ -732,7 +732,7 @@ class App extends React.Component {
                         || checkPositionRight
                     ) {
                         accumBoard[rowId][cellIndex] = {
-                            url: 'url(../images/three-line.png)',
+                            url: 'url(../images/xx-bomb.png)',
                             type: 'three-row',
                             toDelete: false,
                         };
@@ -765,7 +765,7 @@ class App extends React.Component {
                         || checkPositionBot
                     ) {
                         accumBoard[rowId][cellIndex] = {
-                            url: 'url(../images/three-line.png)',
+                            url: 'url(../images/xx-bomb.png)',
                             type: 'three-row',
                             toDelete: false,
                         };
@@ -825,7 +825,7 @@ class App extends React.Component {
                                     }
                                     cell.url = sizeCheckRow === 4
                                         ? urlImage
-                                        : 'url(../images/rainbow.jpg)';
+                                        : 'url(../images/rainbow.png)';
                                     cell.type = sizeCheckRow === 4
                                         ? typeBonus
                                         : 'rainbow';
@@ -892,7 +892,7 @@ class App extends React.Component {
                     if (cell.isFrozen) {
                         return {
                             url: cell.url.replace(
-                                /candy--frozen.jpg/,
+                                /candy-ice.png/,
                                 'candy.png'
                             ),
                             type: cell.type,
