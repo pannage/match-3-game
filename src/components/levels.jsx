@@ -7,16 +7,16 @@ export default class LevelRoad extends React.Component {
         return (
             <div className="level-road">
                 <div className="level-wrapper">
-                    <div className="level-7 level-btn"></div>
-                    <div className="level-6 level-btn"></div>
-                    <div className="level-5 level-btn"></div>
-                    <div className="level-4 level-btn"></div>
-                    <div className="level-3 level-btn"></div>
-                    <div className="level-2 level-btn"></div>
-                    <div className="level-1 level-btn"></div>
+                    <div className="level-7 level-btn" />
+                    <div className="level-6 level-btn" />
+                    <div className="level-5 level-btn" />
+                    <div className="level-4 level-btn" />
+                    <div className="level-3 level-btn" />
+                    <div className="level-2 level-btn" />
+                    <div className="level-1 level-btn" />
                 </div>
             </div>
 
-        )
+        );
     }
 }
