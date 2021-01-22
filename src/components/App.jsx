@@ -5,7 +5,6 @@ import Board from './Board.jsx';
 import LevelRoad from './levels.jsx';
 import checkNumberLevel from './loadLevels.js';
 
-
 // function CreateScore(props) {
 //     const { score } = props;
 //     return (
@@ -18,7 +17,6 @@ import checkNumberLevel from './loadLevels.js';
 // CreateScore.propTypes = {
 //     score: PropTypes.number.isRequired,
 // };
-
 
 // const candies = [
 //     'url(../images/red-candy.png)',
@@ -348,7 +346,7 @@ class App extends React.Component {
     //     this.cellToReplace = undefined;
     // }
 
-  dragEnd() {
+    dragEnd() {
         if (!this.cellToDrag) return;
         const movementVector = {
             x: this.cellToReplace.x - this.cellToDrag.x,
@@ -362,8 +360,8 @@ class App extends React.Component {
         let boardData = JSON.parse(JSON.stringify(this.state.boardData));
 
         if ((boardData[this.cellToDrag.y][this.cellToDrag.x].type
-                === 'rainbow'
-                && this.cellToDrag.y !== this.cellToReplace.y)
+            === 'rainbow'
+            && this.cellToDrag.y !== this.cellToReplace.y)
             || this.cellToDrag.y.isFrozen !== this.cellToReplace.y.isFrozen) {
             boardData = this.startBonusRainbow(boardData);
         } else if (this.cellToReplace !== undefined && isMoveValid) {
@@ -463,7 +461,6 @@ class App extends React.Component {
                     let changeCell;
 
                     if (cell.isFrozen && !boardData[rowIndex + 1][cellIndex].isFrozen) {
-
                         changeCell = { ...boardData[rowIndex + 1][cellIndex] };
                         changeCell.isFrozen = true;
                         boardData[rowIndex + 1][cellIndex] = { ...cell };
@@ -474,7 +471,6 @@ class App extends React.Component {
                             'candy.png'
                         );
                     } else if (!cell.isFrozen && boardData[rowIndex + 1][cellIndex].isFrozen) {
-
                         changeCell = { ...boardData[rowIndex + 1][cellIndex] };
                         changeCell.isFrozen = false;
                         boardData[rowIndex + 1][cellIndex] = { ...cell };
@@ -487,8 +483,8 @@ class App extends React.Component {
                         boardData[rowIndex + 1][cellIndex] = cell;
                     }
                     return changeCell;
-                } 
-              if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex - 1]
+                }
+                if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex - 1]
                     && boardData[rowIndex + 1][cellIndex - 1].type === 'empty'
                     && boardData[rowIndex][cellIndex - 1].type === 'ground'
                     && cell.type !== 'ground'
@@ -496,7 +492,6 @@ class App extends React.Component {
                     const changeCell = boardData[rowIndex + 1][cellIndex - 1];
                     boardData[rowIndex + 1][cellIndex - 1] = cell;
                     return changeCell;
-
                 } if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex + 1]
                     && boardData[rowIndex + 1][cellIndex + 1].type === 'empty'
                     && boardData[rowIndex][cellIndex + 1].type === 'ground'
@@ -505,7 +500,6 @@ class App extends React.Component {
                     const changeCell = boardData[rowIndex + 1][cellIndex + 1];
                     boardData[rowIndex + 1][cellIndex + 1] = cell;
                     return changeCell;
-
                 } if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex - 1]
                     && boardData[rowIndex + 1][cellIndex - 1].type === 'empty' && cell.type !== 'ground'
                     && boardData[rowIndex][cellIndex - 1].type === 'empty' && boardData[rowIndex - 1]
@@ -515,9 +509,9 @@ class App extends React.Component {
                     boardData[rowIndex + 1][cellIndex - 1] = cell;
                     return changeCell;
                 } if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex + 1]
-                        && boardData[rowIndex + 1][cellIndex + 1].type === 'empty' && cell.type !== 'ground'
-                        && boardData[rowIndex][cellIndex + 1].type === 'empty' && boardData[rowIndex - 1]
-                        && boardData[rowIndex - 1][cellIndex + 1].type === 'ground'
+                    && boardData[rowIndex + 1][cellIndex + 1].type === 'empty' && cell.type !== 'ground'
+                    && boardData[rowIndex][cellIndex + 1].type === 'empty' && boardData[rowIndex - 1]
+                    && boardData[rowIndex - 1][cellIndex + 1].type === 'ground'
                 ) {
                     const changeCell = boardData[rowIndex + 1][cellIndex + 1];
                     boardData[rowIndex + 1][cellIndex + 1] = cell;
@@ -1092,8 +1086,6 @@ class App extends React.Component {
                 onMouseDown={(event) => this.onMouseDown(event)}
                 onMouseUp={(event) => this.onMouseUp(event)}
             >
-                <LevelRoad />
-                {/* <CreateScore score={score} /> */}
                 <div
                     className="grid"
                     onDragStart={(e) => e.preventDefault()}
