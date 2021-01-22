@@ -1,4 +1,3 @@
-// import App from "./App";
 const candies = [
     "url(../images/red-candy.png)",
     "url(../images/yellow-candy.png)",
@@ -49,6 +48,7 @@ function getBoardDataOfLevel1() {
                 cell.isFrozen = true;
                 cell.url = cell.url.replace(/candy.png/, "candy-ice.png");
             }
+
             return cell;
         });
     });
@@ -63,18 +63,22 @@ function getBoardDataOfLevel1() {
     // });
 }
 
+// const valid = [];
+
 function getBoardDataOfLevel2() {
+
     return boardData.map((row, rowId) => {
         return row.map((cell, cellId) => {
             if (rowId === 2 || rowId === 5) {
                 if (cellId === 3 || cellId === 4)
-                    return {
+                    {return {
                         url: "url(../images/ground.png)",
                         type: "ground",
                         toDelete: false,
                         isFrozen: false,
-                    };
+                    };}
             }
+
             if (rowId === 3 || rowId === 4) {
                 if (
                     cellId === 2 ||
@@ -82,13 +86,14 @@ function getBoardDataOfLevel2() {
                     cellId === 4 ||
                     cellId === 5
                 )
-                    return {
+                    {return {
                         url: "url(../images/ground.png)",
                         type: "ground",
                         toDelete: false,
                         isFrozen: false,
-                    };
+                    };}
             }
+
             return cell;
         });
     });
@@ -106,7 +111,9 @@ function checkNumberLevel(target) {
     // const { target } = event;
     // if (target.dataset.typeBtn !== "level") return;
     let boardData = [];
+
     const { level } = target.dataset;
+
     switch (level) {
         case "1":
             boardData = getBoardDataOfLevel1();
@@ -135,10 +142,10 @@ function checkNumberLevel(target) {
             boardData = getBoardDataOfLevel7();
 
             break;
-
         default:
             break;
     }
+
     // console.log("event.target:>> ", event.target);
     // console.log("object :>> ", isClickButtonLevel);
     return boardData;
