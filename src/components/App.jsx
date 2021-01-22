@@ -173,96 +173,96 @@ class App extends React.Component {
         };
         let boardData = e.target.redraw ? data : JSON.parse(JSON.stringify(this.state.boardData));
         switch (boardData[cell.y][cell.x].type) {
-        case 'torpedoOfColumn':
-            boardData = this.checkColumn(cell, boardData);
-            break;
-        case 'torpedoOfRow':
-            boardData = this.checkRow(cell, boardData);
-            break;
-        case 'rainbow':
-            const colorCell = boardData[e.target.rainbowSet.rowIndex][e.target.rainbowSet.cellIndex].type;
+            case 'torpedoOfColumn':
+                boardData = this.checkColumn(cell, boardData);
+                break;
+            case 'torpedoOfRow':
+                boardData = this.checkRow(cell, boardData);
+                break;
+            case 'rainbow':
+                const colorCell = boardData[e.target.rainbowSet.rowIndex][e.target.rainbowSet.cellIndex].type;
 
-            const newBoardData = boardData.map((row) => {
-                return row.map((item) => {
-                    if (colorCell === item.type) {
-                        item.toDelete = true;
-                    }
-                    return item;
+                const newBoardData = boardData.map((row) => {
+                    return row.map((item) => {
+                        if (colorCell === item.type) {
+                            item.toDelete = true;
+                        }
+                        return item;
+                    });
                 });
-            });
-            boardData = newBoardData;
-            boardData[cell.y][cell.x].toDelete = true;
-            break;
-        case 'mine':
-            boardData[cell.y][cell.x].toDelete = true;
-            if (boardData[cell.y][cell.x + 1]) {
-                boardData[cell.y][cell.x + 1].toDelete = true;
-            }
-            if (
-                boardData[cell.y + 1]
+                boardData = newBoardData;
+                boardData[cell.y][cell.x].toDelete = true;
+                break;
+            case 'mine':
+                boardData[cell.y][cell.x].toDelete = true;
+                if (boardData[cell.y][cell.x + 1]) {
+                    boardData[cell.y][cell.x + 1].toDelete = true;
+                }
+                if (
+                    boardData[cell.y + 1]
                     && boardData[cell.y + 1][cell.x + 1]
-            ) {
-                boardData[cell.y + 1][cell.x + 1].toDelete = true;
-            }
-            if (boardData[cell.y + 1]) {
-                boardData[cell.y + 1][cell.x].toDelete = true;
-            }
-            if (
-                boardData[cell.y + 1]
+                ) {
+                    boardData[cell.y + 1][cell.x + 1].toDelete = true;
+                }
+                if (boardData[cell.y + 1]) {
+                    boardData[cell.y + 1][cell.x].toDelete = true;
+                }
+                if (
+                    boardData[cell.y + 1]
                     && boardData[cell.y + 1][cell.x - 1]
-            ) {
-                boardData[cell.y + 1][cell.x - 1].toDelete = true;
-            }
-            if (boardData[cell.y][cell.x - 1]) {
-                boardData[cell.y][cell.x - 1].toDelete = true;
-            }
-            if (
-                boardData[cell.y - 1]
+                ) {
+                    boardData[cell.y + 1][cell.x - 1].toDelete = true;
+                }
+                if (boardData[cell.y][cell.x - 1]) {
+                    boardData[cell.y][cell.x - 1].toDelete = true;
+                }
+                if (
+                    boardData[cell.y - 1]
                     && boardData[cell.y - 1][cell.x - 1]
-            ) {
-                boardData[cell.y - 1][cell.x - 1].toDelete = true;
-            }
-            if (boardData[cell.y - 1]) {
-                boardData[cell.y - 1][cell.x].toDelete = true;
-            }
-            if (
-                boardData[cell.y - 1]
+                ) {
+                    boardData[cell.y - 1][cell.x - 1].toDelete = true;
+                }
+                if (boardData[cell.y - 1]) {
+                    boardData[cell.y - 1][cell.x].toDelete = true;
+                }
+                if (
+                    boardData[cell.y - 1]
                     && boardData[cell.y - 1][cell.x + 1]
-            ) {
-                boardData[cell.y - 1][cell.x + 1].toDelete = true;
-            }
-            break;
-        case 'x-mine':
-            boardData = this.checkRow(cell, boardData);
-            boardData = this.checkColumn(cell, boardData);
-            break;
-        case 'three-row':
-            boardData = this.checkColumn(cell, boardData);
-            boardData = this.checkRow(cell, boardData);
-            if (boardData[cell.y + 1]) {
-                cell.y += 1;
+                ) {
+                    boardData[cell.y - 1][cell.x + 1].toDelete = true;
+                }
+                break;
+            case 'x-mine':
                 boardData = this.checkRow(cell, boardData);
-                cell.y -= 1;
-            }
-            if (boardData[cell.y - 1]) {
-                cell.y -= 1;
+                boardData = this.checkColumn(cell, boardData);
+                break;
+            case 'three-row':
+                boardData = this.checkColumn(cell, boardData);
                 boardData = this.checkRow(cell, boardData);
-                cell.y += 1;
-            }
-            if (boardData[cell.y][cell.x + 1]) {
-                cell.x += 1;
-                boardData = this.checkRow(cell, boardData);
-                cell.x -= 1;
-            }
-            if (boardData[cell.y][cell.x - 1]) {
-                cell.x -= 1;
-                boardData = this.checkRow(cell, boardData);
-                cell.x += 1;
-            }
-            break;
-        default:
-            if (!e.target.redraw) e.preventDefault();
-            break;
+                if (boardData[cell.y + 1]) {
+                    cell.y += 1;
+                    boardData = this.checkRow(cell, boardData);
+                    cell.y -= 1;
+                }
+                if (boardData[cell.y - 1]) {
+                    cell.y -= 1;
+                    boardData = this.checkRow(cell, boardData);
+                    cell.y += 1;
+                }
+                if (boardData[cell.y][cell.x + 1]) {
+                    cell.x += 1;
+                    boardData = this.checkRow(cell, boardData);
+                    cell.x -= 1;
+                }
+                if (boardData[cell.y][cell.x - 1]) {
+                    cell.x -= 1;
+                    boardData = this.checkRow(cell, boardData);
+                    cell.x += 1;
+                }
+                break;
+            default:
+                if (!e.target.redraw) e.preventDefault();
+                break;
         }
         if (e.target.redraw) {
             return boardData;
@@ -346,25 +346,93 @@ class App extends React.Component {
     //     this.cellToReplace = undefined;
     // }
 
+    // dragEnd() {
+    //     if (!this.cellToDrag) return;
+    //     const movementVector = {
+    //         x: this.cellToReplace.x - this.cellToDrag.x,
+    //         y: this.cellToReplace.y - this.cellToDrag.y,
+    //     };
+
+    //     let bonusUsed = false;
+
+    //     const isMoveValid = Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
+
+    //     let boardData = JSON.parse(JSON.stringify(this.state.boardData));
+
+    //     if ((boardData[this.cellToDrag.y][this.cellToDrag.x].type
+    //         === 'rainbow'
+    //         && this.cellToDrag.y !== this.cellToReplace.y)
+    //         || this.cellToDrag.y.isFrozen !== this.cellToReplace.y.isFrozen) {
+    //         boardData = this.startBonusRainbow(boardData);
+    //     } else if (this.cellToReplace !== undefined && isMoveValid) {
+    //         const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
+    //         boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
+    //         boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+
+    //         if (typeof boardData[this.cellToDrag.y][this.cellToDrag.x].type
+    //             !== 'number') {
+    //             bonusUsed = true;
+    //             const dragBonusEvent = {
+    //                 target: {
+    //                     dataset: {
+    //                         rowIndex: this.cellToDrag.y,
+    //                         cellIndex: this.cellToDrag.x,
+    //                     },
+    //                     rainbowSet: {
+    //                         rowIndex: this.cellToReplace.y,
+    //                         cellIndex: this.cellToReplace.x,
+    //                     },
+    //                     redraw: true,
+    //                 },
+    //             };
+    //             boardData = this.handleDoubleClick(dragBonusEvent, boardData);
+    //         } else if (typeof boardData[this.cellToReplace.y][this.cellToReplace.x].type
+    //             !== 'number') {
+    //             bonusUsed = true;
+    //             const dragBonusEvent = {
+    //                 target: {
+    //                     dataset: {
+    //                         rowIndex: this.cellToReplace.y,
+    //                         cellIndex: this.cellToReplace.x,
+    //                     },
+    //                     rainbowSet: {
+    //                         rowIndex: this.cellToDrag.y,
+    //                         cellIndex: this.cellToDrag.x,
+    //                     },
+    //                     redraw: true,
+    //                 },
+    //             };
+    //             boardData = this.handleDoubleClick(dragBonusEvent, boardData);
+    //         }
+    //     }
+
+    //     const isMatch3 = this.checkGameField(false, boardData);
+    //     if (!isMatch3 && !bonusUsed) {
+    //         if (this.cellToReplace !== undefined && isMoveValid) {
+    //             const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
+    //             boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
+    //             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+    //         }
+    //     } else {
+    //         this.checkGameField();
+    //     }
+
+    //     this.setState({ boardData }, () => this.checkGameField());
+    //     this.cellToReplace = undefined;
+    // }
+
     dragEnd() {
         if (!this.cellToDrag) return;
         const movementVector = {
             x: this.cellToReplace.x - this.cellToDrag.x,
             y: this.cellToReplace.y - this.cellToDrag.y,
         };
-
         let bonusUsed = false;
-
         const isMoveValid = Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
 
         let boardData = JSON.parse(JSON.stringify(this.state.boardData));
 
-        if ((boardData[this.cellToDrag.y][this.cellToDrag.x].type
-            === 'rainbow'
-            && this.cellToDrag.y !== this.cellToReplace.y)
-            || this.cellToDrag.y.isFrozen !== this.cellToReplace.y.isFrozen) {
-            boardData = this.startBonusRainbow(boardData);
-        } else if (this.cellToReplace !== undefined && isMoveValid) {
+        if (this.cellToReplace !== undefined && isMoveValid) {
             const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
             boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
@@ -414,11 +482,9 @@ class App extends React.Component {
                 boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
             }
         } else {
-            this.checkGameField();
+            this.cellToReplace = undefined;
+            this.setState({ boardData });
         }
-
-        this.setState({ boardData }, () => this.checkGameField());
-        this.cellToReplace = undefined;
     }
 
     startBonusRainbow(boardData) {
@@ -1127,7 +1193,7 @@ class App extends React.Component {
                         onClick={() => this.openLevelRoad()}
                     ></button>
                 </div>
-
+                handledoubleclick
                 <div className="app">
                     <div
                         onClick={({ target }) => this.getBoardDataOfStartLevel(
@@ -1139,8 +1205,8 @@ class App extends React.Component {
                         {!isClickButtonLevel ? (
                             <LevelRoad />
                         ) : (
-                            this.getGameField(boardData)
-                        )}
+                                this.getGameField(boardData)
+                            )}
                     </div>
 
                     {/* <CreateScore score={score} /> */}
