@@ -1,45 +1,105 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    background-image: url("../images/fw3.jpg");
+    background-size: 100%;
+    backdrop-filter: blur(3px);
+}
+
+#root {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .grid {
     height: 560px;
     min-width: 560px;
     display: flex;
     flex-wrap: wrap;
-    margin-left: 25px;
-    margin-top: 50px;
-    background-color: rgba(109, 127, 151, 0.5);
-    padding:5px;
+    background-color: rgb(64 81 97 / 78%);
+    padding: 5px;
     border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) inset, 0 1px 0 #fff;
-    color: #85796b;
+    box-shadow: 0 0px 18px rgb(249 249 249 / 80%);
+    color: #b9ac9c;
 }
 
-
 h3 {
- font-family: "Montserrat", sans-serif;
- text-transform: uppercase;
+    font-family: "Montserrat", sans-serif;
+    text-transform: uppercase;
 }
 
 h1 {
- font-family: "Montserrat", sans-serif;
- text-transform: uppercase;
- margin-top: -10px;
+    font-family: "Montserrat", sans-serif;
+    text-transform: uppercase;
+    margin-top: -10px;
+}
+
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
 }
 
 .invisible {
     background-color: white;
 }
 
-body, .app {
+/* body, .app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin: 0;
+} */
 
-  max-width: 100vh;
-  display: flex;
+.menu-btn {
+    margin-left: auto;
+    display: block;
+    margin-bottom: 10px;
+    background-image: url(https://www.flaticon.com/svg/vstatic/svg/122/122637.svg?token=exp=1611315735~hmac=35b1ccd06fe54d7754b41fd17226fcd8);
+    padding: 10px;
+    width: 60px;
+    height: 60px;
+    background-size: 100% 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 14px white;
+    transition: 0.3s;
 }
 
-body {
-    background-image: url('../images/fw3.jpg');
-    background-size: 100%;
+.menu-btn:hover {
+    transform: scale(1.1);
+    transition: 0.3s;
+}
+
+@-webkit-keyframes fadein {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@-moz-keyframes fadein {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes fadein {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+#root, .level-road, .grid {
+    animation: fadein .5s ease-in ;
 }
 
 .board {
+    /* opacity: 1;
+    transition: 0.3s; */
     flex-wrap: wrap;
 }
 
@@ -47,10 +107,12 @@ body {
     display: flex;
 }
 
-.board .cell, .cell.fake {
+.board .cell,
+.cell.fake {
     height: 70px;
     width: 70px;
     background-size: 70px;
+    cursor: pointer;
 }
 
 .cell.fake {
@@ -64,32 +126,34 @@ body {
     opacity: 0;
 }
 
-
 .score-board {
-  background-color: pink;
-  border-radius: 10px;
-  margin-top: 200px;
-  margin-left: 200px;
-  margin-bottom: 350px;
-  min-width: 200px;
+    background-color: pink;
+    border-radius: 10px;
+    margin-top: 200px;
+    margin-left: 200px;
+    margin-bottom: 350px;
+    min-width: 200px;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  text-align: center;
-  background-image: linear-gradient(#FFB6C1, #FFC0CB);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) inset, 0 1px 0 #fff;
-  color: #85796b;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    background-image: linear-gradient(#ffb6c1, #ffc0cb);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) inset, 0 1px 0 #fff;
+    color: #85796b;
 }
 
 .level-road {
- background-image: url('../images/chakras.png');
- height: 753px;
- width: 650px;
- background-color: rgba(255, 255, 255, 0.384);
- border-radius: 20px;
+    background-image: url("../images/chakras.png");
+    height: 753px;
+    width: 650px;
+    background-color: rgba(255, 255, 255, 0.384);
+    border-radius: 20px;
+}
 
+.level-btn {
+    cursor: pointer;
 }
 
 .level-wrapper {
@@ -99,47 +163,43 @@ body {
 }
 
 .level-7 {
-    background-image: url('../images/level7.png');
+    background-image: url("../images/level7.png");
     width: 4vw;
     height: 3.9vw;
     margin-bottom: 3vh;
-
 }
 
 .level-6 {
-    background-image: url('../images/level6.png');
+    background-image: url("../images/level6.png");
     width: 4vw;
     height: 2.7vw;
     margin-bottom: 7.5vh;
 }
 .level-5 {
-    background-image: url('../images/level5.png');
+    background-image: url("../images/level5.png");
     width: 4vw;
     height: 3.9vw;
     margin-bottom: 1vh;
 }
 .level-4 {
-    background-image: url('../images/level4.png');
+    background-image: url("../images/level4.png");
     width: 4vw;
     height: 3.9vw;
-
 }
 .level-3 {
-    background-image: url('../images/level3.png');
+    background-image: url("../images/level3.png");
     width: 4vw;
     height: 3.9vw;
     margin-bottom: 2vh;
 }
 .level-2 {
-    background-image: url('../images/level2.png');
+    background-image: url("../images/level2.png");
     width: 4vw;
     height: 3.9vw;
     margin-bottom: 3vh;
 }
 .level-1 {
-    background-image: url('../images/level1.png');
+    background-image: url("../images/level1.png");
     width: 4vw;
     height: 3.9vw;
 }
-
-

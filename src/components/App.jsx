@@ -18,70 +18,6 @@ import checkNumberLevel from './loadLevels.js';
 //     score: PropTypes.number.isRequired,
 // };
 
-// const candies = [
-//     "url(../images/red-candy.png)",
-//     "url(../images/yellow-candy.png)",
-//     "url(../images/orange-candy.png)",
-//     "url(../images/purple-candy.png)",
-//     "url(../images/green-candy.png)",
-//     "url(../images/blue-candy.png)",
-// ];
-
-// let boardArray = new Array(8).fill(null).map(() =>
-//     new Array(8).fill({ type: 1 }).map(() => {
-//         const randColor = candies[Math.floor(Math.random() * 6)];
-//         return {
-//             url: randColor,
-//             type: candies.indexOf(randColor),
-//             toDelete: false,
-//             isFrozen: false,
-//         };
-//     })
-// );
-
-// TODO здесь создаётся массив для замороженных ячеек
-// boardArray = boardArray.map((row, rowId) => {
-//     return row.map((cell, cellId) => {
-//         if (rowId === 2 || rowId === 5) {
-//             if (cellId === 3 || cellId === 4) {
-//                 cell.isFrozen = true;
-//                 cell.url = cell.url.replace(/candy.png/, "candy-ice.png");
-//             }
-//         }
-//         if (rowId === 3 || rowId === 4) {
-//             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5) {
-//                 cell.isFrozen = true;
-//                 cell.url = cell.url.replace(/candy.png/, "candy-ice.png");
-//             }
-//         }
-//         return cell;
-//     });
-// });
-
-// TODO здесь создаётся массив для земли
-// boardArray = boardArray.map((row, rowId) => {
-//     return row.map((cell, cellId) => {
-//         if (rowId === 2 || rowId === 5) {
-//             if (cellId === 3 || cellId === 4)
-//                 return {
-//                     url: "url(../images/ground.png)",
-//                     type: "ground",
-//                     toDelete: false,
-//                     isFrozen: false,
-//                 };
-//         }
-//         if (rowId === 3 || rowId === 4) {
-//             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5)
-//                 return {
-//                     url: "url(../images/ground.png)",
-//                     type: "ground",
-//                     toDelete: false,
-//                     isFrozen: false,
-//                 };
-//         }
-//         return cell;
-//     });
-// });
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -110,6 +46,8 @@ class App extends React.Component {
         this.checkSecondMine = this.checkSecondMine.bind(this);
         this.checkForFourAndFive = this.checkForFourAndFive.bind(this);
         this.startBonusRainbow = this.startBonusRainbow.bind(this);
+        this.openLevelRoad = this.openLevelRoad.bind(this);
+        this.getGameField = this.getGameField.bind(this);
     }
 
     componentDidMount() {
@@ -341,9 +279,10 @@ class App extends React.Component {
         let { boardData } = this.state;
 
         if (
-            boardData[this.cellToDrag.y][this.cellToDrag.x].type
+            (boardData[this.cellToDrag.y][this.cellToDrag.x].type
                 === 'rainbow'
-            && this.cellToDrag.y !== this.cellToReplace.y
+                && this.cellToDrag.y !== this.cellToReplace.y)
+            || this.cellToDrag.y.isFrozen !== this.cellToReplace.y.isFrozen
         ) {
             boardData = this.startBonusRainbow(boardData);
         } else if (this.cellToReplace !== undefined && isMoveValid) {
@@ -517,29 +456,29 @@ class App extends React.Component {
                 const checkVertical = bd[rowId + 1]
                     && bd[rowId - 1]
                     && bd[rowId + 1][cellIndex].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type;
 
                 const checkHorizontal = bd[rowId][cellIndex + 1]
                     && bd[rowId][cellIndex - 1]
                     && bd[rowId][cellIndex + 1].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type;
 
                 if (checkVertical) {
                     const checkRight = bd[rowId][cellIndex + 1]
                         && bd[rowId][cellIndex + 2]
                         && bd[rowId][cellIndex + 1].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId][cellIndex + 2].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     const checkLeft = bd[rowId][cellIndex - 1]
                         && bd[rowId][cellIndex - 2]
                         && bd[rowId][cellIndex - 1].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId][cellIndex - 2].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     if (checkRight || checkLeft) {
                         accumBoard[rowId][cellIndex] = {
@@ -553,16 +492,16 @@ class App extends React.Component {
                     const checkBot = bd[rowId + 1]
                         && bd[rowId + 2]
                         && bd[rowId + 1][cellIndex].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId + 2][cellIndex].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     const checkTop = bd[rowId - 1]
                         && bd[rowId - 2]
                         && bd[rowId - 1][cellIndex].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId - 2][cellIndex].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     if (checkBot || checkTop) {
                         accumBoard[rowId][cellIndex] = {
@@ -596,29 +535,29 @@ class App extends React.Component {
                 const checkBot = bd[rowId + 1]
                     && bd[rowId + 2]
                     && bd[rowId + 1][cellIndex].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type;
 
                 const checkTop = bd[rowId - 1]
                     && bd[rowId - 2]
                     && bd[rowId - 1][cellIndex].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
 
                 if (checkBot || checkTop) {
                     const checkRight = bd[rowId][cellIndex + 1]
                         && bd[rowId][cellIndex + 2]
                         && bd[rowId][cellIndex + 1].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId][cellIndex + 2].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     const checkLeft = bd[rowId][cellIndex - 1]
                         && bd[rowId][cellIndex - 2]
                         && bd[rowId][cellIndex - 1].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId][cellIndex - 2].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     if (checkRight || checkLeft) {
                         accumBoard[rowId][cellIndex] = {
@@ -653,59 +592,59 @@ class App extends React.Component {
                     && bd[rowId + 2]
                     && bd[rowId - 1]
                     && bd[rowId + 1][cellIndex].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId + 2][cellIndex].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId - 1][cellIndex].type === bd[rowId][cellIndex].type;
 
                 const checkVerticalTop = bd[rowId - 1]
                     && bd[rowId - 2]
                     && bd[rowId + 1]
                     && bd[rowId - 1][cellIndex].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId - 2][cellIndex].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId + 1][cellIndex].type === bd[rowId][cellIndex].type;
 
                 const checkHorizontalLeft = bd[rowId][cellIndex + 1]
                     && bd[rowId][cellIndex + 2]
                     && bd[rowId][cellIndex - 1]
                     && bd[rowId][cellIndex + 1].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId][cellIndex + 2].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId][cellIndex - 1].type === bd[rowId][cellIndex].type;
 
                 const checkHorizontalRight = bd[rowId][cellIndex - 1]
                     && bd[rowId][cellIndex - 2]
                     && bd[rowId][cellIndex + 1]
                     && bd[rowId][cellIndex - 1].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId][cellIndex - 2].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId][cellIndex + 1].type === bd[rowId][cellIndex].type;
 
                 if (checkVerticalBot || checkVerticalTop) {
                     const checkPositionLeft = bd[rowId][cellIndex + 1]
                         && bd[rowId][cellIndex + 2]
                         && bd[rowId][cellIndex + 1].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId][cellIndex + 2].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     const checkPositionMiddle = bd[rowId][cellIndex - 1]
                         && bd[rowId][cellIndex + 1]
                         && bd[rowId][cellIndex - 1].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId][cellIndex + 1].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     const checkPositionRight = bd[rowId][cellIndex - 1]
                         && bd[rowId][cellIndex - 2]
                         && bd[rowId][cellIndex - 1].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId][cellIndex - 2].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     if (
                         checkPositionLeft
@@ -723,23 +662,23 @@ class App extends React.Component {
                     const checkPositionTop = bd[rowId - 1]
                         && bd[rowId - 2]
                         && bd[rowId - 1][cellIndex].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId - 2][cellIndex].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     const checkPositionMiddle = bd[rowId + 1]
                         && bd[rowId - 1]
                         && bd[rowId + 1][cellIndex].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId - 1][cellIndex].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     const checkPositionBot = bd[rowId + 1]
                         && bd[rowId + 2]
                         && bd[rowId + 1][cellIndex].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId + 2][cellIndex].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     if (
                         checkPositionTop
@@ -777,48 +716,48 @@ class App extends React.Component {
                 const checkVertical = bd[rowId + 1]
                     && bd[rowId + 2] // top
                     && bd[rowId + 1][cellIndex].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId + 2][cellIndex].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId - 1]
                     && bd[rowId - 2] // bottom
                     && bd[rowId - 1][cellIndex].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
 
                 const checkHorizontal = bd[rowId][cellIndex + 1]
                     && bd[rowId][cellIndex + 2] // right
                     && bd[rowId][cellIndex + 1].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId][cellIndex + 2].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId][cellIndex - 1]
                     && bd[rowId][cellIndex - 2] // left
                     && bd[rowId][cellIndex - 1].type
-                        === bd[rowId][cellIndex].type
+                    === bd[rowId][cellIndex].type
                     && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
 
                 if (checkVertical) {
                     const checkPositionLeft = bd[rowId][cellIndex + 1]
                         && bd[rowId][cellIndex + 2]
                         && bd[rowId][cellIndex + 1].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId][cellIndex + 2].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     const checkPositionMiddle = bd[rowId][cellIndex - 1]
                         && bd[rowId][cellIndex + 1]
                         && bd[rowId][cellIndex - 1].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId][cellIndex + 1].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     const checkPositionRight = bd[rowId][cellIndex - 1]
                         && bd[rowId][cellIndex - 2]
                         && bd[rowId][cellIndex - 1].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId][cellIndex - 2].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     if (
                         checkPositionLeft
@@ -836,27 +775,24 @@ class App extends React.Component {
                     const checkPositionTop = bd[rowId - 1]
                         && bd[rowId - 2]
                         && bd[rowId - 1][cellIndex].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId - 2][cellIndex].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
                     const checkPositionMiddle = bd[rowId + 1]
                         && bd[rowId - 1]
                         && bd[rowId + 1][cellIndex].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId - 1][cellIndex].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
-                    const checkPositionBot = bd[rowId + 1]
-                        && bd[rowId + 2]
+                    const checkPositionBot = bd[rowId + 1] && bd[rowId + 2]
                         && bd[rowId + 1][cellIndex].type
-                            === bd[rowId][cellIndex].type
+                        === bd[rowId][cellIndex].type
                         && bd[rowId + 2][cellIndex].type
-                            === bd[rowId][cellIndex].type;
+                        === bd[rowId][cellIndex].type;
 
-                    if (
-                        checkPositionTop
-                        || checkPositionMiddle
+                    if (checkPositionTop || checkPositionMiddle
                         || checkPositionBot
                     ) {
                         accumBoard[rowId][cellIndex] = {
@@ -1058,11 +994,13 @@ class App extends React.Component {
 
     getGameField(boardData) {
         return (
-            <div>
+            <div
+                onMouseMove={(event) => this.onMouseMove(event)}
+                onMouseDown={(event) => this.onMouseDown(event)}
+                onMouseUp={(event) => this.onMouseUp(event)}
+            >
                 <div
                     className="grid"
-                    // onClick={() => checkNumberLevel(isClickButtonLevel)}
-                    // onKeyDown={this.handleClick}
                     onDragStart={(e) => e.preventDefault()}
                     onDoubleClick={this.handleDoubleClick}
                 >
@@ -1078,10 +1016,6 @@ class App extends React.Component {
         );
     }
 
-    handleClick() {
-
-    }
-
     getBoardDataOfStartLevel(target, isClickButtonLevel) {
         if (target.dataset.typeBtn !== 'level') return;
 
@@ -1090,32 +1024,40 @@ class App extends React.Component {
         this.setState({ boardData, isClickButtonLevel: isActiveLevel });
     }
 
+    openLevelRoad() {
+        this.setState({ isClickButtonLevel: false });
+    }
+
     render() {
         const { score } = this.state;
         const { boardData, isClickButtonLevel } = this.state;
 
         return (
-            <div
-                className="app"
-                // onMouseMove={(event) => this.onMouseMove(event)}
-                // onMouseDown={(event) => this.onMouseDown(event)}
-                // onMouseUp={(event) => this.onMouseUp(event)}
-            >
-                <div
-                    onClick={({ target }) => this.getBoardDataOfStartLevel(
-                        target,
-                        isClickButtonLevel
-                    )}
-                    // onKeyDown={this.handleClick}
-                >
-                    {!isClickButtonLevel ? (
-                        <LevelRoad />
-                    ) : (
-                        this.getGameField(boardData)
-                    )}
+            <div>
+                <div className="menu">
+                    <button
+                        className="menu-btn"
+                        onClick={() => this.openLevelRoad()}
+                    ></button>
                 </div>
 
-                {/* <CreateScore score={score} /> */}
+                <div className="app">
+                    <div
+                        onClick={({ target }) => this.getBoardDataOfStartLevel(
+                            target,
+                            isClickButtonLevel
+                        )
+                        }
+                    >
+                        {!isClickButtonLevel ? (
+                            <LevelRoad />
+                        ) : (
+                            this.getGameField(boardData)
+                        )}
+                    </div>
+
+                    {/* <CreateScore score={score} /> */}
+                </div>
             </div>
         );
     }
