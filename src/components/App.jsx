@@ -19,24 +19,24 @@ import checkNumberLevel from './loadLevels.js';
 //     score: PropTypes.number.isRequired,
 // };
 
-// const candies = [
-//     'url(../images/red-candy.png)',
-//     'url(../images/yellow-candy.png)',
-//     'url(../images/orange-candy.png)',
-//     'url(../images/purple-candy.png)',
-//     'url(../images/green-candy.png)',
-//     'url(../images/blue-candy.png)',
-// ];
+const candies = [
+    'url(../images/red-candy.png)',
+    'url(../images/yellow-candy.png)',
+    'url(../images/orange-candy.png)',
+    'url(../images/purple-candy.png)',
+    'url(../images/green-candy.png)',
+    'url(../images/blue-candy.png)',
+];
 
-// const boardArray = new Array(8).fill(null).map(() => new Array(8).fill({ type: 1 }).map(() => {
-//     const randColor = candies[Math.floor(Math.random() * 6)];
-//     return {
-//         url: randColor,
-//         type: candies.indexOf(randColor),
-//         toDelete: false,
-//         isFrozen: false,
-//     };
-// }));
+const boardArray = new Array(8).fill(null).map(() => new Array(8).fill({ type: 1 }).map(() => {
+    const randColor = candies[Math.floor(Math.random() * 6)];
+    return {
+        url: randColor,
+        type: candies.indexOf(randColor),
+        toDelete: false,
+        isFrozen: false,
+    };
+}));
 
 // TODO здесь создаётся массив для замороженных ячеек
 boardArray = boardArray.map((row, rowId) => {
@@ -57,48 +57,48 @@ boardArray = boardArray.map((row, rowId) => {
     });
 });
 
-// boardArray = boardArray.map((row, rowId) => {
-//     return row.map((cell, cellId) => {
-//         if (rowId === 2 || rowId === 5) {
-//             if (cellId === 3 || cellId === 4) {
-//                 cell.isFrozen = true;
-//                 cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
-//             }
-//         }
-//         if (rowId === 3 || rowId === 4) {
-//             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5) {
-//                 cell.isFrozen = true;
-//                 cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
-//             }
-//         }
-//         return cell;
-//     });
-// });
+boardArray = boardArray.map((row, rowId) => {
+    return row.map((cell, cellId) => {
+        if (rowId === 2 || rowId === 5) {
+            if (cellId === 3 || cellId === 4) {
+                cell.isFrozen = true;
+                cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
+            }
+        }
+        if (rowId === 3 || rowId === 4) {
+            if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5) {
+                cell.isFrozen = true;
+                cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
+            }
+        }
+        return cell;
+    });
+});
 
 // TODO здесь создаётся массив для земли
-// boardArray = boardArray.map((row, rowId) => {
-//     return row.map((cell, cellId) => {
-//         if (rowId === 2 || rowId === 5) {
-//             if (cellId === 3 || cellId === 4)
-//                 return {
-//                     url: "url(../images/ground.png)",
-//                     type: "ground",
-//                     toDelete: false,
-//                     isFrozen: false,
-//                 };
-//         }
-//         if (rowId === 3 || rowId === 4) {
-//             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5)
-//                 return {
-//                     url: "url(../images/ground.png)",
-//                     type: "ground",
-//                     toDelete: false,
-//                     isFrozen: false,
-//                 };
-//         }
-//         return cell;
-//     });
-// });
+boardArray = boardArray.map((row, rowId) => {
+    return row.map((cell, cellId) => {
+        if (rowId === 2 || rowId === 5) {
+            if (cellId === 3 || cellId === 4)
+                return {
+                    url: "url(../images/ground.png)",
+                    type: "ground",
+                    toDelete: false,
+                    isFrozen: false,
+                };
+        }
+        if (rowId === 3 || rowId === 4) {
+            if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5)
+                return {
+                    url: "url(../images/ground.png)",
+                    type: "ground",
+                    toDelete: false,
+                    isFrozen: false,
+                };
+        }
+        return cell;
+    });
+});
 
 class App extends React.Component {
     constructor(props) {
