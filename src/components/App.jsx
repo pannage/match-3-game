@@ -480,7 +480,8 @@ class App extends React.Component {
         };
 
         boardData = this.handleDoubleClick(dragBonusEvent, boardData);
-      } else if (
+      }
+      if (
         typeof boardData[this.cellToReplace.y][this.cellToReplace.x].type !== 'number'
       ) {
         bonusUsed = true;
