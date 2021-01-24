@@ -11,11 +11,13 @@ export default class Board extends React.Component {
                 {
                     squares.map((row, rowIndex) => {
                         const rowKey = `row-${rowIndex}`;
+
                         return (
                             <div className="board-row" key={rowKey}>
                                 {
                                     row.map((cell, cellIndex) => {
                                         const cellKey = `${rowIndex}${cellIndex}`;
+
                                         return (
                                             <div
                                                 className="cell square"
