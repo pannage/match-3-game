@@ -146,7 +146,9 @@ button {
 
 .level-road {
  background-image: url('../images/chakras.png');
- height: 60vh;
+ background-repeat: no-repeat;
+ background-position-y: center;
+ height: 65vh;
  width: 40.7rem;
  background-color: rgba(255, 255, 255, 0.384);
  border-radius: 20px;
@@ -157,9 +159,11 @@ button {
 }
 
 .level-wrapper {
-    height: 43vh;
-    width: 5vw;
+    padding-top: 3vh;
+    height: 65vh;
+    width: 3vw;
     margin: 0 auto;
+    text-align: center;
 }
 
 .level-7 {
@@ -168,7 +172,6 @@ button {
     height: 4.4rem;
     margin-bottom: 3vh;
 }
-
 .level-6 {
     background-image: url('../images/level6.png');
     width: 4.4rem;
@@ -224,6 +227,8 @@ transition: 0.2s linear;
     50% {
 
         box-shadow: 0 0 0 20px rgba(204, 169, 44, 0.1);
+        transform: scale(1.2);
+
     }
 
     70% {
@@ -237,5 +242,27 @@ transition: 0.2s linear;
   }
 
 .task-box {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.384);
+    border-radius: 20px;
+    height: 10vh;
+    width: 35.4rem;
+    margin-bottom: 1vh;
+}
 
+.moves-wrap {
+    width: 5vw;
+}
+.moves {
+    font-size: 5rem;
+    text-align: center;
+}
+
+.moves-txt {
+    text-align: center;
+    font-size: 1.5rem;
+}
+.task {
+    text-align: center;
+    font-size: 1.5rem;
 }

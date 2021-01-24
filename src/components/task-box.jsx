@@ -5,11 +5,15 @@ import '../styles/App.css';
 export default class TaskBox extends React.Component {
     render() {
         return (
-        <div>
-            <div className="task-box"></div>
-            <div></div>
-            <div></div>
-        </div>
+
+            <div className="task-box">
+                <div className="moves-wrap">
+                    <div className="moves">{this.props.moves}</div>
+                    <div className="moves-txt">moves</div>
+                </div>
+                <div className="task">{this.props.message}</div>
+            </div>
+
 
         );
     }

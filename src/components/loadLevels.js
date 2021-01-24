@@ -105,14 +105,24 @@ function getBoardDataOfLevel2() {
 function checkNumberLevel(target) {
     // const { target } = event;
     // if (target.dataset.typeBtn !== "level") return;
+    let result = {};
     let boardData = [];
     const { level } = target.dataset;
     switch (level) {
         case "1":
-            boardData = getBoardDataOfLevel1();
+            result = {
+                boardData: getBoardDataOfLevel1(),
+                taskText: `delete 10 red`,
+                moves: 30
+            }
+
             break;
         case "2":
-            boardData = getBoardDataOfLevel2();
+            result = {
+                boardData: getBoardDataOfLevel2(),
+                taskText: `30 turns`,
+                moves: 30
+            }
 
             break;
         case "3":
@@ -141,7 +151,7 @@ function checkNumberLevel(target) {
     }
     // console.log("event.target:>> ", event.target);
     // console.log("object :>> ", isClickButtonLevel);
-    return boardData;
+    return result;
 }
 
 export default checkNumberLevel;
