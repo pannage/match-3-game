@@ -292,7 +292,8 @@ class App extends React.Component {
 
       if (
         this.state.boardData[this.cellToDrag.y][this.cellToDrag.x].type === 'ground' ||
-        this.state.boardData[this.cellToDrag.y][this.cellToDrag.x].isFrozen
+        this.state.boardData[this.cellToDrag.y][this.cellToDrag.x].isFrozen ||
+        this.state.boardData[this.cellToDrag.y][this.cellToDrag.x].type === 'empty'
       ) {
         this.cellToDrag = false;
       } else {
@@ -329,7 +330,9 @@ class App extends React.Component {
             e.target.dataset.cellIndex
         ].type !== 'ground' && !this.state.boardData[e.target.dataset.rowIndex][
             e.target.dataset.cellIndex
-        ].isFrozen
+        ].isFrozen && this.state.boardData[e.target.dataset.rowIndex][
+          e.target.dataset.cellIndex
+      ].type !== 'empty'
     ) {
       this.cellToReplace = {
         y: e.target.dataset.rowIndex,
@@ -1033,57 +1036,79 @@ moveIntoSquareBelow() {
   }
 
   handleDelete(boardData) {
-    const newBoardData = boardData.map((row, rowId) => {
+    let dataBeforeDelete;
+    let newBoardData;
+    while (JSON.stringify(dataBeforeDelete) !==
+    JSON.stringify(boardData)){
+        dataBeforeDelete = JSON.parse(JSON.stringify(boardData));
+        newBoardData = boardData.map((row, rowIndex) => {
+            return row.map((cell, cellIndex) => {
+                if (cell.toDelete && typeof cell.type !== 'number' && cell.type !== 'rainbow') {
+                    const dragBonusEvent = {
+                        target: {
+                            dataset: {
+                                rowIndex,
+                                cellIndex,
+                            },
+                            redraw: true,
+                        },
+                    };
+                    boardData = this.handleDoubleClick(dragBonusEvent, boardData);
+                }
+                return cell;
+            });
+        });
+        boardData = JSON.parse(JSON.stringify(newBoardData));
+    }
+
+    newBoardData = boardData.map((row, rowId) => {
       return row.map((cell, cellId) => {
-        const condition =
-          cell.type === 'ground' &&
-          ((boardData[rowId - 1] &&
-            boardData[rowId - 1][cellId].toDelete &&
-            boardData[rowId - 1][cellId].type !== 'ground') ||
-            (boardData[rowId + 1] &&
-              boardData[rowId + 1][cellId].toDelete &&
-              boardData[rowId + 1][cellId].type !== 'ground') ||
-            (boardData[rowId][cellId + 1] &&
-              boardData[rowId][cellId + 1].toDelete &&
-              boardData[rowId][cellId + 1].type !== 'ground') ||
-            (boardData[rowId][cellId - 1] &&
-              boardData[rowId][cellId - 1].toDelete &&
-              boardData[rowId][cellId - 1].type !== 'ground'));
-
-        if (condition) {
-          cell.toDelete = true;
-        }
-
-        return cell;
-      });
-    });
-
-    boardData = newBoardData.map((row) => {
-      return row.map((cell) => {
-        if (cell.toDelete) {
-          if (cell.isFrozen) {
-            return {
-              url: cell.url.replace(/candy-ice.png/, 'candy.png'),
-              type: cell.type,
-              toDelete: false,
-              isFrozen: false,
-            };
+          const condition = cell.type === 'ground'
+              && ((boardData[rowId - 1]
+                  && boardData[rowId - 1][cellId].toDelete
+                  && boardData[rowId - 1][cellId].type !== 'ground')
+                  || (boardData[rowId + 1]
+                      && boardData[rowId + 1][cellId].toDelete
+                      && boardData[rowId + 1][cellId].type !== 'ground')
+                  || (boardData[rowId][cellId + 1]
+                      && boardData[rowId][cellId + 1].toDelete
+                      && boardData[rowId][cellId + 1].type !== 'ground')
+                  || (boardData[rowId][cellId - 1]
+                      && boardData[rowId][cellId - 1].toDelete
+                      && boardData[rowId][cellId - 1].type !== 'ground'));
+          if (condition) {
+              cell.toDelete = true;
           }
+          return cell;
+      });
+  });
 
+  boardData = newBoardData.map((row) => {
+    return row.map((cell) => {
+      if (cell.toDelete) {
+        if (cell.isFrozen) {
           return {
-            url: '',
-            type: 'empty',
+            url: cell.url.replace(/candy-ice.png/, 'candy.png'),
+            type: cell.type,
             toDelete: false,
             isFrozen: false,
           };
         }
 
-        return cell;
-      });
+        return {
+          url: '',
+          type: 'empty',
+          toDelete: false,
+          isFrozen: false,
+        };
+      }
+
+      return cell;
     });
+  });
 
     return boardData;
-  }
+}
 
   checkGameField(redraw = true, data) {
     let boardData = redraw ? JSON.parse(JSON.stringify(this.state.boardData)) : data;
