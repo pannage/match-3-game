@@ -99,7 +99,7 @@ class App extends React.Component {
       boardData: [],
       isClickButtonLevel: false,
     };
-
+    this.checkForEmptyUnderIce = this.checkForEmptyUnderIce.bind(this);
     this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
     this.handleDoubleClick = this.handleDoubleClick.bind(this);
     this.checkGameField = this.checkGameField.bind(this);
@@ -184,23 +184,23 @@ class App extends React.Component {
       case 'torpedoOfRow':
         boardData = this.checkRow(cell, boardData);
         break;
-      case 'rainbow':
-        const colorCell =
-          boardData[e.target.rainbowSet.rowIndex][e.target.rainbowSet.cellIndex].type;
+        case 'rainbow':
+            if (e.target.redraw) {
+                const colorCell = boardData[e.target.rainbowSet.rowIndex][e.target.rainbowSet.cellIndex].type;
 
-        const newBoardData = boardData.map((row) => {
-          return row.map((item) => {
-            if (colorCell === item.type) {
-              item.toDelete = true;
-            }
+                const newBoardData = boardData.map((row) => {
+                    return row.map((item) => {
+                        if (colorCell === item.type) {
+                            item.toDelete = true;
+                        }
+                        return item;
+                    });
+                });
+                boardData = newBoardData;
+                boardData[cell.y][cell.x].toDelete = true;
+            } else e.preventDefault();
 
-            return item;
-          });
-        });
-
-        boardData = newBoardData;
-        boardData[cell.y][cell.x].toDelete = true;
-        break;
+            break;
       case 'mine':
         boardData[cell.y][cell.x].toDelete = true;
 
@@ -322,10 +322,14 @@ class App extends React.Component {
     fakeCell.style.left = 0;
     fakeCell.style.top = 0;
 
+    fakeCell.style.top = 0;
     if (
-      e.target.classList.contains('cell') &&
-      this.state.boardData[e.target.dataset.rowIndex][e.target.dataset.cellIndex].type !==
-        'ground'
+        e.target.classList.contains('cell')
+        && this.state.boardData[e.target.dataset.rowIndex][
+            e.target.dataset.cellIndex
+        ].type !== 'ground' && !this.state.boardData[e.target.dataset.rowIndex][
+            e.target.dataset.cellIndex
+        ].isFrozen
     ) {
       this.cellToReplace = {
         y: e.target.dataset.rowIndex,
@@ -439,6 +443,7 @@ class App extends React.Component {
 
   dragEnd() {
     if (!this.cellToDrag) {return;}
+    if (this.cellToDrag.x === this.cellToReplace.x && this.cellToDrag.y === this.cellToReplace.y) return;
 
     const movementVector = {
       x: this.cellToReplace.x - this.cellToDrag.x,
@@ -475,7 +480,8 @@ class App extends React.Component {
         };
 
         boardData = this.handleDoubleClick(dragBonusEvent, boardData);
-      } else if (
+      }
+      if (
         typeof boardData[this.cellToReplace.y][this.cellToReplace.x].type !== 'number'
       ) {
         bonusUsed = true;
@@ -531,123 +537,92 @@ class App extends React.Component {
     return newBoardData;
   }
 
-  moveIntoSquareBelow() {
+  checkForEmptyUnderIce(rowIndex, cellIndex, boardData) {
+    let checkData = {
+        result: false,
+    };
+    for (let i = rowIndex + 2; i < 8; i++){
+        if (boardData[i][cellIndex].type === 'empty' &&
+        boardData[i-1][cellIndex].isFrozen){
+            checkData = {
+                result: true,
+                emptyRow: i,
+            };
+        }
+    }
+    return checkData;
+}
+
+moveIntoSquareBelow() {
     const { boardData } = this.state;
     const result = boardData.map((row, rowIndex) => {
-      return row.map((cell, cellIndex) => {
-        if (rowIndex === 0 && cell.type === 'empty') {
-          const randColor = this.candies[Math.floor(Math.random() * 6)];
-
-          return {
-            url: randColor,
-            type: this.candies.indexOf(randColor),
-            toDelete: false,
-            isFrozen: false,
-          };
-        }
-
-        if (
-          boardData[rowIndex + 1] &&
-          boardData[rowIndex + 1][cellIndex].type === 'empty' &&
-          cell.type !== 'ground'
-        ) {
-          let changeCell;
-
-          if (cell.isFrozen && !boardData[rowIndex + 1][cellIndex].isFrozen) {
-            changeCell = { ...boardData[rowIndex + 1][cellIndex] };
-            changeCell.isFrozen = true;
-            boardData[rowIndex + 1][cellIndex] = { ...cell };
-            boardData[rowIndex + 1][cellIndex].isFrozen = false;
-
-            boardData[rowIndex + 1][cellIndex].url = boardData[rowIndex + 1][
-              cellIndex
-            ].url.replace(/candy-ice.png/, 'candy.png');
-          } else if (!cell.isFrozen && boardData[rowIndex + 1][cellIndex].isFrozen) {
-            changeCell = { ...boardData[rowIndex + 1][cellIndex] };
-            changeCell.isFrozen = false;
-            boardData[rowIndex + 1][cellIndex] = { ...cell };
-            boardData[rowIndex + 1][cellIndex].isFrozen = true;
-            boardData[rowIndex + 1][cellIndex].url = boardData[rowIndex + 1][
-              cellIndex
-            ].url.replace(/candy.png/, 'candy-ice.png');
-          } else {
-            changeCell = boardData[rowIndex + 1][cellIndex];
-            boardData[rowIndex + 1][cellIndex] = cell;
-          }
-
-          return changeCell;
-        }
-
-        if (
-          boardData[rowIndex + 1] &&
-          boardData[rowIndex + 1][cellIndex - 1] &&
-          boardData[rowIndex + 1][cellIndex - 1].type === 'empty' &&
-          boardData[rowIndex][cellIndex - 1].type === 'ground' &&
-          cell.type !== 'ground'
-        ) {
-          const changeCell = boardData[rowIndex + 1][cellIndex - 1];
-
-          boardData[rowIndex + 1][cellIndex - 1] = cell;
-
-          return changeCell;
-        }
-
-        if (
-          boardData[rowIndex + 1] &&
-          boardData[rowIndex + 1][cellIndex + 1] &&
-          boardData[rowIndex + 1][cellIndex + 1].type === 'empty' &&
-          boardData[rowIndex][cellIndex + 1].type === 'ground' &&
-          cell.type !== 'ground'
-        ) {
-          const changeCell = boardData[rowIndex + 1][cellIndex + 1];
-
-          boardData[rowIndex + 1][cellIndex + 1] = cell;
-
-          return changeCell;
-        }
-
-        if (
-          boardData[rowIndex + 1] &&
-          boardData[rowIndex + 1][cellIndex - 1] &&
-          boardData[rowIndex + 1][cellIndex - 1].type === 'empty' &&
-          cell.type !== 'ground' &&
-          boardData[rowIndex][cellIndex - 1].type === 'empty' &&
-          boardData[rowIndex - 1] &&
-          boardData[rowIndex - 1][cellIndex - 1].type === 'ground'
-        ) {
-          const changeCell = boardData[rowIndex + 1][cellIndex - 1];
-
-          boardData[rowIndex + 1][cellIndex - 1] = cell;
-
-          return changeCell;
-        }
-
-        if (
-          boardData[rowIndex + 1] &&
-          boardData[rowIndex + 1][cellIndex + 1] &&
-          boardData[rowIndex + 1][cellIndex + 1].type === 'empty' &&
-          cell.type !== 'ground' &&
-          boardData[rowIndex][cellIndex + 1].type === 'empty' &&
-          boardData[rowIndex - 1] &&
-          boardData[rowIndex - 1][cellIndex + 1].type === 'ground'
-        ) {
-          const changeCell = boardData[rowIndex + 1][cellIndex + 1];
-
-          boardData[rowIndex + 1][cellIndex + 1] = cell;
-
-          return changeCell;
-        }
-
-        return cell;
-      });
+        return row.map((cell, cellIndex) => {
+            if (rowIndex === 0 && cell.type === 'empty') {
+                const randColor = this.candies[
+                    Math.floor(Math.random() * 6)
+                ];
+                return {
+                    url: randColor,
+                    type: this.candies.indexOf(randColor),
+                    toDelete: false,
+                    isFrozen: false,
+                };
+            }
+            if (
+                boardData[rowIndex + 1]
+                && boardData[rowIndex + 1][cellIndex].type === 'empty'
+                && cell.type !== 'ground' && !cell.isFrozen
+            ) {     const changeCell = boardData[rowIndex + 1][cellIndex];
+                    boardData[rowIndex + 1][cellIndex] = cell;
+                return changeCell;
+            } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex - 1]
+                && boardData[rowIndex + 1][cellIndex - 1].type === 'empty'
+                && boardData[rowIndex][cellIndex - 1].type === 'ground'
+                && cell.type !== 'ground') {
+                const changeCell = boardData[rowIndex + 1][cellIndex - 1];
+                boardData[rowIndex + 1][cellIndex - 1] = cell;
+                return changeCell;
+            } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex + 1]
+                && boardData[rowIndex + 1][cellIndex + 1].type === 'empty'
+                && boardData[rowIndex][cellIndex + 1].type === 'ground'
+                && cell.type !== 'ground') {
+                const changeCell = boardData[rowIndex + 1][cellIndex + 1];
+                boardData[rowIndex + 1][cellIndex + 1] = cell;
+                return changeCell;
+            } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex - 1]
+                && boardData[rowIndex + 1][cellIndex - 1].type === 'empty' && cell.type !== 'ground'
+                && boardData[rowIndex][cellIndex - 1].type === 'empty' && boardData[rowIndex - 1]
+                && boardData[rowIndex - 1][cellIndex - 1].type === 'ground'
+            ) {
+                const changeCell = boardData[rowIndex + 1][cellIndex - 1];
+                boardData[rowIndex + 1][cellIndex - 1] = cell;
+                return changeCell;
+            } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex + 1]
+                    && boardData[rowIndex + 1][cellIndex + 1].type === 'empty' && cell.type !== 'ground'
+                    && boardData[rowIndex][cellIndex + 1].type === 'empty' && boardData[rowIndex - 1]
+                    && boardData[rowIndex - 1][cellIndex + 1].type === 'ground'
+            ) {
+                const changeCell = boardData[rowIndex + 1][cellIndex + 1];
+                boardData[rowIndex + 1][cellIndex + 1] = cell;
+                return changeCell;
+            } else if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex].isFrozen
+                && !cell.isFrozen){
+                const checkData = this.checkForEmptyUnderIce(rowIndex, cellIndex, boardData);
+                if (checkData.result) {
+                    const changeCell = boardData[checkData.emptyRow][cellIndex];
+                    boardData[checkData.emptyRow][cellIndex] = cell;
+                    return changeCell;
+                }
+            }
+            return cell;
+        });
     });
-
     if (JSON.stringify(boardData) !== JSON.stringify(result)) {
-      this.setState({ boardData: result });
+        this.setState({ boardData: result });
     } else {
-      setTimeout(this.checkGameField, 100);
+        setTimeout(this.checkGameField, 100);
     }
-  }
+}
 
   checkFirstMine() {
     const accumBoard = new Array(8).fill(null).map(() => new Array(8).fill(null));
@@ -1004,9 +979,6 @@ class App extends React.Component {
 
               if (index !== arr.length - 1) {
                 return cell.type === checkArray[index + 1].type;
-              }
-
-              if (condition) {
               }
 
               return true;
