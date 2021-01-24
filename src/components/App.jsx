@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/App.css';
-import Board from './Board';
-import LevelRoad from './levels';
+import Board from './Board.jsx';
+import LevelRoad from './levels.jsx';
+import TaskBox from './task-box.jsx';
 import checkNumberLevel from './loadLevels';
 
 // function CreateScore(props) {
@@ -1167,9 +1168,9 @@ moveIntoSquareBelow() {
     if (target.dataset.typeBtn !== 'level') {return;}
 
     const isActiveLevel = !isClickButtonLevel;
-    const boardData = checkNumberLevel(target);
+    const { boardData, taskText, moves } = checkNumberLevel(target);
 
-    this.setState({ boardData, isClickButtonLevel: isActiveLevel });
+    this.setState({ boardData, isClickButtonLevel: isActiveLevel, task: { moves, message: taskText } });
   }
 
   openLevelRoad() {
@@ -1191,6 +1192,7 @@ moveIntoSquareBelow() {
               this.getBoardDataOfStartLevel(target, isClickButtonLevel)
             }
           >
+              {isClickButtonLevel && <TaskBox moves={this.state.task?.moves} message={this.state.task?.message}/>}
             {!isClickButtonLevel ? <LevelRoad /> : this.getGameField(boardData)}
           </div>
 
