@@ -101,6 +101,7 @@ button {
     /* opacity: 1;
     transition: 0.3s; */
     flex-wrap: wrap;
+    position: absolute;
 }
 
 .board-row {

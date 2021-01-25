@@ -49,6 +49,8 @@ function getBoardDataOfLevel1() {
                 cell.url = cell.url.replace(/candy.png/, "candy-ice.png");
             }
 
+            cell.isDesk = Math.random() * 100 > 50 ? true : false;
+
             return cell;
         });
     });
