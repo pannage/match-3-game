@@ -1152,6 +1152,7 @@ moveIntoSquareBelow() {
           onDragStart={(e) => e.preventDefault()}
           onDoubleClick={this.handleDoubleClick}
         >
+          <Board squares={boardData} background={true} />
           <Board squares={boardData} />
         </div>
         <div
