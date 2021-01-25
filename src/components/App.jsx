@@ -625,17 +625,17 @@ moveIntoSquareBelow() {
     }
 }
 
-  checkFirstMine() {
-    const accumBoard = new Array(8).fill(null).map(() => new Array(8).fill(null));
-    const bd = this.checkBoardData;
+    checkFirstMine() {
+        const accumBoard = new Array(8).fill(null).map(() => new Array(8).fill(null));
+        const bd = this.checkBoardData;
 
-    bd.forEach((row, rowId) => {
-      row.forEach((cell, cellIndex) => {
-        if (!bd[rowId][cellIndex].toDelete || bd[rowId][cellIndex].type === 'ground') {
-          accumBoard[rowId][cellIndex] = { ...cell };
+        bd.forEach((row, rowId) => {
+            row.forEach((cell, cellIndex) => {
+                if (!bd[rowId][cellIndex].toDelete || bd[rowId][cellIndex].type === 'ground') {
+                    accumBoard[rowId][cellIndex] = { ...cell };
 
-          return;
-        }
+                    return;
+                }
 
         const checkVertical =
           bd[rowId + 1] &&
