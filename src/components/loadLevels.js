@@ -37,7 +37,7 @@ function getBoardDataOfLevel1() {
 function getBoardDataOfLevel2() {
   return getNewBoarDataOfGame().map((row, rowId) => {
     return row.map((cell, cellId) => {
-      if (cellId === 0 || cellId === 7 || rowId === 7) {
+      if ((cellId === 0 && rowId !== 0) || (cellId === 7 && rowId !== 0) || rowId === 7) {
         cell.isFrozen = true;
         cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
       }
