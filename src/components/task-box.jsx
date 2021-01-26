@@ -14,7 +14,6 @@ export default class TaskBox extends React.Component {
                 <div className="task">{this.props.message}</div>
             </div>
 
-
         );
     }
 }

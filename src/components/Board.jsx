@@ -33,7 +33,7 @@ export default class Board extends React.Component {
                                         return (<div
                                             className="cell square"
                                             key={cellKey}
-                                            style={{ backgroundColor: cell.isDesk ? 'red' : 'none' }}
+                                            style={{ backgroundColor: cell.isDesk ? '#fad69f' : 'transparent' }}
                                         />);
                                     })
                                 }
