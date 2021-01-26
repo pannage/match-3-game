@@ -1087,6 +1087,7 @@ moveIntoSquareBelow() {
   boardData = newBoardData.map((row) => {
     return row.map((cell) => {
       if (cell.toDelete) {
+          
         if (cell.isFrozen) {
           return {
             url: cell.url.replace(/candy-ice.png/, 'candy.png'),
