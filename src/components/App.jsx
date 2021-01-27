@@ -283,7 +283,7 @@ class App extends React.Component {
             return boardData;
         }
 
-        this.setState({ boardData });
+        this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
     }
 
     onMouseDown(e) {
@@ -527,7 +527,7 @@ class App extends React.Component {
             }
         } else {
             this.cellToReplace = undefined;
-            this.setState({ boardData });
+            this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
         }
     }
 
