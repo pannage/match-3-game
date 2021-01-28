@@ -4,7 +4,7 @@ import '../styles/App.css';
 import Board from './Board.jsx';
 import LevelRoad from './levels.jsx';
 import TaskBox from './task-box.jsx';
-import checkNumberLevel from './loadLevels';
+import { checkNumberLevel, getNewBoarDataOfGame, checkToDeleteCell } from './loadLevels';
 
 // function CreateScore(props) {
 //     const { score } = props;
@@ -283,7 +283,7 @@ class App extends React.Component {
             return boardData;
         }
 
-        this.setState({ boardData });
+        this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
     }
 
     onMouseDown(e) {
@@ -527,7 +527,7 @@ class App extends React.Component {
             }
         } else {
             this.cellToReplace = undefined;
-            this.setState({ boardData });
+            this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
         }
     }
 
@@ -1157,39 +1157,10 @@ class App extends React.Component {
     checkGameField(redraw = true, data) {
         let boardData = redraw ? JSON.parse(JSON.stringify(this.state.boardData)) : data;
         let someCellMarkedAsDeleted = false;
+        let resultCheckObj = checkToDeleteCell(boardData, someCellMarkedAsDeleted);
 
-        boardData.forEach((rowArray, indexRow) => {
-            rowArray.forEach((item, indexItem) => {
-                if (item.type === 'ground') { return; }
-
-                const leftCellType = rowArray[indexItem - 1]
-                    ? rowArray[indexItem - 1].type
-                    : null;
-                const rightCellType = rowArray[indexItem + 1]
-                    ? rowArray[indexItem + 1].type
-                    : null;
-                const topCellType = boardData[indexRow + 1]
-                    ? boardData[indexRow + 1][indexItem].type
-                    : null;
-                const bottomCellType = boardData[indexRow - 1]
-                    ? boardData[indexRow - 1][indexItem].type
-                    : null;
-
-                if (item.type === leftCellType && item.type === rightCellType) {
-                    someCellMarkedAsDeleted = true;
-                    item.toDelete = true;
-                    rowArray[indexItem - 1].toDelete = true;
-                    rowArray[indexItem + 1].toDelete = true;
-                }
-
-                if (item.type === bottomCellType && item.type === topCellType) {
-                    someCellMarkedAsDeleted = true;
-                    item.toDelete = true;
-                    boardData[indexRow + 1][indexItem].toDelete = true;
-                    boardData[indexRow - 1][indexItem].toDelete = true;
-                }
-            });
-        });
+        someCellMarkedAsDeleted = resultCheckObj.someCellMarkedAsDeleted;
+        boardData = resultCheckObj.boardData;
 
         this.checkBoardData = boardData;
         this.checkThreeRow();
@@ -1198,7 +1169,6 @@ class App extends React.Component {
         this.checkSecondMine();
         this.checkForFourAndFive(5);
         this.checkForFourAndFive(4);
-
         boardData = this.handleDelete(this.checkBoardData);
 
         if (redraw) {
