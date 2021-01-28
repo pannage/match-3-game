@@ -4,6 +4,7 @@ import '../styles/App.css';
 import Board from './Board.jsx';
 import LevelRoad from './levels.jsx';
 import TaskBox from './task-box.jsx';
+import LoseScreen from './lose-screen.jsx'
 import { checkNumberLevel, getNewBoarDataOfGame, checkToDeleteCell } from './loadLevels';
 
 // function CreateScore(props) {
