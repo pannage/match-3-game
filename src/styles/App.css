@@ -146,13 +146,13 @@ button {
 }
 
 .level-road {
- background-image: url('../images/chakras.png');
- background-repeat: no-repeat;
- background-position-y: center;
- height: 65vh;
- width: 40.7rem;
- background-color: rgba(255, 255, 255, 0.384);
- border-radius: 20px;
+    background-image: url('../images/chakras.png');
+    background-repeat: no-repeat;
+    background-position-y: center;
+    height: 770px;
+    width: 650px;
+    background-color: rgba(255, 255, 255, 0.384);
+    border-radius: 20px;
 }
 
 .level-btn {
@@ -160,10 +160,10 @@ button {
 }
 
 .level-wrapper {
-    padding-top: 3vh;
+    padding-top: 22px;
     height: 65vh;
     width: 3vw;
-    margin: 0 auto;
+    margin-left: 286px;
     text-align: center;
 }
 
@@ -171,13 +171,13 @@ button {
     background-image: url('../images/level7.png');
     width: 4.4rem;
     height: 4.4rem;
-    margin-bottom: 3vh;
+    margin-bottom: 27px;
 }
 .level-6 {
     background-image: url('../images/level6.png');
     width: 4.4rem;
     height: 2.96rem;
-    margin-bottom: 7.5vh;
+    margin-bottom: 91px;
 }
 .level-5 {
     background-image: url('../images/level5.png');
@@ -194,13 +194,13 @@ button {
     background-image: url('../images/level3.png');
     width: 4.4rem;
     height: 4.4rem;
-    margin-bottom: 2vh;
+    margin-bottom: 27px;
 }
 .level-2 {
     background-image: url('../images/level2.png');
     width: 4.4rem;
     height: 4.4rem;
-    margin-bottom: 3vh;
+    margin-bottom: 39px;
 }
 .level-1 {
     background-image: url('../images/level1.png');

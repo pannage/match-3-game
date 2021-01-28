@@ -5,15 +5,17 @@ import '../styles/App.css';
 export default class WinScreen extends React.Component {
     render() {
         return (
-
-            <div className="task-box">
-                <div className="moves-wrap">
-                    <div className="moves">{this.props.moves}</div>
-                    <div className="moves-txt">moves</div>
+            <div>
+                <div className="win-screen-title">Well done!</div>
+                <div className="win-screen-win-screen">
+                    <div className="win-screen-moves">Moves:</div>
+                    <div className="win-screen-deleted">Deleted:</div>
+                    <div className="button-wrap">
+                        <button className="button-next">Next</button>
+                        <button className="button-levels">Levels</button>
+                    </div>
                 </div>
-                <div className="task">{this.props.message}</div>
             </div>
-
         );
     }
 }
