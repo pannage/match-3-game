@@ -8,82 +8,6 @@ import LoseScreen from './lose-screen.jsx'
 import { checkNumberLevel, getNewBoarDataOfGame, checkToDeleteCell } from './loadLevels';
 import { Switch, Route, Link } from 'react-router-dom';
 
-// function CreateScore(props) {
-//     const { score } = props;
-//     return (
-//         <div className="score-board">
-//             <h3>score</h3>
-//             <h1 id="score">{score}</h1>
-//         </div>
-//     );
-// }
-// CreateScore.propTypes = {
-//     score: PropTypes.number.isRequired,
-// };
-
-// const candies = [
-//     'url(../images/red-candy.png)',
-//     'url(../images/yellow-candy.png)',
-//     'url(../images/orange-candy.png)',
-//     'url(../images/purple-candy.png)',
-//     'url(../images/green-candy.png)',
-//     'url(../images/blue-candy.png)',
-// ];
-
-// const boardArray = new Array(8).fill(null).map(() => new Array(8).fill({ type: 1 }).map(() => {
-//     const randColor = candies[Math.floor(Math.random() * 6)];
-//     return {
-//         url: randColor,
-//         type: candies.indexOf(randColor),
-//         toDelete: false,
-//         isFrozen: false,
-//     };
-// }));
-
-// TODO здесь создаётся массив для замороженных ячеек
-// boardArray = boardArray.map((row, rowId) => {
-//     return row.map((cell, cellId) => {
-//         if (rowId === 2 || rowId === 5) {
-//             if (cellId === 3 || cellId === 4) {
-//                 cell.isFrozen = true;
-//                 cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
-//             }
-//         }
-//         if (rowId === 3 || rowId === 4) {
-//             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5) {
-//                 cell.isFrozen = true;
-//                 cell.url = cell.url.replace(/candy.png/, 'candy-ice.png');
-//             }
-//         }
-//         return cell;
-//     });
-// });
-
-// TODO здесь создаётся массив для земли
-// boardArray = boardArray.map((row, rowId) => {
-//     return row.map((cell, cellId) => {
-//         if (rowId === 2 || rowId === 5) {
-//             if (cellId === 3 || cellId === 4)
-//                 return {
-//                     url: "url(../images/ground.png)",
-//                     type: "ground",
-//                     toDelete: false,
-//                     isFrozen: false,
-//                 };
-//         }
-//         if (rowId === 3 || rowId === 4) {
-//             if (cellId === 2 || cellId === 3 || cellId === 4 || cellId === 5)
-//                 return {
-//                     url: "url(../images/ground.png)",
-//                     type: "ground",
-//                     toDelete: false,
-//                     isFrozen: false,
-//                 };
-//         }
-//         return cell;
-//     });
-// });
-
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -98,6 +22,7 @@ class App extends React.Component {
         ];
         this.toMove = true;
         this.levelIsFinished = false;
+        this.levelIsWon = false;
 
         this.state = {
             boardData: [],
@@ -286,7 +211,7 @@ class App extends React.Component {
         if (e.target.redraw) {
             return boardData;
         }
-        if (typeof boardData[cell.y][cell.x].type !== 'number'){
+        if (typeof boardData[cell.y][cell.x].type !== 'number' && boardData[cell.y][cell.x].type !== 'ground') {
             this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
         }
 
@@ -357,103 +282,6 @@ class App extends React.Component {
         document.querySelector('.cell-hidden').classList.remove('cell-hidden');
         fakeCell.classList.add('cell-hidden');
     }
-
-    // dragEnd() {
-    //     if (!this.cellToDrag) return;
-
-    //     let { boardData } = this.state;
-
-    //     if (this.cellToReplace !== undefined) {
-    //         if (
-
-    //             boardData[this.cellToDrag.y][this.cellToDrag.x].type
-    //             === 'rainbow'
-    //         ) {
-    //             boardData = this.startBonusRainbow(boardData);
-    //         } else {
-    //             const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
-    //             boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
-    //             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
-    //         }
-    //     }
-    //     this.setState({ boardData }, () => this.checkGameField());
-    //     this.cellToReplace = undefined;
-    // }
-
-    // dragEnd() {
-    //     if (!this.cellToDrag) return;
-    //     const movementVector = {
-    //         x: this.cellToReplace.x - this.cellToDrag.x,
-    //         y: this.cellToReplace.y - this.cellToDrag.y,
-    //     };
-
-    //     let bonusUsed = false;
-
-    //     const isMoveValid = Math.abs(movementVector.x) + Math.abs(movementVector.y) < 2;
-
-    //     let boardData = JSON.parse(JSON.stringify(this.state.boardData));
-
-    //     if ((boardData[this.cellToDrag.y][this.cellToDrag.x].type
-    //         === 'rainbow'
-    //         && this.cellToDrag.y !== this.cellToReplace.y)
-    //         || this.cellToDrag.y.isFrozen !== this.cellToReplace.y.isFrozen) {
-    //         boardData = this.startBonusRainbow(boardData);
-    //     } else if (this.cellToReplace !== undefined && isMoveValid) {
-    //         const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
-    //         boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
-    //         boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
-
-    //         if (typeof boardData[this.cellToDrag.y][this.cellToDrag.x].type
-    //             !== 'number') {
-    //             bonusUsed = true;
-    //             const dragBonusEvent = {
-    //                 target: {
-    //                     dataset: {
-    //                         rowIndex: this.cellToDrag.y,
-    //                         cellIndex: this.cellToDrag.x,
-    //                     },
-    //                     rainbowSet: {
-    //                         rowIndex: this.cellToReplace.y,
-    //                         cellIndex: this.cellToReplace.x,
-    //                     },
-    //                     redraw: true,
-    //                 },
-    //             };
-    //             boardData = this.handleDoubleClick(dragBonusEvent, boardData);
-    //         } else if (typeof boardData[this.cellToReplace.y][this.cellToReplace.x].type
-    //             !== 'number') {
-    //             bonusUsed = true;
-    //             const dragBonusEvent = {
-    //                 target: {
-    //                     dataset: {
-    //                         rowIndex: this.cellToReplace.y,
-    //                         cellIndex: this.cellToReplace.x,
-    //                     },
-    //                     rainbowSet: {
-    //                         rowIndex: this.cellToDrag.y,
-    //                         cellIndex: this.cellToDrag.x,
-    //                     },
-    //                     redraw: true,
-    //                 },
-    //             };
-    //             boardData = this.handleDoubleClick(dragBonusEvent, boardData);
-    //         }
-    //     }
-
-    //     const isMatch3 = this.checkGameField(false, boardData);
-    //     if (!isMatch3 && !bonusUsed) {
-    //         if (this.cellToReplace !== undefined && isMoveValid) {
-    //             const changeSqr = boardData[this.cellToReplace.y][this.cellToReplace.x];
-    //             boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
-    //             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
-    //         }
-    //     } else {
-    //         this.checkGameField();
-    //     }
-
-    //     this.setState({ boardData }, () => this.checkGameField());
-    //     this.cellToReplace = undefined;
-    // }
 
     dragEnd() {
         if (!this.cellToDrag) { return; }
@@ -1154,14 +982,13 @@ class App extends React.Component {
             })
         });
         if (isFinishedBoard) {
-            console.log('win');
             this.clearLocalStorage();
             this.setResult();
             this.levelIsFinished = true;
             this.toMove = false;
+            this.levelIsWon = true;
         } else if (moves <= 0) {
             this.clearLocalStorage();
-            console.log('lose');
             this.levelIsFinished = true;
             this.toMove = false;
         }
@@ -1214,11 +1041,11 @@ class App extends React.Component {
 
         if (redraw && !this.levelIsFinished) {
             this.toMove = true;
-            this.setState({ boardData });
+            this.setState({ boardData }, () => {
+                this.setLocalStorage();
+                this.checkForWinLose();
+            });
         }
-
-        this.setLocalStorage();
-        this.checkForWinLose();
 
         return someCellMarkedAsDeleted;
     }
@@ -1254,7 +1081,7 @@ class App extends React.Component {
         const isActiveLevel = !isClickButtonLevel;
         const { boardData, taskText, moves } = checkNumberLevel(target);
 
-        this.setState({ boardData, isClickButtonLevel: isActiveLevel, task: { moves, message: taskText } });
+        this.setState({ boardData, isClickButtonLevel: isActiveLevel, task: { moves, message: taskText }, level: target.dataset.level });
     }
 
     openLevelRoad() {
@@ -1284,6 +1111,7 @@ class App extends React.Component {
                                     message={this.state.task?.message}
                                 />
                                 {this.getGameField(boardData)}
+                                { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
                             </Route>
 
                             <Route exact path="/">
