@@ -3,6 +3,17 @@ import PropTypes from 'prop-types';
 import '../styles/App.css';
 
 export default class WinScreen extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    clear() {
+        const { that } = this.props;
+
+        that.levelIsFinished = false;
+        that.levelIsWon = false;
+    }
+
     render() {
         return (
             <div>

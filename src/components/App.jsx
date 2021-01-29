@@ -37,7 +37,6 @@ class App extends React.Component {
         this.checkFirstMine = this.checkFirstMine.bind(this);
         this.checkSecondMine = this.checkSecondMine.bind(this);
         this.checkForFourAndFive = this.checkForFourAndFive.bind(this);
-        this.openLevelRoad = this.openLevelRoad.bind(this);
         this.getGameField = this.getGameField.bind(this);
         this.checkForWinLose = this.checkForWinLose.bind(this);
         this.setLocalStorage = this.setLocalStorage.bind(this);
@@ -1075,18 +1074,14 @@ class App extends React.Component {
         );
     }
 
-    getBoardDataOfStartLevel(target, isClickButtonLevel) {
-        if (target.dataset.typeBtn !== 'level') { return; }
+    getBoardDataOfStartLevel(numberLevel) {
+        // if (target.dataset.typeBtn !== 'level') { return; }
 
-        const isActiveLevel = !isClickButtonLevel;
-        const { boardData, taskText, moves } = checkNumberLevel(target);
+        const { boardData, taskText, moves } = checkNumberLevel(numberLevel);
 
-        this.setState({ boardData, isClickButtonLevel: isActiveLevel, task: { moves, message: taskText }, level: target.dataset.level });
+        this.setState({ boardData, task: { moves, message: taskText }, level: numberLevel });
     }
 
-    openLevelRoad() {
-        this.setState({ isClickButtonLevel: false });
-    }
 
     render() {
         const { score } = this.state;
@@ -1096,14 +1091,14 @@ class App extends React.Component {
             <>
                 <div className="menu">
                     <Link to="/">
-                        <button className="menu-btn" onClick={() => this.openLevelRoad()} />
+                        <button className="menu-btn"/>
                     </Link>
                 </div>
                 <div className="app">
-                    <div
+                    {/* <div
                         onClick={({ target }) => this.getBoardDataOfStartLevel(target, isClickButtonLevel)
                         }
-                    >
+                    > */}
                         <Switch>
                             <Route path="/level">
                                 <TaskBox
@@ -1115,10 +1110,12 @@ class App extends React.Component {
                             </Route>
 
                             <Route exact path="/">
+                                <div onClick={({ target }) => this.getBoardDataOfStartLevel(target.dataset.level)}>
                                 <LevelRoad />
+                                </div>
                             </Route>
                         </Switch>
-                    </div>
+                    {/* </div> */}
                 </div>
             </>
         );

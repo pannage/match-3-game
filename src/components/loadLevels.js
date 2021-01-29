@@ -227,7 +227,7 @@ function checkToDeleteCell(boardData, someCellMarkedAsDeleted) {
     return { boardData, someCellMarkedAsDeleted };
 }
 
-function checkNumberLevel(target) {
+function checkNumberLevel(numberLevel) {
     let result = {};
 
     let isCheckBoardData = false;
@@ -241,9 +241,9 @@ function checkNumberLevel(target) {
         boardData = resultCheckObj.boardData;
     }
 
-    const { level } = target.dataset;
+    // const { level } = target.dataset;
 
-    switch (level) {
+    switch (numberLevel) {
     case '1':
         result = {
             boardData: getBoardDataOfLevel1(boardData),

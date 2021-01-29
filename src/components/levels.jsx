@@ -6,7 +6,7 @@ import '../styles/App.css';
 export default class LevelRoad extends React.Component {
     render() {
         return (
-            <div className="level-road">
+            <div className="level-road" >
                 <div className="level-wrapper">
                     <Link to="/level">
                         <div
