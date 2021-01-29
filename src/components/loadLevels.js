@@ -248,7 +248,7 @@ function checkNumberLevel(target) {
         result = {
             boardData: getBoardDataOfLevel1(boardData),
             taskText: 'delete 10 red',
-            moves: 30,
+            moves: 3,
         };
 
         break;

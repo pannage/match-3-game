@@ -6,6 +6,7 @@ import LevelRoad from './levels.jsx';
 import TaskBox from './task-box.jsx';
 import LoseScreen from './lose-screen.jsx'
 import { checkNumberLevel, getNewBoarDataOfGame, checkToDeleteCell } from './loadLevels';
+import { Switch, Route, Link } from 'react-router-dom';
 
 // function CreateScore(props) {
 //     const { score } = props;
@@ -96,9 +97,9 @@ class App extends React.Component {
             'url(../images/blue-candy.png)',
         ];
         this.toMove = true;
+        this.levelIsFinished = false;
 
         this.state = {
-            score: 0,
             boardData: [],
             isClickButtonLevel: false,
         };
@@ -111,13 +112,15 @@ class App extends React.Component {
         this.checkFirstMine = this.checkFirstMine.bind(this);
         this.checkSecondMine = this.checkSecondMine.bind(this);
         this.checkForFourAndFive = this.checkForFourAndFive.bind(this);
-        this.startBonusRainbow = this.startBonusRainbow.bind(this);
         this.openLevelRoad = this.openLevelRoad.bind(this);
         this.getGameField = this.getGameField.bind(this);
+        this.checkForWinLose = this.checkForWinLose.bind(this);
+        this.setLocalStorage = this.setLocalStorage.bind(this);
+        this.clearLocalStorage = this.clearLocalStorage.bind(this);
+        this.setResult = this.setResult.bind(this);
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log(prevState.boardData);
 
         if (JSON.stringify(prevState.boardData) !== JSON.stringify(this.state.boardData)) {
             this.toMove = false;
@@ -283,8 +286,10 @@ class App extends React.Component {
         if (e.target.redraw) {
             return boardData;
         }
+        if (typeof boardData[cell.y][cell.x].type !== 'number'){
+            this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
+        }
 
-        this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
     }
 
     onMouseDown(e) {
@@ -530,24 +535,6 @@ class App extends React.Component {
             this.cellToReplace = undefined;
             this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
         }
-    }
-
-    startBonusRainbow(boardData) {
-        const colorCell = boardData[this.cellToDrag.y][this.cellToDrag.x].type;
-
-        const newBoardData = boardData.map((row) => {
-            return row.map((item) => {
-                if (colorCell === item.type) {
-                    item.toDelete = true;
-                }
-
-                return item;
-            });
-        });
-
-        newBoardData[this.cellToReplace.y][this.cellToReplace.x].toDelete = true;
-
-        return newBoardData;
     }
 
     checkForEmptyUnderIce(rowIndex, cellIndex, boardData) {
@@ -1037,6 +1024,8 @@ class App extends React.Component {
                                     cell.url = sizeCheckRow === 4 ? urlImage : 'url(../images/rainbow.png)';
                                     cell.type = sizeCheckRow === 4 ? typeBonus : 'rainbow';
                                     cell.toDelete = false;
+                                    cell.isDesk = false;
+                                    cell.isFrozen = false;
                                 }
                             });
                         }
@@ -1155,6 +1144,57 @@ class App extends React.Component {
         return boardData;
     }
 
+    checkForWinLose() {
+        const {boardData} = this.state;
+        const {moves} = this.state.task;
+        const isFinishedBoard = boardData.every(row => {
+            return row.every(cell => {
+                return cell.type !== 'ground' &&
+                !cell.isFrozen && !cell.isDesk;
+            })
+        });
+        if (isFinishedBoard) {
+            console.log('win');
+            this.clearLocalStorage();
+            this.setResult();
+            this.levelIsFinished = true;
+            this.toMove = false;
+        } else if (moves <= 0) {
+            this.clearLocalStorage();
+            console.log('lose');
+            this.levelIsFinished = true;
+            this.toMove = false;
+        }
+
+    }
+
+    setResult() {
+        const {level} = this.state;
+        const {moves} = this.state.task;
+        let result;
+        if (localStorage.getItem('result')) {
+            result = JSON.parse(localStorage.getItem('result'));
+        } else {
+            result = {};
+        }
+
+        if (result[level] && result[level] > 30 - moves) {
+            result[level] = 30 - moves;
+        } else if (!result[level]) result[level] = 30 - moves;
+        localStorage.setItem('result', JSON.stringify(result));
+    }
+
+    setLocalStorage() {
+        const {level, boardData, task} = this.state;
+        localStorage.setItem(level, [JSON.stringify(boardData), JSON.stringify(task)]);
+    }
+
+    clearLocalStorage() {
+        const {level} = this.state;
+        localStorage.removeItem(level);
+    }
+
+
     checkGameField(redraw = true, data) {
         let boardData = redraw ? JSON.parse(JSON.stringify(this.state.boardData)) : data;
         let someCellMarkedAsDeleted = false;
@@ -1172,10 +1212,13 @@ class App extends React.Component {
         this.checkForFourAndFive(4);
         boardData = this.handleDelete(this.checkBoardData);
 
-        if (redraw) {
-            this.setState({ boardData });
+        if (redraw && !this.levelIsFinished) {
             this.toMove = true;
+            this.setState({ boardData });
         }
+
+        this.setLocalStorage();
+        this.checkForWinLose();
 
         return someCellMarkedAsDeleted;
     }
@@ -1225,18 +1268,29 @@ class App extends React.Component {
         return (
             <>
                 <div className="menu">
-                    <button className="menu-btn" onClick={() => this.openLevelRoad()} />
+                    <Link to="/">
+                        <button className="menu-btn" onClick={() => this.openLevelRoad()} />
+                    </Link>
                 </div>
                 <div className="app">
                     <div
                         onClick={({ target }) => this.getBoardDataOfStartLevel(target, isClickButtonLevel)
                         }
                     >
-                        {isClickButtonLevel && <TaskBox moves={this.state.task?.moves} message={this.state.task?.message}/>}
-                        {!isClickButtonLevel ? <LevelRoad /> : this.getGameField(boardData)}
-                    </div>
+                        <Switch>
+                            <Route path="/level">
+                                <TaskBox
+                                    moves={this.state.task?.moves}
+                                    message={this.state.task?.message}
+                                />
+                                {this.getGameField(boardData)}
+                            </Route>
 
-                    {/* <CreateScore score={score} /> */}
+                            <Route exact path="/">
+                                <LevelRoad />
+                            </Route>
+                        </Switch>
+                    </div>
                 </div>
             </>
         );
