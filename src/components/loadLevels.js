@@ -241,8 +241,6 @@ function checkNumberLevel(numberLevel) {
         boardData = resultCheckObj.boardData;
     }
 
-    // const { level } = target.dataset;
-
     switch (numberLevel) {
     case '1':
         result = {

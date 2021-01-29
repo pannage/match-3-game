@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/App.css';
+import { Switch, Route, Link } from 'react-router-dom';
 import Board from './Board.jsx';
 import LevelRoad from './levels.jsx';
 import TaskBox from './task-box.jsx';
-import LoseScreen from './lose-screen.jsx'
+import LoseScreen from './lose-screen.jsx';
 import { checkNumberLevel, getNewBoarDataOfGame, checkToDeleteCell } from './loadLevels';
-import { Switch, Route, Link } from 'react-router-dom';
 
 class App extends React.Component {
     constructor(props) {
@@ -26,7 +26,6 @@ class App extends React.Component {
 
         this.state = {
             boardData: [],
-            isClickButtonLevel: false,
         };
         this.checkForEmptyUnderIce = this.checkForEmptyUnderIce.bind(this);
         this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
@@ -45,7 +44,6 @@ class App extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-
         if (JSON.stringify(prevState.boardData) !== JSON.stringify(this.state.boardData)) {
             this.toMove = false;
             setTimeout(this.moveIntoSquareBelow, 100);
@@ -210,10 +208,10 @@ class App extends React.Component {
         if (e.target.redraw) {
             return boardData;
         }
+
         if (typeof boardData[cell.y][cell.x].type !== 'number' && boardData[cell.y][cell.x].type !== 'ground') {
             this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
         }
-
     }
 
     onMouseDown(e) {
@@ -972,14 +970,15 @@ class App extends React.Component {
     }
 
     checkForWinLose() {
-        const {boardData} = this.state;
-        const {moves} = this.state.task;
-        const isFinishedBoard = boardData.every(row => {
-            return row.every(cell => {
-                return cell.type !== 'ground' &&
-                !cell.isFrozen && !cell.isDesk;
-            })
+        const { boardData } = this.state;
+        const { moves } = this.state.task;
+        const isFinishedBoard = boardData.every((row) => {
+            return row.every((cell) => {
+                return cell.type !== 'ground'
+                && !cell.isFrozen && !cell.isDesk;
+            });
         });
+
         if (isFinishedBoard) {
             this.clearLocalStorage();
             this.setResult();
@@ -991,13 +990,14 @@ class App extends React.Component {
             this.levelIsFinished = true;
             this.toMove = false;
         }
-
     }
 
     setResult() {
-        const {level} = this.state;
-        const {moves} = this.state.task;
+        const { level } = this.state;
+        const { moves } = this.state.task;
+
         let result;
+
         if (localStorage.getItem('result')) {
             result = JSON.parse(localStorage.getItem('result'));
         } else {
@@ -1006,25 +1006,28 @@ class App extends React.Component {
 
         if (result[level] && result[level] > 30 - moves) {
             result[level] = 30 - moves;
-        } else if (!result[level]) result[level] = 30 - moves;
+        } else if (!result[level]) { result[level] = 30 - moves; }
+
         localStorage.setItem('result', JSON.stringify(result));
     }
 
     setLocalStorage() {
-        const {level, boardData, task} = this.state;
+        const { level, boardData, task } = this.state;
+
         localStorage.setItem(level, [JSON.stringify(boardData), JSON.stringify(task)]);
     }
 
     clearLocalStorage() {
-        const {level} = this.state;
+        const { level } = this.state;
+
         localStorage.removeItem(level);
     }
-
 
     checkGameField(redraw = true, data) {
         let boardData = redraw ? JSON.parse(JSON.stringify(this.state.boardData)) : data;
         let someCellMarkedAsDeleted = false;
-        let resultCheckObj = checkToDeleteCell(boardData, someCellMarkedAsDeleted);
+
+        const resultCheckObj = checkToDeleteCell(boardData, someCellMarkedAsDeleted);
 
         someCellMarkedAsDeleted = resultCheckObj.someCellMarkedAsDeleted;
         boardData = resultCheckObj.boardData;
@@ -1075,17 +1078,14 @@ class App extends React.Component {
     }
 
     getBoardDataOfStartLevel(numberLevel) {
-        // if (target.dataset.typeBtn !== 'level') { return; }
-
         const { boardData, taskText, moves } = checkNumberLevel(numberLevel);
 
         this.setState({ boardData, task: { moves, message: taskText }, level: numberLevel });
     }
 
-
     render() {
         const { score } = this.state;
-        const { boardData, isClickButtonLevel } = this.state;
+        const { boardData } = this.state;
 
         return (
             <>
@@ -1095,27 +1095,22 @@ class App extends React.Component {
                     </Link>
                 </div>
                 <div className="app">
-                    {/* <div
-                        onClick={({ target }) => this.getBoardDataOfStartLevel(target, isClickButtonLevel)
-                        }
-                    > */}
-                        <Switch>
-                            <Route path="/level">
-                                <TaskBox
-                                    moves={this.state.task?.moves}
-                                    message={this.state.task?.message}
-                                />
-                                {this.getGameField(boardData)}
-                                { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
-                            </Route>
+                    <Switch>
+                        <Route path="/level">
+                            <TaskBox
+                                moves={this.state.task?.moves}
+                                message={this.state.task?.message}
+                            />
+                            {this.getGameField(boardData)}
+                            { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
+                        </Route>
 
-                            <Route exact path="/">
-                                <div onClick={({ target }) => this.getBoardDataOfStartLevel(target.dataset.level)}>
+                        <Route exact path="/">
+                            <div onClick={({ target }) => this.getBoardDataOfStartLevel(target.dataset.level)}>
                                 <LevelRoad />
-                                </div>
-                            </Route>
-                        </Switch>
-                    {/* </div> */}
+                            </div>
+                        </Route>
+                    </Switch>
                 </div>
             </>
         );
