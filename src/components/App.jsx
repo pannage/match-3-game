@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Switch, Route, Link } from 'react-router-dom';
 import '../styles/App.css';
 import Board from './Board.jsx';
 import LevelRoad from './levels.jsx';
 import TaskBox from './task-box.jsx';
-import LoseScreen from './lose-screen.jsx'
+import LoseScreen from './lose-screen.jsx';
 import { checkNumberLevel, getNewBoarDataOfGame, checkToDeleteCell } from './loadLevels';
 
 // function CreateScore(props) {
@@ -1158,7 +1159,8 @@ class App extends React.Component {
     checkGameField(redraw = true, data) {
         let boardData = redraw ? JSON.parse(JSON.stringify(this.state.boardData)) : data;
         let someCellMarkedAsDeleted = false;
-        let resultCheckObj = checkToDeleteCell(boardData, someCellMarkedAsDeleted);
+
+        const resultCheckObj = checkToDeleteCell(boardData, someCellMarkedAsDeleted);
 
         someCellMarkedAsDeleted = resultCheckObj.someCellMarkedAsDeleted;
         boardData = resultCheckObj.boardData;
@@ -1225,18 +1227,29 @@ class App extends React.Component {
         return (
             <>
                 <div className="menu">
-                    <button className="menu-btn" onClick={() => this.openLevelRoad()} />
+                    <Link to="/">
+                        <button className="menu-btn" onClick={() => this.openLevelRoad()} />
+                    </Link>
                 </div>
                 <div className="app">
                     <div
                         onClick={({ target }) => this.getBoardDataOfStartLevel(target, isClickButtonLevel)
                         }
                     >
-                        {isClickButtonLevel && <TaskBox moves={this.state.task?.moves} message={this.state.task?.message}/>}
-                        {!isClickButtonLevel ? <LevelRoad /> : this.getGameField(boardData)}
-                    </div>
+                        <Switch>
+                            <Route path="/level">
+                                <TaskBox
+                                    moves={this.state.task?.moves}
+                                    message={this.state.task?.message}
+                                />
+                                {this.getGameField(boardData)}
+                            </Route>
 
-                    {/* <CreateScore score={score} /> */}
+                            <Route exact path="/">
+                                <LevelRoad />
+                            </Route>
+                        </Switch>
+                    </div>
                 </div>
             </>
         );
