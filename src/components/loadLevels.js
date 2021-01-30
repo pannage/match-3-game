@@ -7,7 +7,6 @@ const candies = [
   'url(../images/blue-candy.png)',
 ];
 
-// let boardData = [];
 function getNewBoarDataOfGame() {
     return new Array(8).fill(null).map(() =>
         new Array(8).fill({ type: 1 }).map(() => {
@@ -26,7 +25,7 @@ function getNewBoarDataOfGame() {
 function getBoardDataOfLevel1(boardData) {
     return boardData.map((row, rowId) => {
         return row.map((cell, cellId) => {
-            if (rowId >= 1 && rowId <= 6 && cellId >= 1 && cellId <= 6) {
+            if (rowId >= 1 && rowId <= 1 && cellId >= 1 && cellId <= 1) {
                 cell.isDesk = true;
             }
 
@@ -254,7 +253,7 @@ function checkNumberLevel(numberLevel) {
         result = {
             boardData: getBoardDataOfLevel2(boardData),
             taskText: '30 turns',
-            moves: 30,
+            moves: 3,
         };
 
         break;

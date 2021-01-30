@@ -7,6 +7,7 @@ import LevelRoad from './levels.jsx';
 import TaskBox from './task-box.jsx';
 import LoseScreen from './lose-screen.jsx';
 import { checkNumberLevel, getNewBoarDataOfGame, checkToDeleteCell } from './loadLevels';
+import WinScreen from './win-screen';
 
 class App extends React.Component {
     constructor(props) {
@@ -1103,6 +1104,7 @@ class App extends React.Component {
                             />
                             {this.getGameField(boardData)}
                             { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
+                            { (this.levelIsWon && this.levelIsFinished) && <WinScreen that={this} /> }
                         </Route>
 
                         <Route exact path="/">
