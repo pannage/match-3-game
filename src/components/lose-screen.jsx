@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/App.css';
-import { Switch, Route, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default class LoseScreen extends React.Component {
     constructor(props) {
@@ -17,10 +17,9 @@ export default class LoseScreen extends React.Component {
 
     restartLevel() {
         const { that } = this.props;
-        const { boardData, level } = that.state;
+        const { level } = that.state;
 
         that.getBoardDataOfStartLevel(level);
-        that.getGameField(boardData);
         this.clear();
     }
 

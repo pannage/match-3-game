@@ -6,7 +6,7 @@ import Board from './Board.jsx';
 import LevelRoad from './levels.jsx';
 import TaskBox from './task-box.jsx';
 import LoseScreen from './lose-screen.jsx';
-import { checkNumberLevel, getNewBoarDataOfGame, checkToDeleteCell } from './loadLevels';
+import { checkNumberLevel, checkToDeleteCell } from './loadLevels';
 import WinScreen from './win-screen';
 
 class App extends React.Component {
@@ -22,9 +22,8 @@ class App extends React.Component {
             'url(../images/blue-candy.png)',
         ];
         this.toMove = true;
-        this.levelIsFinished = false;
         this.levelIsWon = false;
-
+        this.levelIsFinished = false;
         this.state = {
             boardData: [],
         };
@@ -48,6 +47,9 @@ class App extends React.Component {
         if (JSON.stringify(prevState.boardData) !== JSON.stringify(this.state.boardData)) {
             this.toMove = false;
             setTimeout(this.moveIntoSquareBelow, 100);
+        } else if (!this.levelIsFinished) {
+            this.setLocalStorage();
+            this.checkForWinLose();
         }
     }
 
@@ -983,13 +985,15 @@ class App extends React.Component {
         if (isFinishedBoard) {
             this.clearLocalStorage();
             this.setResult();
-            this.levelIsFinished = true;
             this.toMove = false;
             this.levelIsWon = true;
+            this.levelIsFinished = true;
+            this.forceUpdate();
         } else if (moves <= 0) {
             this.clearLocalStorage();
-            this.levelIsFinished = true;
             this.toMove = false;
+            this.levelIsFinished = true;
+            this.forceUpdate();
         }
     }
 
@@ -1044,10 +1048,7 @@ class App extends React.Component {
 
         if (redraw && !this.levelIsFinished) {
             this.toMove = true;
-            this.setState({ boardData }, () => {
-                this.setLocalStorage();
-                this.checkForWinLose();
-            });
+            this.setState({ boardData });
         }
 
         return someCellMarkedAsDeleted;
