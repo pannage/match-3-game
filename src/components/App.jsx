@@ -900,15 +900,15 @@ class App extends React.Component {
             newBoardData = boardData.map((row, rowIndex) => {
                 return row.map((cell, cellIndex) => {
                     if (cell.toDelete && typeof cell.type !== 'number' && cell.type !== 'rainbow') {
-                        const dragBonusEvent = {
-                            target: {
-                                dataset: {
-                                    rowIndex,
-                                    cellIndex,
-                                },
-                                redraw: true,
+                    const dragBonusEvent = {
+                        target: {
+                            dataset: {
+                                rowIndex,
+                                cellIndex,
                             },
-                        };
+                            redraw: true,
+                        },
+                    };
 
                         boardData = this.handleDoubleClick(dragBonusEvent, boardData);
                     }
@@ -1090,7 +1090,7 @@ class App extends React.Component {
         const { boardData } = this.state;
 
         return (
-             <>
+                 <>
                 <div className="menu">
                     <Link to="/">
                         <button className="menu-btn"/>
@@ -1109,6 +1109,7 @@ class App extends React.Component {
                         </Route>
 
                         <Route exact path="/">
+
                             <div onClick={({ target }) => this.getBoardDataOfStartLevel(target.dataset.level)}>
                                 <LevelRoad />
                             </div>

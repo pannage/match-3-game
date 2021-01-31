@@ -26,15 +26,15 @@ export default class WinScreen extends React.Component {
     render() {
         const {that} = this.props;
         return (
-            <div>
+            <div className="win-screen-container">
                 <div className="win-screen-title">Well done!</div>
-                <div className="win-screen-win-screen">
+                <div className="win-screen-wrapper">
                     <div className="win-screen-moves">Moves: {30 - that.state.task.moves}</div>
                     <div className="win-screen-deleted">Deleted:</div>
                     <div className="button-wrap">
-                    <button className="button-next" onClick={() => this.nextLevel()}>Next</button>
+                    <button className="button" onClick={() => this.nextLevel()}>Next</button>
                         <Link to="/">
-                            <button className="button-levels" onClick={() => this.clear()}>
+                            <button className="button" onClick={() => this.clear()}>
                                 Levels
                             </button>
                         </Link>
