@@ -21,6 +21,7 @@ class App extends React.Component {
             'url(../images/green-candy.png)',
             'url(../images/blue-candy.png)',
         ];
+        document.addEventListener('keydown', (e) => this.hotKeys(e));
         this.toMove = true;
         this.levelIsWon = false;
         this.levelIsFinished = false;
@@ -41,6 +42,13 @@ class App extends React.Component {
         this.setLocalStorage = this.setLocalStorage.bind(this);
         this.clearLocalStorage = this.clearLocalStorage.bind(this);
         this.setResult = this.setResult.bind(this);
+        this.hotKeys = this.hotKeys.bind(this);
+    }
+
+    hotKeys({key}){
+        if(parseInt(key) < 8){
+            this.getBoardDataOfStartLevel(key);
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
