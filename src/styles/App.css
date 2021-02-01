@@ -360,7 +360,7 @@ transition: 0.2s linear;
     font-family: Jetix Revived;
     font-weight: bold;
     text-decoration: none;
-    text-shadow: -1px -1px rgb(248, 38, 203) 199);
+    text-shadow: (-1px -1px rgb(248, 38, 203) 199);
     user-select: none;
     padding: 0.5em .8em;
     outline: none;
@@ -375,6 +375,7 @@ transition: 0.2s linear;
     background-position: 200% 0, 0 0;
     box-shadow: rgba(0,0,0,.3) 0 2px 5px;
   }
+
   .button:active {
     top: 1px;
     box-shadow: none;
@@ -383,3 +384,21 @@ transition: 0.2s linear;
     transition: .5s linear;
     background-position: -200% 0, 0 0;
   }
+
+  .task div {
+      width: 70px;
+      height: 70px;
+  }
+
+  .menu-point {
+    font-family: Material Icons;
+  }
+
+  .menu-container {
+    width: 100px;
+    height: 560px;
+    }
+
+    .app {
+        display: flex;
+    }
