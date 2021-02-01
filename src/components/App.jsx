@@ -7,7 +7,8 @@ import LevelRoad from './levels.jsx';
 import TaskBox from './task-box.jsx';
 import LoseScreen from './lose-screen.jsx';
 import { checkNumberLevel, checkToDeleteCell } from './loadLevels';
-import WinScreen from './win-screen';
+import WinScreen from './win-screen.jsx';
+import Menu from './menu.jsx'
 
 class App extends React.Component {
     constructor(props) {
@@ -1158,6 +1159,7 @@ class App extends React.Component {
                     </Link>
                 </div>
                 <div className="app">
+                    <Menu/>
                     <Switch>
                         <Route path="/level">
                             <TaskBox
