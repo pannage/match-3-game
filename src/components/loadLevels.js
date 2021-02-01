@@ -25,7 +25,7 @@ function getNewBoarDataOfGame() {
 function getBoardDataOfLevel1(boardData) {
     return boardData.map((row, rowId) => {
         return row.map((cell, cellId) => {
-            if (rowId >= 1 && rowId <= 1 && cellId >= 1 && cellId <= 1) {
+            if (rowId >= 1 && rowId <= 6 && cellId >= 1 && cellId <= 6) {
                 cell.isDesk = true;
             }
 
@@ -244,23 +244,23 @@ function checkNumberLevel(numberLevel) {
     case '1':
         result = {
             boardData: getBoardDataOfLevel1(boardData),
-            taskText: 'delete 10 red',
-            moves: 3,
+            taskText: [[0, 15], [3, 15], [5, 15]],
+            moves: 30,
         };
 
         break;
     case '2':
         result = {
             boardData: getBoardDataOfLevel2(boardData),
-            taskText: '30 turns',
-            moves: 3,
+            taskText: [[1, 20], [2, 20], [4, 20]],
+            moves: 30,
         };
 
         break;
     case '3':
         result = {
             boardData: getBoardDataOfLevel3(boardData),
-            taskText: 'delete 10 red',
+            taskText: [[6, 4, 'torpedo'], [7, 2, 'rainbow'], [8, 1, 'mine']],
             moves: 30,
         };
 
@@ -268,28 +268,28 @@ function checkNumberLevel(numberLevel) {
     case '4':
         result = {
             boardData: getBoardDataOfLevel4(boardData),
-            taskText: 'delete 10 red',
+            taskText: [[0, 20], [2, 20], [4, 20]],
             moves: 30,
         };
         break;
     case '5':
         result = {
             boardData: getBoardDataOfLevel5(boardData),
-            taskText: 'delete 10 red',
+            taskText: [[1, 20], [3, 20], [5, 20]],
             moves: 30,
         };
         break;
     case '6':
         result = {
             boardData: getBoardDataOfLevel6(boardData),
-            taskText: 'delete 10 red',
+            taskText: [[7, 2, 'rainbow']],
             moves: 30,
         };
         break;
     case '7':
         result = {
             boardData: getBoardDataOfLevel7(boardData),
-            taskText: 'delete 10 red',
+            taskText: [[0, 15], [1, 15], [2, 15], [3, 15], [4, 15], [5, 15], [6, 1, 'torpedo'], [7, 1, 'rainbow'], [8, 1, 'mine'], [10, 1, 'three-row']],
             moves: 30,
         };
         break;
