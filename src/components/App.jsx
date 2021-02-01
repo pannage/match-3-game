@@ -41,6 +41,8 @@ class App extends React.Component {
         this.setLocalStorage = this.setLocalStorage.bind(this);
         this.clearLocalStorage = this.clearLocalStorage.bind(this);
         this.setResult = this.setResult.bind(this);
+        this.checkBonusTask = this.checkBonusTask.bind(this);
+        this.checkTask = this.checkTask.bind(this);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -212,8 +214,16 @@ class App extends React.Component {
             return boardData;
         }
 
-        if (typeof boardData[cell.y][cell.x].type !== 'number' && boardData[cell.y][cell.x].type !== 'ground') {
-            this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
+        if (typeof boardData[cell.y][cell.x].type !== 'number' && boardData[cell.y][cell.x].type !== 'ground' && !this.levelIsFinished) {
+            this.setState((prevState) => {
+                return {
+                    boardData,
+                    task: {
+                        moves: prevState.task.moves - 1,
+                        message: prevState.task.message,
+                    }
+                }
+            });
         }
     }
 
@@ -361,7 +371,15 @@ class App extends React.Component {
             }
         } else {
             this.cellToReplace = undefined;
-            this.setState({ boardData, task: { moves: this.state.task.moves - 1 } });
+            this.setState((prevState) => {
+                return {
+                    boardData,
+                    task: {
+                        moves: prevState.task.moves - 1,
+                        message: prevState.task.message,
+                    }
+                }
+            });
         }
     }
 
@@ -542,6 +560,7 @@ class App extends React.Component {
                             isFrozen: false,
                             isDesk: false,
                         };
+                        this.checkBonusTask('mine');
                     } else { accumBoard[rowId][cellIndex] = { ...cell }; }
                 } else if (checkHorizontal) {
                     const checkBot = bd[rowId + 1]
@@ -562,6 +581,7 @@ class App extends React.Component {
                             isFrozen: false,
                             isDesk: false,
                         };
+                        this.checkBonusTask('mine');
                     } else { accumBoard[rowId][cellIndex] = { ...cell }; }
                 } else { accumBoard[rowId][cellIndex] = { ...cell }; }
             });
@@ -611,6 +631,7 @@ class App extends React.Component {
                             isFrozen: false,
                             isDesk: false,
                         };
+                        this.checkBonusTask('mine');
                     } else { accumBoard[rowId][cellIndex] = { ...cell }; }
                 } else { accumBoard[rowId][cellIndex] = { ...cell }; }
             });
@@ -683,6 +704,7 @@ class App extends React.Component {
                             isFrozen: false,
                             isDesk: false,
                         };
+                        this.checkBonusTask('x-mine');
                     } else { accumBoard[rowId][cellIndex] = { ...cell }; }
                 } else if (checkHorizontalLeft || checkHorizontalRight) {
                     const checkPositionTop = bd[rowId - 1]
@@ -708,6 +730,7 @@ class App extends React.Component {
                             isFrozen: false,
                             isDesk: false,
                         };
+                        this.checkBonusTask('x-mine');
                     } else { accumBoard[rowId][cellIndex] = { ...cell }; }
                 } else { accumBoard[rowId][cellIndex] = { ...cell }; }
             });
@@ -770,6 +793,7 @@ class App extends React.Component {
                             isFrozen: false,
                             isDesk: false,
                         };
+                        this.checkBonusTask('three-row');
                     } else { accumBoard[rowId][cellIndex] = { ...cell }; }
                 } else if (checkHorizontal) {
                     const checkPositionTop = bd[rowId - 1]
@@ -795,6 +819,7 @@ class App extends React.Component {
                             isFrozen: false,
                             isDesk: false,
                         };
+                        this.checkBonusTask('three-row');
                     } else { accumBoard[rowId][cellIndex] = { ...cell }; }
                 } else { accumBoard[rowId][cellIndex] = { ...cell }; }
             });
@@ -854,6 +879,7 @@ class App extends React.Component {
                                     cell.toDelete = false;
                                     cell.isDesk = false;
                                     cell.isFrozen = false;
+                                    this.checkBonusTask(cell.type);
                                 }
                             });
                         }
@@ -863,7 +889,8 @@ class App extends React.Component {
                 }
 
                 if (arrayRowOfFourOrFive) {
-                    arrayRowOfFourOrFive = getCheckArray(
+                    arrayRowOfFourOrFive = getCheckArray.call(
+                        this,
                         arrayRowOfFourOrFive,
                         urlImageTorpedaRow,
                         typeBonusOfRow,
@@ -875,7 +902,8 @@ class App extends React.Component {
                 }
 
                 if (arrayColumnOfFourOrFive) {
-                    arrayColumnOfFourOrFive = getCheckArray(
+                    arrayColumnOfFourOrFive = getCheckArray.call(
+                        this,
                         arrayColumnOfFourOrFive,
                         urlImageTorpedaColumn,
                         typeBonusOfColumn,
@@ -900,15 +928,15 @@ class App extends React.Component {
             newBoardData = boardData.map((row, rowIndex) => {
                 return row.map((cell, cellIndex) => {
                     if (cell.toDelete && typeof cell.type !== 'number' && cell.type !== 'rainbow') {
-                    const dragBonusEvent = {
-                        target: {
-                            dataset: {
-                                rowIndex,
-                                cellIndex,
+                        const dragBonusEvent = {
+                            target: {
+                                dataset: {
+                                    rowIndex,
+                                    cellIndex,
+                                },
+                                redraw: true,
                             },
-                            redraw: true,
-                        },
-                    };
+                        };
 
                         boardData = this.handleDoubleClick(dragBonusEvent, boardData);
                     }
@@ -974,7 +1002,7 @@ class App extends React.Component {
 
     checkForWinLose() {
         const { boardData } = this.state;
-        const { moves } = this.state.task;
+        const { moves, message } = this.state.task;
         const isFinishedBoard = boardData.every((row) => {
             return row.every((cell) => {
                 return cell.type !== 'ground'
@@ -982,7 +1010,9 @@ class App extends React.Component {
             });
         });
 
-        if (isFinishedBoard) {
+        const isFinishedTask = message.every((item) => item[1] === 0);
+
+        if (isFinishedBoard && isFinishedTask) {
             this.clearLocalStorage();
             this.setResult();
             this.toMove = false;
@@ -1028,16 +1058,23 @@ class App extends React.Component {
         localStorage.removeItem(level);
     }
 
+
     checkGameField(redraw = true, data) {
         let boardData = redraw ? JSON.parse(JSON.stringify(this.state.boardData)) : data;
         let someCellMarkedAsDeleted = false;
+        let task = JSON.parse(JSON.stringify(this.state.task));
 
         const resultCheckObj = checkToDeleteCell(boardData, someCellMarkedAsDeleted);
 
         someCellMarkedAsDeleted = resultCheckObj.someCellMarkedAsDeleted;
         boardData = resultCheckObj.boardData;
+        this.taskCheck = task;
+
+       this.checkTask(boardData);
 
         this.checkBoardData = boardData;
+
+
         this.checkThreeRow();
         this.checkXMine();
         this.checkFirstMine();
@@ -1046,13 +1083,37 @@ class App extends React.Component {
         this.checkForFourAndFive(4);
         boardData = this.handleDelete(this.checkBoardData);
 
+
         if (redraw && !this.levelIsFinished) {
             this.toMove = true;
-            this.setState({ boardData });
+            this.setState({ boardData, task: this.taskCheck });
         }
 
         return someCellMarkedAsDeleted;
     }
+
+    checkTask(boardData) {
+
+        boardData.forEach((row) => {
+            row.forEach((cell) => {
+                 const index = this.taskCheck.message.findIndex((item) => item[0] === cell.type);
+                 if (index !== -1 && cell.toDelete){
+                     if (this.taskCheck.message[index][1] > 0) {
+                        this.taskCheck.message[index][1] -= 1;
+                     }
+                 }
+             });
+         });
+     }
+
+    checkBonusTask(type) {
+                 const index = this.taskCheck.message.findIndex((item) => type.includes(item[2]));
+                 if (index !== -1 ){
+                     if (this.taskCheck.message[index][1] > 0) {
+                        this.taskCheck.message[index][1] -= 1;
+                     }
+                 }
+    };
 
     getGameField(boardData) {
         return (
@@ -1090,7 +1151,7 @@ class App extends React.Component {
         const { boardData } = this.state;
 
         return (
-                 <>
+             <>
                 <div className="menu">
                     <Link to="/">
                         <button className="menu-btn"/>
@@ -1109,7 +1170,6 @@ class App extends React.Component {
                         </Route>
 
                         <Route exact path="/">
-
                             <div onClick={({ target }) => this.getBoardDataOfStartLevel(target.dataset.level)}>
                                 <LevelRoad />
                             </div>
