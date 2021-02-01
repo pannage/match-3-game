@@ -1154,14 +1154,16 @@ class App extends React.Component {
         return (
              <>
                 <div className="menu">
-                    <Link to="/">
-                        <button className="menu-btn"/>
+                    <Link to="/" className="link">
+                        <button className="menu-btn">pause_circle_outline</button>
+
                     </Link>
                 </div>
                 <div className="app">
                     <Menu/>
                     <Switch>
                         <Route path="/level">
+                            <div>
                             <TaskBox
                                 moves={this.state.task?.moves}
                                 message={this.state.task?.message}
@@ -1169,6 +1171,7 @@ class App extends React.Component {
                             {this.getGameField(boardData)}
                             { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
                             { (this.levelIsWon && this.levelIsFinished) && <WinScreen that={this} /> }
+                            </div>
                         </Route>
 
                         <Route exact path="/">
