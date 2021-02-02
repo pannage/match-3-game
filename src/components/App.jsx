@@ -10,7 +10,7 @@ import LoseScreen from './lose-screen.jsx';
 import { checkNumberLevel, checkToDeleteCell } from './loadLevels';
 import WinScreen from './win-screen.jsx';
 import Menu from './menu.jsx';
-import { playAudio } from './playAudio';
+import { playAudioLevel, pauseAudioLevel, playAudioEffect } from './playAudio';
 
 class App extends React.Component {
     constructor(props) {
@@ -28,6 +28,7 @@ class App extends React.Component {
         this.toMove = true;
         this.levelIsWon = false;
         this.levelIsFinished = false;
+        this.isLoadLevel = false;
         this.state = {
             boardData: [],
         };
@@ -62,19 +63,26 @@ class App extends React.Component {
     }
 
     hotKeys({ key }) {
-        if (parseInt(key) < 8) {
+        if (parseInt(key) < 8 && !this.isLoadLevel) {
+            this.isLoadLevel = true;
+
             this.getBoardDataOfStartLevel(key);
-            playAudio('level1');
+            playAudioLevel(`level-${key}`);
             this.props.history.push('/level');
         }
 
         switch (key) {
         case 'q':
+            this.isLoadLevel = false;
+
             console.log('key :>> ', key);
+            pauseAudioLevel();
             this.props.history.push('/');
             break;
         case 'w':
+
             this.getBoardDataOfStartLevel(this.state.level);
+
             break;
         default:
             break;
@@ -138,9 +146,11 @@ class App extends React.Component {
         switch (boardData[cell.y][cell.x].type) {
         case 'torpedoOfColumn':
             boardData = this.checkColumn(cell, boardData);
+            playAudioEffect('torpedo');
             break;
         case 'torpedoOfRow':
             boardData = this.checkRow(cell, boardData);
+            playAudioEffect('torpedo');
             break;
         case 'rainbow':
             if (e.target.redraw) {
@@ -155,6 +165,8 @@ class App extends React.Component {
                         return item;
                     });
                 });
+
+                playAudioEffect('rainbow');
 
                 boardData = newBoardData;
                 boardData[cell.y][cell.x].toDelete = true;
@@ -198,10 +210,15 @@ class App extends React.Component {
                 boardData[cell.y - 1][cell.x + 1].toDelete = true;
             }
 
+            playAudioEffect('mine');
+
             break;
         case 'x-mine':
             boardData = this.checkRow(cell, boardData);
             boardData = this.checkColumn(cell, boardData);
+
+            playAudioEffect('x-mine');
+
             break;
         case 'three-row':
             boardData = this.checkColumn(cell, boardData);
@@ -230,6 +247,8 @@ class App extends React.Component {
                 boardData = this.checkRow(cell, boardData);
                 cell.x += 1;
             }
+
+            playAudioEffect('three-row');
 
             break;
         default:
@@ -358,6 +377,8 @@ class App extends React.Component {
             boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
             boardData[this.cellToReplace.y][this.cellToReplace.x].isDesk = desk;
             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
+
+            playAudioEffect('move');
 
             if (typeof boardData[this.cellToDrag.y][this.cellToDrag.x].type !== 'number') {
                 bonusUsed = true;
@@ -1224,6 +1245,8 @@ class App extends React.Component {
     getBoardDataOfStartLevel(numberLevel) {
         const { boardData, taskText, moves } = checkNumberLevel(numberLevel);
 
+        playAudioLevel(`level-${numberLevel}`);
+
         this.setState({ boardData, task: { moves, message: taskText }, level: numberLevel });
     }
 
@@ -1239,7 +1262,7 @@ class App extends React.Component {
                     </Link>
                 </div>
                 <div className="app">
-                    <Menu />
+                    <Menu that={this}/>
                     <Switch>
                         <Route path="/level">
                             <TaskBox
