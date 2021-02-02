@@ -243,6 +243,11 @@ animation: pulse 2s infinite;
 transition: 0.2s linear;
 }
 
+.level-inactive{
+    cursor: auto;
+    opacity: 0.3;
+}
+
 .level-btn:hover {
     cursor: pointer;
     transform: scale(1.3);
