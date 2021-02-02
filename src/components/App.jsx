@@ -107,6 +107,7 @@ class App extends React.Component {
     }
 
     handleDoubleClick(e, data) {
+        if (!this.toMove) return;
         const cell = {
             y: parseInt(e.target.dataset.rowIndex, 10),
             x: parseInt(e.target.dataset.cellIndex, 10),
