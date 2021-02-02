@@ -45,6 +45,9 @@ class App extends React.Component {
         this.checkBonusTask = this.checkBonusTask.bind(this);
         this.checkTask = this.checkTask.bind(this);
         this.checkObstaclesTask = this.checkObstaclesTask.bind(this);
+        this.getMaxLevel = this.getMaxLevel.bind(this);
+        this.setMaxLevel = this.setMaxLevel.bind(this);
+        this.maxLevel = this.getMaxLevel();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -75,6 +78,12 @@ class App extends React.Component {
         }
 
         return boardData;
+    }
+
+    getMaxLevel() {
+        let maxLevel = localStorage.getItem('max-level');
+        if (!maxLevel) maxLevel = 1;
+        return maxLevel;
     }
 
     checkRow(cell, boardData) {
@@ -1029,12 +1038,22 @@ class App extends React.Component {
             this.toMove = false;
             this.levelIsWon = true;
             this.levelIsFinished = true;
+            this.setMaxLevel();
             this.forceUpdate();
         } else if (moves <= 0) {
             this.clearLocalStorage();
             this.toMove = false;
             this.levelIsFinished = true;
             this.forceUpdate();
+        }
+    }
+
+    setMaxLevel() {
+        if (this.maxLevel === 7 || parseInt(this.state.level) !== this.maxLevel) {
+            return;
+        } else {
+            this.maxLevel += 1;
+            localStorage.setItem('max-level', this.maxLevel);
         }
     }
 
@@ -1136,7 +1155,6 @@ class App extends React.Component {
         } else if (cell.type === 'ground'){
             const index = this.taskCheck.message.findIndex((item) => item[0] === 'ground');
                 this.taskCheck.message[index][1] -= 1;
-                console.log(1);
     }
 }
 
@@ -1199,8 +1217,10 @@ class App extends React.Component {
                         </Route>
 
                         <Route exact path="/">
-                            <div onClick={({ target }) => this.getBoardDataOfStartLevel(target.dataset.level)}>
-                                <LevelRoad />
+                            <div onClick={({ target }) => {
+                                if (!target.dataset.level || target.dataset.typeBtn.includes('level-inactive')) return;
+                                this.getBoardDataOfStartLevel(target.dataset.level)}}>
+                                <LevelRoad level={this.maxLevel}/>
                             </div>
                         </Route>
                     </Switch>
