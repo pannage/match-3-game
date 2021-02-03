@@ -1,19 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Switch, Route, Link } from 'react-router-dom';
-import { withRouter } from 'react-router';
 import '../styles/App.css';
 import Board from './Board.jsx';
-import Footer from './Footer.jsx';
 import LevelRoad from './levels.jsx';
 import TaskBox from './task-box.jsx';
 import LoseScreen from './lose-screen.jsx';
 import { checkNumberLevel, checkToDeleteCell } from './loadLevels';
 import WinScreen from './win-screen.jsx';
-import Menu from './menu.jsx';
-import {
-    playAudioLevel, pauseAudioLevel, playAudioEffect, volumeOff, volumeOn
-} from './playAudio';
+import Menu from './menu.jsx'
 
 class App extends React.Component {
     constructor(props) {
@@ -27,15 +22,11 @@ class App extends React.Component {
             'url(../images/green-candy.png)',
             'url(../images/blue-candy.png)',
         ];
-        document.addEventListener('keydown', (e) => this.hotKeys(e));
         this.toMove = true;
         this.levelIsWon = false;
         this.levelIsFinished = false;
-        this.isLoadLevel = false;
         this.state = {
             boardData: [],
-            isClickBtnVolume: false,
-            isClickBtnMusic: false,
         };
         this.checkForEmptyUnderIce = this.checkForEmptyUnderIce.bind(this);
         this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
@@ -51,8 +42,6 @@ class App extends React.Component {
         this.setLocalStorage = this.setLocalStorage.bind(this);
         this.clearLocalStorage = this.clearLocalStorage.bind(this);
         this.setResult = this.setResult.bind(this);
-        this.getBoardDataOfStartLevel = this.getBoardDataOfStartLevel.bind(this);
-        this.hotKeys = this.hotKeys.bind(this);
         this.checkBonusTask = this.checkBonusTask.bind(this);
         this.checkTask = this.checkTask.bind(this);
         this.checkObstaclesTask = this.checkObstaclesTask.bind(this);
@@ -70,6 +59,7 @@ class App extends React.Component {
             this.checkForWinLose();
         }
     }
+
 
     hotKeys({ key }) {
         if (this.levelIsFinished || this.levelIsWon || !isMaxLevel) { return; }
@@ -108,6 +98,7 @@ class App extends React.Component {
         }
 
     }
+
 
     checkColumn(cell, boardData) {
         for (let i = cell.y; i < 8; i += 1) {
@@ -169,19 +160,9 @@ class App extends React.Component {
         switch (boardData[cell.y][cell.x].type) {
         case 'torpedoOfColumn':
             boardData = this.checkColumn(cell, boardData);
-
-            if (!this.state.isClickBtnVolume) {
-                playAudioEffect('torpedo');
-            }
-
             break;
         case 'torpedoOfRow':
             boardData = this.checkRow(cell, boardData);
-
-            if (!this.state.isClickBtnVolume) {
-                playAudioEffect('torpedo');
-            }
-
             break;
         case 'rainbow':
             if (e.target.redraw) {
@@ -197,15 +178,9 @@ class App extends React.Component {
                     });
                 });
 
-                if (!this.state.isClickBtnVolume) {
-                    playAudioEffect('rainbow');
-                }
-
                 boardData = newBoardData;
                 boardData[cell.y][cell.x].toDelete = true;
-            } else {
-                e.preventDefault();
-            }
+            } else { e.preventDefault(); }
 
             break;
         case 'mine':
@@ -243,19 +218,10 @@ class App extends React.Component {
                 boardData[cell.y - 1][cell.x + 1].toDelete = true;
             }
 
-            if (!this.state.isClickBtnVolume) {
-                playAudioEffect('mine');
-            }
-
             break;
         case 'x-mine':
             boardData = this.checkRow(cell, boardData);
             boardData = this.checkColumn(cell, boardData);
-
-            if (!this.state.isClickBtnVolume) {
-                playAudioEffect('x-mine');
-            }
-
             break;
         case 'three-row':
             boardData = this.checkColumn(cell, boardData);
@@ -285,15 +251,9 @@ class App extends React.Component {
                 cell.x += 1;
             }
 
-            if (!this.state.isClickBtnVolume) {
-                playAudioEffect('three-row');
-            }
-
             break;
         default:
-            if (!e.target.redraw) {
-                e.preventDefault();
-            }
+            if (!e.target.redraw) { e.preventDefault(); }
 
             break;
         }
@@ -302,19 +262,15 @@ class App extends React.Component {
             return boardData;
         }
 
-        if (
-            typeof boardData[cell.y][cell.x].type !== 'number'
-      && boardData[cell.y][cell.x].type !== 'ground'
-      && !this.levelIsFinished
-        ) {
+        if (typeof boardData[cell.y][cell.x].type !== 'number' && boardData[cell.y][cell.x].type !== 'ground' && !this.levelIsFinished) {
             this.setState((prevState) => {
                 return {
                     boardData,
                     task: {
                         moves: prevState.task.moves - 1,
                         message: prevState.task.message,
-                    },
-                };
+                    }
+                }
             });
         }
     }
@@ -364,12 +320,13 @@ class App extends React.Component {
 
         if (
             e.target.classList.contains('cell')
-      && this.state.boardData[e.target.dataset.rowIndex][e.target.dataset.cellIndex].type
-        !== 'ground'
-      && !this.state.boardData[e.target.dataset.rowIndex][e.target.dataset.cellIndex]
-          .isFrozen
-      && this.state.boardData[e.target.dataset.rowIndex][e.target.dataset.cellIndex].type
-        !== 'empty'
+        && this.state.boardData[e.target.dataset.rowIndex][
+            e.target.dataset.cellIndex
+        ].type !== 'ground' && !this.state.boardData[e.target.dataset.rowIndex][
+                e.target.dataset.cellIndex
+            ].isFrozen && this.state.boardData[e.target.dataset.rowIndex][
+                e.target.dataset.cellIndex
+            ].type !== 'empty'
         ) {
             this.cellToReplace = {
                 y: e.target.dataset.rowIndex,
@@ -385,16 +342,9 @@ class App extends React.Component {
     }
 
     dragEnd() {
-        if (!this.cellToDrag) {
-            return;
-        }
+        if (!this.cellToDrag) { return; }
 
-        if (
-            this.cellToDrag.x === this.cellToReplace.x
-      && this.cellToDrag.y === this.cellToReplace.y
-        ) {
-            return;
-        }
+        if (this.cellToDrag.x === this.cellToReplace.x && this.cellToDrag.y === this.cellToReplace.y) { return; }
 
         const movementVector = {
             x: this.cellToReplace.x - this.cellToDrag.x,
@@ -416,10 +366,6 @@ class App extends React.Component {
             boardData[this.cellToReplace.y][this.cellToReplace.x] = boardData[this.cellToDrag.y][this.cellToDrag.x];
             boardData[this.cellToReplace.y][this.cellToReplace.x].isDesk = desk;
             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
-
-            if (!this.state.isClickBtnVolume) {
-                playAudioEffect('move');
-            }
 
             if (typeof boardData[this.cellToDrag.y][this.cellToDrag.x].type !== 'number') {
                 bonusUsed = true;
@@ -479,8 +425,8 @@ class App extends React.Component {
                     task: {
                         moves: prevState.task.moves - 1,
                         message: prevState.task.message,
-                    },
-                };
+                    }
+                }
             });
         }
     }
@@ -491,10 +437,8 @@ class App extends React.Component {
         };
 
         for (let i = rowIndex + 2; i < 8; i += 1) {
-            if (
-                boardData[i][cellIndex].type === 'empty'
-        && boardData[i - 1][cellIndex].isFrozen
-            ) {
+            if (boardData[i][cellIndex].type === 'empty'
+        && boardData[i - 1][cellIndex].isFrozen) {
                 checkData = {
                     result: true,
                     emptyRow: i,
@@ -510,7 +454,9 @@ class App extends React.Component {
         const result = boardData.map((row, rowIndex) => {
             return row.map((cell, cellIndex) => {
                 if (rowIndex === 0 && cell.type === 'empty') {
-                    const randColor = this.candies[Math.floor(Math.random() * 6)];
+                    const randColor = this.candies[
+                        Math.floor(Math.random() * 6)
+                    ];
 
                     return {
                         url: randColor,
@@ -523,9 +469,8 @@ class App extends React.Component {
 
                 if (
                     boardData[rowIndex + 1]
-          && boardData[rowIndex + 1][cellIndex].type === 'empty'
-          && cell.type !== 'ground'
-          && !cell.isFrozen
+                && boardData[rowIndex + 1][cellIndex].type === 'empty'
+                && cell.type !== 'ground' && !cell.isFrozen
                 ) {
                     const changeCell = boardData[rowIndex + 1][cellIndex];
                     const desk = changeCell.isDesk;
@@ -537,13 +482,10 @@ class App extends React.Component {
                     return changeCell;
                 }
 
-                if (
-                    boardData[rowIndex + 1]
-          && boardData[rowIndex + 1][cellIndex - 1]
-          && boardData[rowIndex + 1][cellIndex - 1].type === 'empty'
-          && boardData[rowIndex][cellIndex - 1].type === 'ground'
-          && cell.type !== 'ground'
-                ) {
+                if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex - 1]
+                && boardData[rowIndex + 1][cellIndex - 1].type === 'empty'
+                && boardData[rowIndex][cellIndex - 1].type === 'ground'
+                && cell.type !== 'ground') {
                     const changeCell = boardData[rowIndex + 1][cellIndex - 1];
                     const desk = changeCell.isDesk;
 
@@ -554,13 +496,10 @@ class App extends React.Component {
                     return changeCell;
                 }
 
-                if (
-                    boardData[rowIndex + 1]
-          && boardData[rowIndex + 1][cellIndex + 1]
-          && boardData[rowIndex + 1][cellIndex + 1].type === 'empty'
-          && boardData[rowIndex][cellIndex + 1].type === 'ground'
-          && cell.type !== 'ground'
-                ) {
+                if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex + 1]
+                && boardData[rowIndex + 1][cellIndex + 1].type === 'empty'
+                && boardData[rowIndex][cellIndex + 1].type === 'ground'
+                && cell.type !== 'ground') {
                     const changeCell = boardData[rowIndex + 1][cellIndex + 1];
                     const desk = changeCell.isDesk;
 
@@ -571,14 +510,10 @@ class App extends React.Component {
                     return changeCell;
                 }
 
-                if (
-                    boardData[rowIndex + 1]
-          && boardData[rowIndex + 1][cellIndex - 1]
-          && boardData[rowIndex + 1][cellIndex - 1].type === 'empty'
-          && cell.type !== 'ground'
-          && boardData[rowIndex][cellIndex - 1].type === 'empty'
-          && boardData[rowIndex - 1]
-          && boardData[rowIndex - 1][cellIndex - 1].type === 'ground'
+                if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex - 1]
+                && boardData[rowIndex + 1][cellIndex - 1].type === 'empty' && cell.type !== 'ground'
+                && boardData[rowIndex][cellIndex - 1].type === 'empty' && boardData[rowIndex - 1]
+                && boardData[rowIndex - 1][cellIndex - 1].type === 'ground'
                 ) {
                     const changeCell = boardData[rowIndex + 1][cellIndex - 1];
                     const desk = changeCell.isDesk;
@@ -590,14 +525,10 @@ class App extends React.Component {
                     return changeCell;
                 }
 
-                if (
-                    boardData[rowIndex + 1]
-          && boardData[rowIndex + 1][cellIndex + 1]
-          && boardData[rowIndex + 1][cellIndex + 1].type === 'empty'
-          && cell.type !== 'ground'
-          && boardData[rowIndex][cellIndex + 1].type === 'empty'
-          && boardData[rowIndex - 1]
-          && boardData[rowIndex - 1][cellIndex + 1].type === 'ground'
+                if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex + 1]
+                    && boardData[rowIndex + 1][cellIndex + 1].type === 'empty' && cell.type !== 'ground'
+                    && boardData[rowIndex][cellIndex + 1].type === 'empty' && boardData[rowIndex - 1]
+                    && boardData[rowIndex - 1][cellIndex + 1].type === 'ground'
                 ) {
                     const changeCell = boardData[rowIndex + 1][cellIndex + 1];
                     const desk = changeCell.isDesk;
@@ -609,11 +540,8 @@ class App extends React.Component {
                     return changeCell;
                 }
 
-                if (
-                    boardData[rowIndex + 1]
-          && boardData[rowIndex + 1][cellIndex].isFrozen
-          && !cell.isFrozen
-                ) {
+                if (boardData[rowIndex + 1] && boardData[rowIndex + 1][cellIndex].isFrozen
+                && !cell.isFrozen) {
                     const checkData = this.checkForEmptyUnderIce(rowIndex, cellIndex, boardData);
 
                     if (checkData.result) {
@@ -682,9 +610,7 @@ class App extends React.Component {
                             isDesk: false,
                         };
                         this.checkBonusTask('mine');
-                    } else {
-                        accumBoard[rowId][cellIndex] = { ...cell };
-                    }
+                    } else { accumBoard[rowId][cellIndex] = { ...cell }; }
                 } else if (checkHorizontal) {
                     const checkBot = bd[rowId + 1]
             && bd[rowId + 2]
@@ -706,12 +632,8 @@ class App extends React.Component {
                             isDesk: false,
                         };
                         this.checkBonusTask('mine');
-                    } else {
-                        accumBoard[rowId][cellIndex] = { ...cell };
-                    }
-                } else {
-                    accumBoard[rowId][cellIndex] = { ...cell };
-                }
+                    } else { accumBoard[rowId][cellIndex] = { ...cell }; }
+                } else { accumBoard[rowId][cellIndex] = { ...cell }; }
             });
         });
 
@@ -761,12 +683,8 @@ class App extends React.Component {
                             isDesk: false,
                         };
                         this.checkBonusTask('mine');
-                    } else {
-                        accumBoard[rowId][cellIndex] = { ...cell };
-                    }
-                } else {
-                    accumBoard[rowId][cellIndex] = { ...cell };
-                }
+                    } else { accumBoard[rowId][cellIndex] = { ...cell }; }
+                } else { accumBoard[rowId][cellIndex] = { ...cell }; }
             });
         });
 
@@ -839,9 +757,7 @@ class App extends React.Component {
                             isDesk: false,
                         };
                         this.checkBonusTask('x-mine');
-                    } else {
-                        accumBoard[rowId][cellIndex] = { ...cell };
-                    }
+                    } else { accumBoard[rowId][cellIndex] = { ...cell }; }
                 } else if (checkHorizontalLeft || checkHorizontalRight) {
                     const checkPositionTop = bd[rowId - 1]
             && bd[rowId - 2]
@@ -868,12 +784,8 @@ class App extends React.Component {
                             isDesk: false,
                         };
                         this.checkBonusTask('x-mine');
-                    } else {
-                        accumBoard[rowId][cellIndex] = { ...cell };
-                    }
-                } else {
-                    accumBoard[rowId][cellIndex] = { ...cell };
-                }
+                    } else { accumBoard[rowId][cellIndex] = { ...cell }; }
+                } else { accumBoard[rowId][cellIndex] = { ...cell }; }
             });
         });
 
@@ -936,9 +848,7 @@ class App extends React.Component {
                             isDesk: false,
                         };
                         this.checkBonusTask('three-row');
-                    } else {
-                        accumBoard[rowId][cellIndex] = { ...cell };
-                    }
+                    } else { accumBoard[rowId][cellIndex] = { ...cell }; }
                 } else if (checkHorizontal) {
                     const checkPositionTop = bd[rowId - 1]
             && bd[rowId - 2]
@@ -965,12 +875,8 @@ class App extends React.Component {
                             isDesk: false,
                         };
                         this.checkBonusTask('three-row');
-                    } else {
-                        accumBoard[rowId][cellIndex] = { ...cell };
-                    }
-                } else {
-                    accumBoard[rowId][cellIndex] = { ...cell };
-                }
+                    } else { accumBoard[rowId][cellIndex] = { ...cell }; }
+                } else { accumBoard[rowId][cellIndex] = { ...cell }; }
             });
         });
         this.checkBoardData = accumBoard;
@@ -1005,9 +911,7 @@ class App extends React.Component {
                 function getCheckArray(checkArray, urlImage, typeBonus) {
                     if (checkArray) {
                         const isCheckOfFourAndFive = checkArray.every((cell, index, arr) => {
-                            if (cell.type === 'ground') {
-                                return false;
-                            }
+                            if (cell.type === 'ground') { return false; }
 
                             if (index !== arr.length - 1) {
                                 return cell.type === checkArray[index + 1].type;
@@ -1074,7 +978,8 @@ class App extends React.Component {
         let dataBeforeDelete;
         let newBoardData;
 
-        while (JSON.stringify(dataBeforeDelete) !== JSON.stringify(boardData)) {
+        while (JSON.stringify(dataBeforeDelete)
+    !== JSON.stringify(boardData)) {
             dataBeforeDelete = JSON.parse(JSON.stringify(boardData));
             newBoardData = boardData.map((row, rowIndex) => {
                 return row.map((cell, cellIndex) => {
@@ -1105,18 +1010,18 @@ class App extends React.Component {
         newBoardData = boardData.map((row, rowId) => {
             return row.map((cell, cellId) => {
                 const condition = cell.type === 'ground'
-          && ((boardData[rowId - 1]
-            && boardData[rowId - 1][cellId].toDelete
-            && boardData[rowId - 1][cellId].type !== 'ground')
-            || (boardData[rowId + 1]
-              && boardData[rowId + 1][cellId].toDelete
-              && boardData[rowId + 1][cellId].type !== 'ground')
-            || (boardData[rowId][cellId + 1]
-              && boardData[rowId][cellId + 1].toDelete
-              && boardData[rowId][cellId + 1].type !== 'ground')
-            || (boardData[rowId][cellId - 1]
-              && boardData[rowId][cellId - 1].toDelete
-              && boardData[rowId][cellId - 1].type !== 'ground'));
+              && ((boardData[rowId - 1]
+                  && boardData[rowId - 1][cellId].toDelete
+                  && boardData[rowId - 1][cellId].type !== 'ground')
+                  || (boardData[rowId + 1]
+                      && boardData[rowId + 1][cellId].toDelete
+                      && boardData[rowId + 1][cellId].type !== 'ground')
+                  || (boardData[rowId][cellId + 1]
+                      && boardData[rowId][cellId + 1].toDelete
+                      && boardData[rowId][cellId + 1].type !== 'ground')
+                  || (boardData[rowId][cellId - 1]
+                      && boardData[rowId][cellId - 1].toDelete
+                      && boardData[rowId][cellId - 1].type !== 'ground'));
 
                 if (condition) {
                     cell.toDelete = true;
@@ -1161,7 +1066,8 @@ class App extends React.Component {
         const { moves, message } = this.state.task;
         const isFinishedBoard = boardData.every((row) => {
             return row.every((cell) => {
-                return cell.type !== 'ground' && !cell.isFrozen && !cell.isDesk;
+                return cell.type !== 'ground'
+                && !cell.isFrozen && !cell.isDesk;
             });
         });
 
@@ -1206,9 +1112,7 @@ class App extends React.Component {
 
         if (result[level] && result[level] > 30 - moves) {
             result[level] = 30 - moves;
-        } else if (!result[level]) {
-            result[level] = 30 - moves;
-        }
+        } else if (!result[level]) { result[level] = 30 - moves; }
 
         localStorage.setItem('result', JSON.stringify(result));
     }
@@ -1225,11 +1129,11 @@ class App extends React.Component {
         localStorage.removeItem(level);
     }
 
+
     checkGameField(redraw = true, data) {
         let boardData = redraw ? JSON.parse(JSON.stringify(this.state.boardData)) : data;
         let someCellMarkedAsDeleted = false;
-
-        const task = JSON.parse(JSON.stringify(this.state.task));
+        let task = JSON.parse(JSON.stringify(this.state.task));
 
         const resultCheckObj = checkToDeleteCell(boardData, someCellMarkedAsDeleted);
 
@@ -1241,6 +1145,7 @@ class App extends React.Component {
 
         this.checkBoardData = boardData;
 
+
         this.checkThreeRow();
         this.checkXMine();
         this.checkFirstMine();
@@ -1248,6 +1153,7 @@ class App extends React.Component {
         this.checkForFourAndFive(5);
         this.checkForFourAndFive(4);
         boardData = this.handleDelete(this.checkBoardData);
+
 
         if (redraw && !this.levelIsFinished) {
             this.toMove = true;
@@ -1258,28 +1164,27 @@ class App extends React.Component {
     }
 
     checkTask(boardData) {
+
         boardData.forEach((row) => {
             row.forEach((cell) => {
-                const index = this.taskCheck.message.findIndex((item) => item[0] === cell.type);
-
-                if (index !== -1 && cell.toDelete) {
-                    if (this.taskCheck.message[index][1] > 0) {
+                 const index = this.taskCheck.message.findIndex((item) => item[0] === cell.type);
+                 if (index !== -1 && cell.toDelete){
+                     if (this.taskCheck.message[index][1] > 0) {
                         this.taskCheck.message[index][1] -= 1;
-                    }
-                }
-            });
-        });
-    }
+                     }
+                 }
+             });
+         });
+     }
 
     checkBonusTask(type) {
-        const index = this.taskCheck.message.findIndex((item) => type.includes(item[2]));
-
-        if (index !== -1) {
-            if (this.taskCheck.message[index][1] > 0) {
-                this.taskCheck.message[index][1] -= 1;
-            }
-        }
-    }
+                 const index = this.taskCheck.message.findIndex((item) => type.includes(item[2]));
+                 if (index !== -1 ){
+                     if (this.taskCheck.message[index][1] > 0) {
+                        this.taskCheck.message[index][1] -= 1;
+                     }
+                 }
+    };
 
     checkObstaclesTask(cell){
         if (cell.isFrozen){
@@ -1322,14 +1227,6 @@ class App extends React.Component {
     getBoardDataOfStartLevel(numberLevel) {
         const { boardData, taskText, moves } = checkNumberLevel(numberLevel);
 
-        playAudioLevel(`level-${numberLevel}`);
-
-        if (this.state.isClickBtnVolume || this.state.isClickBtnMusic) {
-            volumeOff();
-        } else {
-            volumeOn();
-        }
-
         this.setState({ boardData, task: { moves, message: taskText }, level: numberLevel });
     }
 
@@ -1338,14 +1235,15 @@ class App extends React.Component {
         const { boardData } = this.state;
 
         return (
-            <>
+             <>
                 <div className="menu">
                     <Link to="/" className="link">
                         <button className="menu-btn">pause_circle_outline</button>
+
                     </Link>
                 </div>
                 <div className="app">
-                    <Menu that={this}/>
+                    <Menu/>
                     <Switch>
                         <Route path="/level">
                             <div>
@@ -1354,7 +1252,6 @@ class App extends React.Component {
                                 message={this.state.task?.message}
                             />
                             {this.getGameField(boardData)}
-
                             { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
                             { (this.levelIsWon && this.levelIsFinished) && <WinScreen that={this} /> }
                             </div>
@@ -1369,10 +1266,9 @@ class App extends React.Component {
                         </Route>
                     </Switch>
                 </div>
-                <Footer />
             </>
         );
     }
 }
 
-export default withRouter(App);
+export default App;
