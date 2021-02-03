@@ -4,6 +4,9 @@
         "plugin:react/recommended"
     ],
     "parser": "babel-eslint",
+    "env": {
+        "browser": true,
+    },
     "rules": {
         "indent": [
             "error",
