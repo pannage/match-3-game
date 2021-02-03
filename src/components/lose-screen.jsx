@@ -6,6 +6,9 @@ import { Link } from 'react-router-dom';
 export default class LoseScreen extends React.Component {
     constructor(props) {
         super(props);
+
+        this.clear = this.clear.bind(this);
+        this.restartLevel = this.restartLevel.bind(this);
     }
 
     clear() {
@@ -13,14 +16,15 @@ export default class LoseScreen extends React.Component {
 
         that.levelIsFinished = false;
         that.levelIsWon = false;
+        that.isLoadLevel = false;
     }
 
     restartLevel() {
         const { that } = this.props;
         const { level } = that.state;
 
-        that.getBoardDataOfStartLevel(level);
         this.clear();
+        that.getBoardDataOfStartLevel(level);
     }
 
     render() {

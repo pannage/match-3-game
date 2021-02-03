@@ -55,11 +55,14 @@ export default class Menu extends React.Component {
         this.setState({ isClickBtnMusic: !this.isClickBtnMusic });
     }
 
+    showStatistics() {
+        const {that} = this.props;
+        that.showStatistics = true;
+        that.forceUpdate();
+    }
+
     render() {
         const { that } = this.props;
-
-        console.log('that.levelIsFinished :>> ', that.levelIsFinished);
-        console.log('that.levelIsWon :>> ', that.levelIsWon);
 
         if (that.levelIsFinished || that.levelIsWon) {
             pauseAudioLevel();
@@ -96,7 +99,7 @@ export default class Menu extends React.Component {
                 <div className="menu-point" onClick={() => this.musicOffOn()}>
                     {!this.isClickBtnMusic ? 'music_note' : 'music_off'}
                 </div>
-                <div className="menu-point">grading</div>
+                <div className="menu-point" onClick={() => this.showStatistics()}>grading</div>
                 <div className="menu-point">contact_support</div>
             </div>
         );

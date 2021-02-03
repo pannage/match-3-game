@@ -14,6 +14,7 @@ import Menu from './menu.jsx';
 import {
     playAudioLevel, pauseAudioLevel, playAudioEffect, volumeOff, volumeOn
 } from './playAudio';
+import Statistics from './Statistics';
 
 class App extends React.Component {
     constructor(props) {
@@ -32,6 +33,7 @@ class App extends React.Component {
         this.levelIsWon = false;
         this.levelIsFinished = false;
         this.isLoadLevel = false;
+        this.showStatistics = false;
         this.state = {
             boardData: [],
             isClickBtnVolume: false,
@@ -66,7 +68,7 @@ class App extends React.Component {
         if (JSON.stringify(prevState.boardData) !== JSON.stringify(this.state.boardData)) {
             this.toMove = false;
             setTimeout(this.moveIntoSquareBelow, 100);
-        } else if (!this.levelIsFinished) {
+        } else if (!this.levelIsFinished && this.isLoadLevel) {
             this.setLocalStorage();
             this.checkForWinLose();
         }
@@ -105,7 +107,6 @@ class App extends React.Component {
         default:
             break;
         }
-
     }
 
     checkColumn(cell, boardData) {
@@ -157,8 +158,6 @@ class App extends React.Component {
     }
 
     handleDoubleClick(e, data) {
-        if (!this.toMove) { return; }
-
         const cell = {
             y: parseInt(e.target.dataset.rowIndex, 10),
             x: parseInt(e.target.dataset.cellIndex, 10),
@@ -1204,15 +1203,18 @@ class App extends React.Component {
         if (localStorage.getItem('result')) {
             result = JSON.parse(localStorage.getItem('result'));
         } else {
-            result = {};
+            result = [];
         }
 
-        if (result[level] && result[level] > 30 - moves) {
-            result[level] = 30 - moves;
-        } else if (!result[level]) {
-            result[level] = 30 - moves;
+        const levelIndex = result.findIndex((item) => item[0] === level);
+
+        if (levelIndex !== -1 && result[levelIndex][1] > 30 - moves) {
+            result[levelIndex][1] = 30 - moves;
+        } else if (levelIndex === -1) {
+            result.push([level, 30 - moves]);
         }
 
+        result.sort((a, b) => a[0] - b[0]);
         localStorage.setItem('result', JSON.stringify(result));
     }
 
@@ -1328,6 +1330,8 @@ class App extends React.Component {
     getBoardDataOfStartLevel(numberLevel) {
         const { boardData, taskText, moves } = checkNumberLevel(numberLevel);
 
+        this.isLoadLevel = true;
+
         playAudioLevel(`level-${numberLevel}`);
 
         if (this.state.isClickBtnMusic) {
@@ -1340,7 +1344,6 @@ class App extends React.Component {
     }
 
     render() {
-        const { score } = this.state;
         const { boardData } = this.state;
 
         return (
@@ -1359,6 +1362,7 @@ class App extends React.Component {
                                 { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
                                 { (this.levelIsWon && this.levelIsFinished) && <WinScreen that={this} /> }
                             </div>
+                            {this.showStatistics && <Statistics that={this} />}
                         </Route>
 
                         <Route exact path="/">
@@ -1369,8 +1373,10 @@ class App extends React.Component {
                             }}>
                                 <LevelRoad level={this.maxLevel}/>
                             </div>
+                            {this.showStatistics && <Statistics that={this} />}
                         </Route>
                     </Switch>
+
                 </div>
                 <Footer />
             </>
