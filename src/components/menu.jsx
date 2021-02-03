@@ -57,6 +57,12 @@ export default class Menu extends React.Component {
 
         this.setState({ isClickBtnMusic: !this.isClickBtnMusic });
     }
+  
+    showStatistics() {
+        const {that} = this.props;
+        that.showStatistics = true;
+        that.forceUpdate();
+    }
 
     getButtonBackMenu(isLoadPage) {
         if (isLoadPage) {
@@ -81,12 +87,12 @@ export default class Menu extends React.Component {
 
         that.isClickRulesOfGame = !that.isClickRulesOfGame;
 
-        // that.forceUpdate();
         this.setState({ isClickRulesOfGame: this.isClickRulesOfGame });
       }
 
     render() {
         const { that } = this.props;
+
 
         if (that.levelIsFinished || that.levelIsWon) {
             pauseAudioLevel();
@@ -119,10 +125,11 @@ export default class Menu extends React.Component {
                 <div className="menu-point" onClick={() => this.musicOffOn()}>
                     {!this.isClickBtnMusic ? 'music_note' : 'music_off'}
                 </div>
+                <div className="menu-point" onClick={() => this.showStatistics()}>grading</div>
                 <div className="menu-point" onClick={() => this.hiddenRulesPage()}>
                     grading
                 </div>
-                <div className="menu-point">contact_support</div>
+                <div className="menu-point" onClick={() => this.hiddenRulesPage()}>contact_support</div>
             </div>
         );
     }

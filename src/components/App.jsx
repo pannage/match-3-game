@@ -19,68 +19,71 @@ import {
   volumeOff,
   volumeOn,
 } from './playAudio';
+import Statistics from './Statistics';
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.width = 8;
-    this.candies = [
-      'url(../images/red-candy.png)',
-      'url(../images/yellow-candy.png)',
-      'url(../images/orange-candy.png)',
-      'url(../images/purple-candy.png)',
-      'url(../images/green-candy.png)',
-      'url(../images/blue-candy.png)',
-    ];
-    document.addEventListener('keydown', (e) => this.hotKeys(e));
-    this.toMove = true;
-    this.levelIsWon = false;
-    this.levelIsFinished = false;
-    this.isLoadLevel = false;
-    this.isClickRulesOfGame = false;
-    this.state = {
-      boardData: [],
-      isClickBtnVolume: false,
-      isClickBtnMusic: false,
-    };
-    this.checkForEmptyUnderIce = this.checkForEmptyUnderIce.bind(this);
-    this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
-    this.handleDoubleClick = this.handleDoubleClick.bind(this);
-    this.checkGameField = this.checkGameField.bind(this);
-    this.checkThreeRow = this.checkThreeRow.bind(this);
-    this.checkXMine = this.checkXMine.bind(this);
-    this.checkFirstMine = this.checkFirstMine.bind(this);
-    this.checkSecondMine = this.checkSecondMine.bind(this);
-    this.checkForFourAndFive = this.checkForFourAndFive.bind(this);
-    this.getGameField = this.getGameField.bind(this);
-    this.checkForWinLose = this.checkForWinLose.bind(this);
-    this.setLocalStorage = this.setLocalStorage.bind(this);
-    this.clearLocalStorage = this.clearLocalStorage.bind(this);
-    this.setResult = this.setResult.bind(this);
-    this.getBoardDataOfStartLevel = this.getBoardDataOfStartLevel.bind(this);
-    this.hotKeys = this.hotKeys.bind(this);
-    this.checkBonusTask = this.checkBonusTask.bind(this);
-    this.checkTask = this.checkTask.bind(this);
-    this.checkObstaclesTask = this.checkObstaclesTask.bind(this);
-    this.getMaxLevel = this.getMaxLevel.bind(this);
-    this.setMaxLevel = this.setMaxLevel.bind(this);
-    this.maxLevel = this.getMaxLevel();
-    localStorage.setItem('max-level', Number(this.maxLevel));
-  }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (JSON.stringify(prevState.boardData) !== JSON.stringify(this.state.boardData)) {
-      this.toMove = false;
-      setTimeout(this.moveIntoSquareBelow, 100);
-    } else if (!this.levelIsFinished) {
-      this.setLocalStorage();
-      this.checkForWinLose();
+    constructor(props) {
+        super(props);
+        this.width = 8;
+        this.candies = [
+            'url(../images/red-candy.png)',
+            'url(../images/yellow-candy.png)',
+            'url(../images/orange-candy.png)',
+            'url(../images/purple-candy.png)',
+            'url(../images/green-candy.png)',
+            'url(../images/blue-candy.png)',
+        ];
+        document.addEventListener('keydown', (e) => this.hotKeys(e));
+        this.toMove = true;
+        this.levelIsWon = false;
+        this.levelIsFinished = false;
+        this.isLoadLevel = false;
+        this.showStatistics = false;
+        this.state = {
+            boardData: [],
+            isClickBtnVolume: false,
+            isClickBtnMusic: false,
+        };
+        this.checkForEmptyUnderIce = this.checkForEmptyUnderIce.bind(this);
+        this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
+        this.handleDoubleClick = this.handleDoubleClick.bind(this);
+        this.checkGameField = this.checkGameField.bind(this);
+        this.checkThreeRow = this.checkThreeRow.bind(this);
+        this.checkXMine = this.checkXMine.bind(this);
+        this.checkFirstMine = this.checkFirstMine.bind(this);
+        this.checkSecondMine = this.checkSecondMine.bind(this);
+        this.checkForFourAndFive = this.checkForFourAndFive.bind(this);
+        this.getGameField = this.getGameField.bind(this);
+        this.checkForWinLose = this.checkForWinLose.bind(this);
+        this.setLocalStorage = this.setLocalStorage.bind(this);
+        this.clearLocalStorage = this.clearLocalStorage.bind(this);
+        this.setResult = this.setResult.bind(this);
+        this.getBoardDataOfStartLevel = this.getBoardDataOfStartLevel.bind(this);
+        this.hotKeys = this.hotKeys.bind(this);
+        this.checkBonusTask = this.checkBonusTask.bind(this);
+        this.checkTask = this.checkTask.bind(this);
+        this.checkObstaclesTask = this.checkObstaclesTask.bind(this);
+        this.getMaxLevel = this.getMaxLevel.bind(this);
+        this.setMaxLevel = this.setMaxLevel.bind(this);
+        this.maxLevel = this.getMaxLevel();
+        localStorage.setItem('max-level', Number(this.maxLevel));
     }
-  }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (JSON.stringify(prevState.boardData) !== JSON.stringify(this.state.boardData)) {
+            this.toMove = false;
+            setTimeout(this.moveIntoSquareBelow, 100);
+        } else if (!this.levelIsFinished && this.isLoadLevel) {
+            this.setLocalStorage();
+            this.checkForWinLose();
+        }
+    }
+  
   hotKeys({ key }) {
     if (this.levelIsFinished || this.levelIsWon) {
       return;
+
     }
 
     if (!isNaN(parseInt(key))) {
@@ -105,6 +108,7 @@ class App extends React.Component {
         if (this.isLoadLevel) {
           this.getBoardDataOfStartLevel(this.state.level);
         }
+
 
         break;
       case 'e':
@@ -131,6 +135,7 @@ class App extends React.Component {
       } else {
         boardData[i][cell.x].toDelete = true;
       }
+
     }
 
     return boardData;
@@ -171,14 +176,15 @@ class App extends React.Component {
       return;
     }
 
-    const cell = {
-      y: parseInt(e.target.dataset.rowIndex, 10),
-      x: parseInt(e.target.dataset.cellIndex, 10),
-    };
+  handleDoubleClick(e, data) {
+        const cell = {
+            y: parseInt(e.target.dataset.rowIndex, 10),
+            x: parseInt(e.target.dataset.cellIndex, 10),
+        };
 
-    let boardData = e.target.redraw
-      ? data
-      : JSON.parse(JSON.stringify(this.state.boardData));
+        let boardData = e.target.redraw
+            ? data
+            : JSON.parse(JSON.stringify(this.state.boardData));
 
     switch (boardData[cell.y][cell.x].type) {
       case 'torpedoOfColumn':
@@ -1137,161 +1143,164 @@ class App extends React.Component {
     this.checkBoardData = boardData;
   }
 
-  handleDelete(boardData) {
-    let dataBeforeDelete;
-    let newBoardData;
+ handleDelete(boardData) {
+        let dataBeforeDelete;
+        let newBoardData;
 
-    while (JSON.stringify(dataBeforeDelete) !== JSON.stringify(boardData)) {
-      dataBeforeDelete = JSON.parse(JSON.stringify(boardData));
-      newBoardData = boardData.map((row, rowIndex) => {
-        return row.map((cell, cellIndex) => {
-          if (cell.toDelete && typeof cell.type !== 'number') {
-            const dragBonusEvent = {
-              target: {
-                dataset: {
-                  rowIndex,
-                  cellIndex,
-                },
-                redraw: true,
-                rainbowSet: {
-                  rowIndex: rowIndex + 1,
-                  cellIndex,
-                },
-              },
-            };
+        while (JSON.stringify(dataBeforeDelete) !== JSON.stringify(boardData)) {
+            dataBeforeDelete = JSON.parse(JSON.stringify(boardData));
+            newBoardData = boardData.map((row, rowIndex) => {
+                return row.map((cell, cellIndex) => {
+                    if (cell.toDelete && typeof cell.type !== 'number') {
+                        const dragBonusEvent = {
+                            target: {
+                                dataset: {
+                                    rowIndex,
+                                    cellIndex,
+                                },
+                                redraw: true,
+                                rainbowSet: {
+                                    rowIndex: rowIndex + 1,
+                                    cellIndex,
+                                },
+                            },
+                        };
 
-            boardData = this.handleDoubleClick(dragBonusEvent, boardData);
-          }
+                        boardData = this.handleDoubleClick(dragBonusEvent, boardData);
+                    }
 
-          return cell;
+                    return cell;
+                });
+            });
+            boardData = JSON.parse(JSON.stringify(newBoardData));
+        }
+
+        newBoardData = boardData.map((row, rowId) => {
+            return row.map((cell, cellId) => {
+                const condition = cell.type === 'ground'
+          && ((boardData[rowId - 1]
+            && boardData[rowId - 1][cellId].toDelete
+            && boardData[rowId - 1][cellId].type !== 'ground')
+            || (boardData[rowId + 1]
+              && boardData[rowId + 1][cellId].toDelete
+              && boardData[rowId + 1][cellId].type !== 'ground')
+            || (boardData[rowId][cellId + 1]
+              && boardData[rowId][cellId + 1].toDelete
+              && boardData[rowId][cellId + 1].type !== 'ground')
+            || (boardData[rowId][cellId - 1]
+              && boardData[rowId][cellId - 1].toDelete
+              && boardData[rowId][cellId - 1].type !== 'ground'));
+
+                if (condition) {
+                    cell.toDelete = true;
+                }
+
+                return cell;
+            });
         });
-      });
-      boardData = JSON.parse(JSON.stringify(newBoardData));
+
+        boardData = newBoardData.map((row) => {
+            return row.map((cell) => {
+                if (cell.toDelete) {
+                    this.checkObstaclesTask(cell);
+
+                    if (cell.isFrozen) {
+                        return {
+                            url: cell.url.replace(/candy-ice.png/, 'candy.png'),
+                            type: cell.type,
+                            toDelete: false,
+                            isFrozen: false,
+                            isDesk: false,
+                        };
+                    }
+
+                    return {
+                        url: '',
+                        type: 'empty',
+                        toDelete: false,
+                        isFrozen: false,
+                        isDesk: false,
+                    };
+                }
+
+                return cell;
+            });
+        });
+
+        return boardData;
     }
 
-    newBoardData = boardData.map((row, rowId) => {
-      return row.map((cell, cellId) => {
-        const condition =
-          cell.type === 'ground' &&
-          ((boardData[rowId - 1] &&
-            boardData[rowId - 1][cellId].toDelete &&
-            boardData[rowId - 1][cellId].type !== 'ground') ||
-            (boardData[rowId + 1] &&
-              boardData[rowId + 1][cellId].toDelete &&
-              boardData[rowId + 1][cellId].type !== 'ground') ||
-            (boardData[rowId][cellId + 1] &&
-              boardData[rowId][cellId + 1].toDelete &&
-              boardData[rowId][cellId + 1].type !== 'ground') ||
-            (boardData[rowId][cellId - 1] &&
-              boardData[rowId][cellId - 1].toDelete &&
-              boardData[rowId][cellId - 1].type !== 'ground'));
+    checkForWinLose() {
+        const { boardData } = this.state;
+        const { moves, message } = this.state.task;
+        const isFinishedBoard = boardData.every((row) => {
+            return row.every((cell) => {
+                return cell.type !== 'ground' && !cell.isFrozen && !cell.isDesk;
+            });
+        });
 
-        if (condition) {
-          cell.toDelete = true;
+        const isFinishedTask = message.every((item) => item[1] === 0);
+
+        if (isFinishedBoard && isFinishedTask) {
+            this.clearLocalStorage();
+            this.setResult();
+            this.toMove = false;
+            this.levelIsWon = true;
+            this.levelIsFinished = true;
+            this.setMaxLevel();
+            this.forceUpdate();
+        } else if (moves <= 0) {
+            this.clearLocalStorage();
+            this.toMove = false;
+            this.levelIsFinished = true;
+            this.forceUpdate();
+        }
+    }
+
+    setMaxLevel() {
+        if (this.maxLevel === 7 || parseInt(this.state.level) !== this.maxLevel) {
+
+        } else {
+            this.maxLevel += 1;
+            localStorage.setItem('max-level', this.maxLevel);
+        }
+    }
+
+    setResult() {
+        const { level } = this.state;
+        const { moves } = this.state.task;
+
+        let result;
+
+        if (localStorage.getItem('result')) {
+            result = JSON.parse(localStorage.getItem('result'));
+        } else {
+            result = [];
         }
 
-        return cell;
-      });
-    });
+        const levelIndex = result.findIndex((item) => item[0] === level);
 
-    boardData = newBoardData.map((row) => {
-      return row.map((cell) => {
-        if (cell.toDelete) {
-          this.checkObstaclesTask(cell);
-
-          if (cell.isFrozen) {
-            return {
-              url: cell.url.replace(/candy-ice.png/, 'candy.png'),
-              type: cell.type,
-              toDelete: false,
-              isFrozen: false,
-              isDesk: false,
-            };
-          }
-
-          return {
-            url: '',
-            type: 'empty',
-            toDelete: false,
-            isFrozen: false,
-            isDesk: false,
-          };
+        if (levelIndex !== -1 && result[levelIndex][1] > 30 - moves) {
+            result[levelIndex][1] = 30 - moves;
+        } else if (levelIndex === -1) {
+            result.push([level, 30 - moves]);
         }
 
-        return cell;
-      });
-    });
-
-    return boardData;
-  }
-
-  checkForWinLose() {
-    const { boardData } = this.state;
-    const { moves, message } = this.state.task;
-    const isFinishedBoard = boardData.every((row) => {
-      return row.every((cell) => {
-        return cell.type !== 'ground' && !cell.isFrozen && !cell.isDesk;
-      });
-    });
-
-    const isFinishedTask = message.every((item) => item[1] === 0);
-
-    if (isFinishedBoard && isFinishedTask) {
-      this.clearLocalStorage();
-      this.setResult();
-      this.toMove = false;
-      this.levelIsWon = true;
-      this.levelIsFinished = true;
-      this.setMaxLevel();
-      this.forceUpdate();
-    } else if (moves <= 0) {
-      this.clearLocalStorage();
-      this.toMove = false;
-      this.levelIsFinished = true;
-      this.forceUpdate();
-    }
-  }
-
-  setMaxLevel() {
-    if (this.maxLevel === 7 || parseInt(this.state.level) !== this.maxLevel) {
-    } else {
-      this.maxLevel += 1;
-      localStorage.setItem('max-level', this.maxLevel);
-    }
-  }
-
-  setResult() {
-    const { level } = this.state;
-    const { moves } = this.state.task;
-
-    let result;
-
-    if (localStorage.getItem('result')) {
-      result = JSON.parse(localStorage.getItem('result'));
-    } else {
-      result = {};
+        result.sort((a, b) => a[0] - b[0]);
+        localStorage.setItem('result', JSON.stringify(result));
     }
 
-    if (result[level] && result[level] > 30 - moves) {
-      result[level] = 30 - moves;
-    } else if (!result[level]) {
-      result[level] = 30 - moves;
+    setLocalStorage() {
+        const { level, boardData, task } = this.state;
+
+        localStorage.setItem(level, [JSON.stringify(boardData), JSON.stringify(task)]);
     }
 
-    localStorage.setItem('result', JSON.stringify(result));
-  }
+    clearLocalStorage() {
+        const { level } = this.state;
 
-  setLocalStorage() {
-    const { level, boardData, task } = this.state;
-
-    localStorage.setItem(level, [JSON.stringify(boardData), JSON.stringify(task)]);
-  }
-
-  clearLocalStorage() {
-    const { level } = this.state;
-
-    localStorage.removeItem(level);
-  }
+        localStorage.removeItem(level);
+    }
 
   checkGameField(redraw = true, data) {
     let boardData = redraw ? JSON.parse(JSON.stringify(this.state.boardData)) : data;
@@ -1350,20 +1359,20 @@ class App extends React.Component {
   }
 
   checkObstaclesTask(cell) {
-    if (cell.isFrozen) {
-      const index = this.taskCheck.message.findIndex((item) => item[0] === 'ice');
+        if (cell.isFrozen) {
+            const index = this.taskCheck.message.findIndex((item) => item[0] === 'ice');
 
-      this.taskCheck.message[index][1] -= 1;
-    } else if (cell.isDesk) {
-      const index = this.taskCheck.message.findIndex((item) => item[0] === 'desk');
+            this.taskCheck.message[index][1] -= 1;
+        } else if (cell.isDesk) {
+            const index = this.taskCheck.message.findIndex((item) => item[0] === 'desk');
 
-      this.taskCheck.message[index][1] -= 1;
-    } else if (cell.type === 'ground') {
-      const index = this.taskCheck.message.findIndex((item) => item[0] === 'ground');
+            this.taskCheck.message[index][1] -= 1;
+        } else if (cell.type === 'ground') {
+            const index = this.taskCheck.message.findIndex((item) => item[0] === 'ground');
 
-      this.taskCheck.message[index][1] -= 1;
+            this.taskCheck.message[index][1] -= 1;
+        }
     }
-  }
 
   getGameField(boardData) {
     return (
@@ -1392,7 +1401,9 @@ class App extends React.Component {
 
   getBoardDataOfStartLevel(numberLevel) {
     const { boardData, taskText, moves } = checkNumberLevel(numberLevel);
+   
     this.isLoadLevel = true;
+    
     playAudioLevel(`level-${numberLevel}`);
 
     if (this.state.isClickBtnMusic) {
@@ -1400,55 +1411,48 @@ class App extends React.Component {
     } else {
       volumeOn();
     }
-
     this.setState({ boardData, task: { moves, message: taskText }, level: numberLevel });
   }
 
-  render() {
-    const { score } = this.state;
-    const { boardData } = this.state;
+     render() {
+        const { boardData } = this.state;
 
-    return (
-      <>
-        <div className="app">
-          <Menu that={this} />
-          <Switch>
-            <Route path="/level">
-              <div>
-                <TaskBox
-                  moves={this.state.task?.moves}
-                  message={this.state.task?.message}
-                />
-                {this.getGameField(boardData)}
+        return (
+            <>
+                <div className="app">
+                    <Menu that={this}/>
+                    <Switch>
+                        <Route path="/level">
+                            <div>
+                                <TaskBox
+                                    moves={this.state.task?.moves}
+                                    message={this.state.task?.message}
+                                />
+                                {this.getGameField(boardData)}
 
-                {!this.levelIsWon && this.levelIsFinished && <LoseScreen that={this} />}
-                {this.levelIsWon && this.levelIsFinished && <WinScreen that={this} />}
-              </div>
-            </Route>
-            {this.isClickRulesOfGame && <Rules />}
-            {/* <Rules /> */}
-            <Route exact path="/">
-              <div
-                onClick={({ target }) => {
-                  if (
-                    !target.dataset.level ||
-                    target.dataset.typeBtn.includes('level-inactive')
-                  ) {
-                    return;
-                  }
+                                { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
+                                { (this.levelIsWon && this.levelIsFinished) && <WinScreen that={this} /> }
+                            </div>
+                            {this.showStatistics && <Statistics that={this} />}
+                        </Route>
+                        {this.isClickRulesOfGame && <Rules />}
+                        <Route exact path="/">
+                            <div onClick={({ target }) => {
+                                if (!target.dataset.level || target.dataset.typeBtn.includes('level-inactive')) { return; }
 
-                  this.getBoardDataOfStartLevel(target.dataset.level);
-                }}
-              >
-                <LevelRoad level={this.maxLevel} />
-              </div>
-            </Route>
-          </Switch>
-        </div>
-        <Footer />
-      </>
-    );
-  }
+                                this.getBoardDataOfStartLevel(target.dataset.level);
+                            }}>
+                                <LevelRoad level={this.maxLevel}/>
+                            </div>
+                            {this.showStatistics && <Statistics that={this} />}
+                        </Route>
+                    </Switch>
+
+                </div>
+                <Footer />
+            </>
+        );
+    }
 }
 
 export default withRouter(App);
