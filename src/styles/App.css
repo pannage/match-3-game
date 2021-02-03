@@ -13,6 +13,10 @@
   font-style: normal;
 }
 
+a {
+    text-decoration: none;
+}
+
 html {
   height: 100%;
 }
@@ -408,11 +412,6 @@ button {
   background-position: -200% 0, 0 0;
 }
 
-.task div {
-  width: 70px;
-  height: 70px;
-}
-
 .menu-point {
   font-family: "Material Icons";
 }
@@ -539,4 +538,19 @@ button {
             transform: translateX(0);
             transform: translateX(0);
         }
+    }
+
+
+
+    .task-point {
+        width: 60px!important;
+        height: 60px!important;
+        background-size: 60px 60px;
+    }
+
+    .task-wrapper {
+        display: flex;
+        margin: 0 auto;
+        justify-content: center;
+        align-items: center;
     }
