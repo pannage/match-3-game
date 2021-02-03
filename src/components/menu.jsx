@@ -36,7 +36,6 @@ export default class Menu extends React.Component {
             volumeOn();
         }
 
-        // this.isClickBtnVolume = that.state.isClickBtnVolume;
         this.setState({ isClickBtnVolume: !this.isClickBtnVolume });
     }
 
@@ -61,7 +60,6 @@ export default class Menu extends React.Component {
             volumeOn();
         }
 
-        // this.isClickBtnMusic = that.state.isClickBtnMusic;
         this.setState({ isClickBtnMusic: !this.isClickBtnMusic });
     }
 
