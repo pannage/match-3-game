@@ -5,6 +5,7 @@ import '../styles/App.css';
 export default class Rules extends React.Component {
     constructor(props) {
         super(props);
+        this.closeRules = this.closeRules.bind(this);
     }
 
     closeRules() {
@@ -72,3 +73,10 @@ export default class Rules extends React.Component {
         );
     }
 }
+
+Rules.propTypes = {
+    that: PropTypes.objectOf(
+        PropTypes.object,
+        PropTypes.bool,
+    ).isRequired,
+};

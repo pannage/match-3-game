@@ -50,4 +50,5 @@ Board.propTypes = {
     squares: PropTypes.arrayOf(
         PropTypes.arrayOf(PropTypes.object),
     ).isRequired,
+    background: PropTypes.bool,
 };

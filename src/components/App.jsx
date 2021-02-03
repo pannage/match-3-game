@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Switch, Route, Link } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import { withRouter } from 'react-router';
 import '../styles/App.css';
 import Rules from './Rules.jsx';
@@ -83,10 +83,10 @@ class App extends React.Component {
             return;
         }
 
-        if (!isNaN(parseInt(key))) {
-            const isMaxLevel = parseInt(key) <= +localStorage.getItem('max-level');
+        if (!Number.isNaN(parseInt(key, 10))) {
+            const isMaxLevel = parseInt(key, 10) <= +localStorage.getItem('max-level');
 
-            if (parseInt(key) < 8 && !this.isLoadLevel && isMaxLevel) {
+            if (parseInt(key, 10) < 8 && !this.isLoadLevel && isMaxLevel) {
                 this.isLoadLevel = true;
 
                 this.getBoardDataOfStartLevel(key);
@@ -120,7 +120,9 @@ class App extends React.Component {
         }
     }
 
-    checkColumn(cell, boardData) {
+    checkColumn(cell, newBoardData) {
+        const boardData = JSON.parse(JSON.stringify(newBoardData));
+
         for (let i = cell.y; i < 8; i += 1) {
             if (boardData[i][cell.x].type === 'ground') {
                 i = 8;
@@ -151,7 +153,9 @@ class App extends React.Component {
         return maxLevel;
     }
 
-    checkRow(cell, boardData) {
+    checkRow(cell, newBoardData) {
+        const boardData = JSON.parse(JSON.stringify(newBoardData));
+
         for (let i = cell.x; i < 8; i += 1) {
             if (boardData[cell.y][i].type === 'ground') {
                 i = 8;
@@ -169,12 +173,6 @@ class App extends React.Component {
         }
 
         return boardData;
-    }
-
-    handleDoubleClick(e, data) {
-        if (!this.toMove) {
-
-        }
     }
 
     handleDoubleClick(e, data) {
@@ -210,11 +208,13 @@ class App extends React.Component {
 
                 const newBoardData = boardData.map((row) => {
                     return row.map((item) => {
+                        const newItem = { ...item };
+
                         if (colorCell === item.type) {
-                            item.toDelete = true;
+                            newItem.toDelete = true;
                         }
 
-                        return item;
+                        return newItem;
                     });
                 });
 
@@ -360,6 +360,8 @@ class App extends React.Component {
                 };
             });
         }
+
+        return true;
     }
 
     onMouseDown(e) {
@@ -1228,11 +1230,14 @@ class App extends React.Component {
     }
 
     setMaxLevel() {
-        if (this.maxLevel === 7 || parseInt(this.state.level) !== this.maxLevel) {
-        } else {
-            this.maxLevel += 1;
-            localStorage.setItem('max-level', this.maxLevel);
+        if (this.maxLevel === 7 || parseInt(this.state.level, 10) !== this.maxLevel) {
+            return true;
         }
+
+        this.maxLevel += 1;
+        localStorage.setItem('max-level', this.maxLevel);
+
+        return true;
     }
 
     setResult() {
@@ -1432,5 +1437,9 @@ class App extends React.Component {
         );
     }
 }
+
+App.propTypes = {
+    history: PropTypes.object.isRequired,
+};
 
 export default withRouter(App);

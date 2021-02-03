@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/App.css';
 import { Link } from 'react-router-dom';
-import { playAudioLevel, pauseAudioLevel, playAudioEffect } from './playAudio';
+import { pauseAudioLevel } from './playAudio';
 
 export default class WinScreen extends React.Component {
     constructor(props) {
@@ -49,3 +49,10 @@ export default class WinScreen extends React.Component {
         );
     }
 }
+
+WinScreen.propTypes = {
+    that: PropTypes.objectOf(
+        PropTypes.object,
+        PropTypes.bool,
+    ).isRequired,
+};
