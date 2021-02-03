@@ -22,13 +22,13 @@ export default class Statistics extends React.Component {
             <div className="win-screen-container">
                 <div className="win-screen-title">Statistics</div>
                 <div className="win-screen-wrapper">
-                    <ul>
+                    {result ? <ul>
                         {result.map((item) => {
                             return <li key={`Level-${item[0]}`}>
                                 {`Level-${item[0]} : ${item[1]} moves`}
                             </li>;
                         })}
-                    </ul>
+                    </ul> : <div>Sorry, no statistics yet</div>}
                     <div className="button-wrap">
                         <button className="button" onClick={() => this.close()}>CLOSE</button>
                     </div>

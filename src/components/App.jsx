@@ -19,7 +19,7 @@ import {
     volumeOff,
     volumeOn,
 } from './playAudio';
-import Statistics from './Statistics';
+import Statistics from './Statistics.jsx';
 
 class App extends React.Component {
     constructor(props) {
@@ -66,7 +66,6 @@ class App extends React.Component {
         this.getMaxLevel = this.getMaxLevel.bind(this);
         this.setMaxLevel = this.setMaxLevel.bind(this);
         this.maxLevel = this.getMaxLevel();
-        localStorage.setItem('max-level', Number(this.maxLevel));
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -146,6 +145,7 @@ class App extends React.Component {
 
         if (!maxLevel) {
             maxLevel = 1;
+            localStorage.setItem('max-level', maxLevel);
         }
 
         return maxLevel;
