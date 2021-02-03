@@ -10,6 +10,7 @@ export default class Menu extends React.Component {
         this.state = {
             isClickBtnVolume: false,
             isClickBtnMusic: false,
+            isClickRulesOfGame: false,
         };
         this.isClickBtnVolume = false;
         this.isClickBtnMusic = false;
@@ -18,7 +19,9 @@ export default class Menu extends React.Component {
     restartGame() {
         const { that } = this.props;
 
-        that.getBoardDataOfStartLevel(that.state.level);
+        if (that.isLoadLevel) {
+            that.getBoardDataOfStartLevel(that.state.level);
+        }
     }
 
     volumeOffOn() {
@@ -55,11 +58,35 @@ export default class Menu extends React.Component {
         this.setState({ isClickBtnMusic: !this.isClickBtnMusic });
     }
 
-    render() {
+    getButtonBackMenu(isLoadPage) {
+        if (isLoadPage) {
+            return (
+                <Link to="/">
+                    <div className="menu-point" onClick={() => this.clickButtonArrowBack()}>
+                        arrow_back
+                    </div>
+                </Link>
+            );
+        }
+
+        return (
+            <div className="menu-point" onClick={() => this.clickButtonArrowBack()}>
+                arrow_back
+            </div>
+        );
+    }
+
+      hiddenRulesPage() {
         const { that } = this.props;
 
-        console.log('that.levelIsFinished :>> ', that.levelIsFinished);
-        console.log('that.levelIsWon :>> ', that.levelIsWon);
+        that.isClickRulesOfGame = !that.isClickRulesOfGame;
+
+        // that.forceUpdate();
+        this.setState({ isClickRulesOfGame: this.isClickRulesOfGame });
+      }
+
+    render() {
+        const { that } = this.props;
 
         if (that.levelIsFinished || that.levelIsWon) {
             pauseAudioLevel();
@@ -82,11 +109,7 @@ export default class Menu extends React.Component {
 
         return (
             <div className="menu-container">
-                <Link to="/">
-                    <div className="menu-point" onClick={() => this.clickButtonArrowBack()}>
-                        arrow_back
-                    </div>
-                </Link>
+                {that.isLoadLevel ? this.getButtonBackMenu(true) : this.getButtonBackMenu(false)}
                 <div className="menu-point" onClick={() => this.restartGame()}>
                     refresh
                 </div>
@@ -96,7 +119,9 @@ export default class Menu extends React.Component {
                 <div className="menu-point" onClick={() => this.musicOffOn()}>
                     {!this.isClickBtnMusic ? 'music_note' : 'music_off'}
                 </div>
-                <div className="menu-point">grading</div>
+                <div className="menu-point" onClick={() => this.hiddenRulesPage()}>
+                    grading
+                </div>
                 <div className="menu-point">contact_support</div>
             </div>
         );
