@@ -60,6 +60,46 @@ class App extends React.Component {
         }
     }
 
+
+    hotKeys({ key }) {
+        if (this.levelIsFinished || this.levelIsWon || !isMaxLevel) { return; }
+
+        if (!isNaN(parseInt(key))) {
+            const isMaxLevel = parseInt(key) <= parseInt(localStorage.getItem('max-level'));
+
+            if (parseInt(key) < 8 && !this.isLoadLevel && isMaxLevel) {
+                this.isLoadLevel = true;
+
+                this.getBoardDataOfStartLevel(key);
+
+                this.props.history.push('/level');
+            }
+        }
+
+        switch (key) {
+        case 'q':
+            this.isLoadLevel = false;
+            pauseAudioLevel();
+            this.props.history.push('/');
+            break;
+        case 'w':
+
+            this.getBoardDataOfStartLevel(this.state.level);
+
+            break;
+        case 'e':
+
+            break;
+        case 'r':
+
+            break;
+        default:
+            break;
+        }
+
+    }
+
+
     checkColumn(cell, boardData) {
         for (let i = cell.y; i < 8; i += 1) {
             if (boardData[i][cell.x].type === 'ground') {
