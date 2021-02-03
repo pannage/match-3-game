@@ -36,6 +36,7 @@ export default class Menu extends React.Component {
             volumeOn();
         }
 
+        // this.isClickBtnVolume = that.state.isClickBtnVolume;
         this.setState({ isClickBtnVolume: !this.isClickBtnVolume });
     }
 
@@ -60,11 +61,16 @@ export default class Menu extends React.Component {
             volumeOn();
         }
 
+        // this.isClickBtnMusic = that.state.isClickBtnMusic;
         this.setState({ isClickBtnMusic: !this.isClickBtnMusic });
     }
 
+
+
     render() {
+
         return (
+
             <div className="menu-container">
                 <Link to="/">
                     <div className="menu-point" onClick={() => this.clickButtonArrowBack()}>arrow_back</div>
