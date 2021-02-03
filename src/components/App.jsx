@@ -4,13 +4,16 @@ import { Switch, Route, Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
 import '../styles/App.css';
 import Board from './Board.jsx';
+import Footer from './Footer.jsx';
 import LevelRoad from './levels.jsx';
 import TaskBox from './task-box.jsx';
 import LoseScreen from './lose-screen.jsx';
 import { checkNumberLevel, checkToDeleteCell } from './loadLevels';
 import WinScreen from './win-screen.jsx';
 import Menu from './menu.jsx';
-import { playAudioLevel, pauseAudioLevel, playAudioEffect } from './playAudio';
+import {
+    playAudioLevel, pauseAudioLevel, playAudioEffect, volumeOff, volumeOn
+} from './playAudio';
 
 class App extends React.Component {
     constructor(props) {
@@ -31,6 +34,8 @@ class App extends React.Component {
         this.isLoadLevel = false;
         this.state = {
             boardData: [],
+            isClickBtnVolume: false,
+            isClickBtnMusic: false,
         };
         this.checkForEmptyUnderIce = this.checkForEmptyUnderIce.bind(this);
         this.moveIntoSquareBelow = this.moveIntoSquareBelow.bind(this);
@@ -63,19 +68,21 @@ class App extends React.Component {
     }
 
     hotKeys({ key }) {
+        const isMaxLevel = parseInt(key) < parseInt(localStorage.getItem('max-level'));
+
+        if (this.levelIsFinished || this.levelIsWon || !isMaxLevel) { return; }
+
         if (parseInt(key) < 8 && !this.isLoadLevel) {
             this.isLoadLevel = true;
 
             this.getBoardDataOfStartLevel(key);
-            playAudioLevel(`level-${key}`);
+
             this.props.history.push('/level');
         }
 
         switch (key) {
         case 'q':
             this.isLoadLevel = false;
-
-            console.log('key :>> ', key);
             pauseAudioLevel();
             this.props.history.push('/');
             break;
@@ -84,9 +91,29 @@ class App extends React.Component {
             this.getBoardDataOfStartLevel(this.state.level);
 
             break;
+        case 'e':
+            // if (!this.state.isClickBtnMusic || !this.state.isClickBtnVolume) {
+            //     this.state.isClickBtnVolume = true;
+            //     volumeOff();
+            // } else {
+            //     volumeOn();
+            // }
+
+            break;
+        case 'r':
+            // if (!this.state.isClickBtnMusic || !this.state.isClickBtnVolume) {
+            //     this.state.isClickBtnMusic = true;
+            //     volumeOff();
+            // } else {
+            //     volumeOn();
+            // }
+
+            break;
         default:
             break;
         }
+
+        // this.setState({ isClickBtnVolume: this.state.isClickBtnVolume }, { isClickBtnMusic: this.state.isClickBtnMusic });
     }
 
     checkColumn(cell, boardData) {
@@ -146,11 +173,19 @@ class App extends React.Component {
         switch (boardData[cell.y][cell.x].type) {
         case 'torpedoOfColumn':
             boardData = this.checkColumn(cell, boardData);
-            playAudioEffect('torpedo');
+
+            if (!this.state.isClickBtnVolume) {
+                playAudioEffect('torpedo');
+            }
+
             break;
         case 'torpedoOfRow':
             boardData = this.checkRow(cell, boardData);
-            playAudioEffect('torpedo');
+
+            if (!this.state.isClickBtnVolume) {
+                playAudioEffect('torpedo');
+            }
+
             break;
         case 'rainbow':
             if (e.target.redraw) {
@@ -166,7 +201,9 @@ class App extends React.Component {
                     });
                 });
 
-                playAudioEffect('rainbow');
+                if (!this.state.isClickBtnVolume) {
+                    playAudioEffect('rainbow');
+                }
 
                 boardData = newBoardData;
                 boardData[cell.y][cell.x].toDelete = true;
@@ -210,14 +247,18 @@ class App extends React.Component {
                 boardData[cell.y - 1][cell.x + 1].toDelete = true;
             }
 
-            playAudioEffect('mine');
+            if (!this.state.isClickBtnVolume) {
+                playAudioEffect('mine');
+            }
 
             break;
         case 'x-mine':
             boardData = this.checkRow(cell, boardData);
             boardData = this.checkColumn(cell, boardData);
 
-            playAudioEffect('x-mine');
+            if (!this.state.isClickBtnVolume) {
+                playAudioEffect('x-mine');
+            }
 
             break;
         case 'three-row':
@@ -248,7 +289,9 @@ class App extends React.Component {
                 cell.x += 1;
             }
 
-            playAudioEffect('three-row');
+            if (!this.state.isClickBtnVolume) {
+                playAudioEffect('three-row');
+            }
 
             break;
         default:
@@ -378,7 +421,9 @@ class App extends React.Component {
             boardData[this.cellToReplace.y][this.cellToReplace.x].isDesk = desk;
             boardData[this.cellToDrag.y][this.cellToDrag.x] = changeSqr;
 
-            playAudioEffect('move');
+            if (!this.state.isClickBtnVolume) {
+                playAudioEffect('move');
+            }
 
             if (typeof boardData[this.cellToDrag.y][this.cellToDrag.x].type !== 'number') {
                 bonusUsed = true;
@@ -1247,6 +1292,12 @@ class App extends React.Component {
 
         playAudioLevel(`level-${numberLevel}`);
 
+        if (this.state.isClickBtnVolume || this.state.isClickBtnMusic) {
+            volumeOff();
+        } else {
+            volumeOn();
+        }
+
         this.setState({ boardData, task: { moves, message: taskText }, level: numberLevel });
     }
 
@@ -1284,6 +1335,7 @@ class App extends React.Component {
                         </Route>
                     </Switch>
                 </div>
+                <Footer />
             </>
         );
     }
