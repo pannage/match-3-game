@@ -59,6 +59,7 @@ class App extends React.Component {
         this.getMaxLevel = this.getMaxLevel.bind(this);
         this.setMaxLevel = this.setMaxLevel.bind(this);
         this.maxLevel = this.getMaxLevel();
+        localStorage.setItem('max-level', Number(this.maxLevel));
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -72,16 +73,18 @@ class App extends React.Component {
     }
 
     hotKeys({ key }) {
-        const isMaxLevel = parseInt(key) < parseInt(localStorage.getItem('max-level'));
+        if (this.levelIsFinished || this.levelIsWon) { return; }
 
-        if (this.levelIsFinished || this.levelIsWon || !isMaxLevel) { return; }
+        if (!isNaN(parseInt(key))) {
+            const isMaxLevel = parseInt(key) <= +localStorage.getItem('max-level');
 
-        if (parseInt(key) < 8 && !this.isLoadLevel) {
-            this.isLoadLevel = true;
+            if (parseInt(key) < 8 && !this.isLoadLevel && isMaxLevel) {
+                this.isLoadLevel = true;
 
-            this.getBoardDataOfStartLevel(key);
+                this.getBoardDataOfStartLevel(key);
 
-            this.props.history.push('/level');
+                this.props.history.push('/level');
+            }
         }
 
         switch (key) {
@@ -96,28 +99,13 @@ class App extends React.Component {
 
             break;
         case 'e':
-            // if (!this.state.isClickBtnMusic || !this.state.isClickBtnVolume) {
-            //     this.state.isClickBtnVolume = true;
-            //     volumeOff();
-            // } else {
-            //     volumeOn();
-            // }
-
             break;
         case 'r':
-            // if (!this.state.isClickBtnMusic || !this.state.isClickBtnVolume) {
-            //     this.state.isClickBtnMusic = true;
-            //     volumeOff();
-            // } else {
-            //     volumeOn();
-            // }
-
             break;
         default:
             break;
         }
 
-        // this.setState({ isClickBtnVolume: this.state.isClickBtnVolume }, { isClickBtnMusic: this.state.isClickBtnMusic });
     }
 
     checkColumn(cell, boardData) {
@@ -142,7 +130,9 @@ class App extends React.Component {
 
     getMaxLevel() {
         let maxLevel = localStorage.getItem('max-level');
-        if (!maxLevel) maxLevel = 1;
+
+        if (!maxLevel) { maxLevel = 1; }
+
         return maxLevel;
     }
 
@@ -167,7 +157,8 @@ class App extends React.Component {
     }
 
     handleDoubleClick(e, data) {
-        if (!this.toMove) return;
+        if (!this.toMove) { return; }
+
         const cell = {
             y: parseInt(e.target.dataset.rowIndex, 10),
             x: parseInt(e.target.dataset.cellIndex, 10),
@@ -1141,6 +1132,7 @@ class App extends React.Component {
             return row.map((cell) => {
                 if (cell.toDelete) {
                     this.checkObstaclesTask(cell);
+
                     if (cell.isFrozen) {
                         return {
                             url: cell.url.replace(/candy-ice.png/, 'candy.png'),
@@ -1196,7 +1188,7 @@ class App extends React.Component {
 
     setMaxLevel() {
         if (this.maxLevel === 7 || parseInt(this.state.level) !== this.maxLevel) {
-            return;
+
         } else {
             this.maxLevel += 1;
             localStorage.setItem('max-level', this.maxLevel);
@@ -1292,18 +1284,21 @@ class App extends React.Component {
         }
     }
 
-    checkObstaclesTask(cell){
-        if (cell.isFrozen){
+    checkObstaclesTask(cell) {
+        if (cell.isFrozen) {
             const index = this.taskCheck.message.findIndex((item) => item[0] === 'ice');
-                this.taskCheck.message[index][1] -= 1;
-        } else if (cell.isDesk){
+
+            this.taskCheck.message[index][1] -= 1;
+        } else if (cell.isDesk) {
             const index = this.taskCheck.message.findIndex((item) => item[0] === 'desk');
-                this.taskCheck.message[index][1] -= 1;
-        } else if (cell.type === 'ground'){
+
+            this.taskCheck.message[index][1] -= 1;
+        } else if (cell.type === 'ground') {
             const index = this.taskCheck.message.findIndex((item) => item[0] === 'ground');
-                this.taskCheck.message[index][1] -= 1;
+
+            this.taskCheck.message[index][1] -= 1;
+        }
     }
-}
 
     getGameField(boardData) {
         return (
@@ -1335,7 +1330,7 @@ class App extends React.Component {
 
         playAudioLevel(`level-${numberLevel}`);
 
-        if (this.state.isClickBtnVolume || this.state.isClickBtnMusic) {
+        if (this.state.isClickBtnMusic) {
             volumeOff();
         } else {
             volumeOn();
@@ -1350,31 +1345,28 @@ class App extends React.Component {
 
         return (
             <>
-                <div className="menu">
-                    <Link to="/" className="link">
-                        <button className="menu-btn">pause_circle_outline</button>
-                    </Link>
-                </div>
                 <div className="app">
                     <Menu that={this}/>
                     <Switch>
                         <Route path="/level">
                             <div>
-                            <TaskBox
-                                moves={this.state.task?.moves}
-                                message={this.state.task?.message}
-                            />
-                            {this.getGameField(boardData)}
+                                <TaskBox
+                                    moves={this.state.task?.moves}
+                                    message={this.state.task?.message}
+                                />
+                                {this.getGameField(boardData)}
 
-                            { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
-                            { (this.levelIsWon && this.levelIsFinished) && <WinScreen that={this} /> }
+                                { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
+                                { (this.levelIsWon && this.levelIsFinished) && <WinScreen that={this} /> }
                             </div>
                         </Route>
 
                         <Route exact path="/">
                             <div onClick={({ target }) => {
-                                if (!target.dataset.level || target.dataset.typeBtn.includes('level-inactive')) return;
-                                this.getBoardDataOfStartLevel(target.dataset.level)}}>
+                                if (!target.dataset.level || target.dataset.typeBtn.includes('level-inactive')) { return; }
+
+                                this.getBoardDataOfStartLevel(target.dataset.level);
+                            }}>
                                 <LevelRoad level={this.maxLevel}/>
                             </div>
                         </Route>

@@ -2,9 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/App.css';
 import { Link } from 'react-router-dom';
-import {
-    playAudioLevel, pauseAudioLevel, playAudioEffect, volumeOff, volumeOn
-} from './playAudio';
+import { pauseAudioLevel, volumeOff, volumeOn } from './playAudio';
 
 export default class Menu extends React.Component {
     constructor(props) {
@@ -30,13 +28,6 @@ export default class Menu extends React.Component {
 
         this.isClickBtnVolume = !this.isClickBtnVolume;
 
-        if (this.isClickBtnVolume || this.isClickBtnMusic) {
-            volumeOff();
-        } else {
-            volumeOn();
-        }
-
-        // this.isClickBtnVolume = that.state.isClickBtnVolume;
         this.setState({ isClickBtnVolume: !this.isClickBtnVolume });
     }
 
@@ -55,29 +46,56 @@ export default class Menu extends React.Component {
 
         this.isClickBtnMusic = !this.isClickBtnMusic;
 
-        if (this.isClickBtnMusic || this.isClickBtnVolume) {
+        if (this.isClickBtnMusic) {
             volumeOff();
         } else {
             volumeOn();
         }
 
-        // this.isClickBtnMusic = that.state.isClickBtnMusic;
         this.setState({ isClickBtnMusic: !this.isClickBtnMusic });
     }
 
-
-
     render() {
+        const { that } = this.props;
+
+        console.log('that.levelIsFinished :>> ', that.levelIsFinished);
+        console.log('that.levelIsWon :>> ', that.levelIsWon);
+
+        if (that.levelIsFinished || that.levelIsWon) {
+            pauseAudioLevel();
+
+            return (
+                <div className="menu-container">
+                    <div className="menu-point">arrow_back</div>
+                    <div className="menu-point">refresh</div>
+                    <div className="menu-point">
+                        {!this.isClickBtnVolume ? 'volume_up' : 'volume_off'}
+                    </div>
+                    <div className="menu-point">
+                        {!this.isClickBtnMusic ? 'music_note' : 'music_off'}
+                    </div>
+                    <div className="menu-point">grading</div>
+                    <div className="menu-point">contact_support</div>
+                </div>
+            );
+        }
 
         return (
-
             <div className="menu-container">
                 <Link to="/">
-                    <div className="menu-point" onClick={() => this.clickButtonArrowBack()}>arrow_back</div>
+                    <div className="menu-point" onClick={() => this.clickButtonArrowBack()}>
+                        arrow_back
+                    </div>
                 </Link>
-                <div className="menu-point" onClick={() => this.restartGame()}>refresh</div>
-                <div className="menu-point" onClick={() => this.volumeOffOn()}>{ !this.isClickBtnVolume ? 'volume_up' : 'volume_off'}</div>
-                <div className="menu-point" onClick={() => this.musicOffOn()}>{ !this.isClickBtnMusic ? 'music_note' : 'music_off' }</div>
+                <div className="menu-point" onClick={() => this.restartGame()}>
+                    refresh
+                </div>
+                <div className="menu-point" onClick={() => this.volumeOffOn()}>
+                    {!this.isClickBtnVolume ? 'volume_up' : 'volume_off'}
+                </div>
+                <div className="menu-point" onClick={() => this.musicOffOn()}>
+                    {!this.isClickBtnMusic ? 'music_note' : 'music_off'}
+                </div>
                 <div className="menu-point">grading</div>
                 <div className="menu-point">contact_support</div>
             </div>

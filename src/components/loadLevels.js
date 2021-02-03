@@ -245,7 +245,7 @@ function checkNumberLevel(numberLevel) {
         result = {
             boardData: getBoardDataOfLevel1(boardData),
             taskText: [[0, 15], [3, 15], [5, 15], ['desk', 36]],
-            moves: 30,
+            moves: 2,
         };
 
         break;
