@@ -244,7 +244,7 @@ function checkNumberLevel(numberLevel) {
     case '1':
         result = {
             boardData: getBoardDataOfLevel1(boardData),
-            taskText: [[0, 15], [3, 15], [5, 15], ['desk', 36]],
+            taskText: [[0, 15], [3, 15], [5, 15]],
             moves: 30,
         };
 
@@ -252,7 +252,7 @@ function checkNumberLevel(numberLevel) {
     case '2':
         result = {
             boardData: getBoardDataOfLevel2(boardData),
-            taskText: [[1, 20], [2, 20], [4, 20], ['desk', 12], ['ice', 20]],
+            taskText: [[1, 20], [2, 20], [4, 20]],
             moves: 30,
         };
 
@@ -260,7 +260,7 @@ function checkNumberLevel(numberLevel) {
     case '3':
         result = {
             boardData: getBoardDataOfLevel3(boardData),
-            taskText: [[6, 4, 'torpedo'], [7, 2, 'rainbow'], [8, 1, 'mine'], ['desk', 16], ['ground', 20]],
+            taskText: [[6, 4, 'torpedo'], [7, 2, 'rainbow'], [8, 1, 'mine']],
             moves: 30,
         };
 
@@ -268,28 +268,28 @@ function checkNumberLevel(numberLevel) {
     case '4':
         result = {
             boardData: getBoardDataOfLevel4(boardData),
-            taskText: [[0, 20], [2, 20], [4, 20], ['desk', 16], ['ground', 24]],
+            taskText: [[0, 20], [2, 20], [4, 20]],
             moves: 30,
         };
         break;
     case '5':
         result = {
             boardData: getBoardDataOfLevel5(boardData),
-            taskText: [[1, 20], [3, 20], [5, 20], ['desk', 18], ['ground', 22], ['ice', 4]],
+            taskText: [[1, 20], [3, 20], [5, 20]],
             moves: 30,
         };
         break;
     case '6':
         result = {
             boardData: getBoardDataOfLevel6(boardData),
-            taskText: [[7, 2, 'rainbow'], ['ice', 16], ['ground', 12], ['desk', 12]],
+            taskText: [[7, 2, 'rainbow']],
             moves: 30,
         };
         break;
     case '7':
         result = {
             boardData: getBoardDataOfLevel7(boardData),
-            taskText: [[0, 15], [1, 15], [2, 15], [3, 15], [4, 15], [5, 15], [6, 1, 'torpedo'], [7, 1, 'rainbow'], [8, 1, 'mine'], [10, 1, 'three-row'], ['ice', 4], ['ground', 18], ['desk', 26]],
+            taskText: [[0, 15], [1, 15], [2, 15], [3, 15], [4, 15], [5, 15], [6, 1, 'torpedo'], [7, 1, 'rainbow'], [8, 1, 'mine'], [10, 1, 'three-row']],
             moves: 30,
         };
         break;
