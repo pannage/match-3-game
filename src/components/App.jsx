@@ -1425,8 +1425,8 @@ class App extends React.Component {
                 {this.levelIsWon && this.levelIsFinished && <WinScreen that={this} />}
               </div>
             </Route>
-            {/* {this.isClickRulesOfGame && <Rules />} */}
-            <Rules />
+            {this.isClickRulesOfGame && <Rules />}
+            {/* <Rules /> */}
             <Route exact path="/">
               <div
                 onClick={({ target }) => {
