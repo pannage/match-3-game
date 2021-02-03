@@ -4,59 +4,35 @@ import { Link } from 'react-router-dom';
 import '../styles/App.css';
 
 export default class LevelRoad extends React.Component {
+    constructor(props) {
+        super(props);
+        this.level = new Array(7).fill(1).map((item, id) => id + 1).reverse();
+    }
     render() {
         return (
             <div className="level-road" >
                 <div className="level-wrapper">
-                    <Link to="/level">
-                        <div
-                            className="level-7 level-btn"
-                            data-level="7"
-                            data-type-btn="level"
+                    {this.level.map((item, id) => {
+                        const check = id + 1 > 7 - this.props.level;
+                        if (check) {
+                            return <Link to="/level">
+                            <div
+                                className= {`level-${item} level-btn`}
+                                data-level={`${item}`}
+                                data-type-btn="level"
+                                key={id + item}
+                            />
+                        </Link>
+                        } else {
+                            return <div
+                            className= {`level-${item} level-inactive`}
+                            data-level={`${item}`}
+                            data-type-btn="level-inactive"
+                            key={id - item}
                         />
-                    </Link>
-                    <Link to="/level">
-                        <div
-                            className="level-6 level-btn"
-                            data-level="6"
-                            data-type-btn="level"
-                        />
-                    </Link>
-                    <Link to="/level">
-                        <div
-                            className="level-5 level-btn"
-                            data-level="5"
-                            data-type-btn="level"
-                        />
-                    </Link>
-                    <Link to="/level">
-                        <div
-                            className="level-4 level-btn"
-                            data-level="4"
-                            data-type-btn="level"
-                        />
-                    </Link>
-                    <Link to="/level">
-                        <div
-                            className="level-3 level-btn"
-                            data-level="3"
-                            data-type-btn="level"
-                        />
-                    </Link>
-                    <Link to="/level">
-                        <div
-                            className="level-2 level-btn"
-                            data-level="2"
-                            data-type-btn="level"
-                        />
-                    </Link>
-                    <Link to="/level">
-                        <div
-                            className="level-1 level-btn"
-                            data-level="1"
-                            data-type-btn="level"
-                        />
-                    </Link>
+                        }
+
+                    })}
                 </div>
             </div>
         );

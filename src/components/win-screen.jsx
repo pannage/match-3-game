@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/App.css';
 import { Link } from 'react-router-dom';
-import { playAudioLevel, pauseAudioLevel, playAudioEffect } from './playAudio';
 
 export default class WinScreen extends React.Component {
     constructor(props) {
@@ -14,8 +13,6 @@ export default class WinScreen extends React.Component {
 
         that.levelIsFinished = false;
         that.levelIsWon = false;
-
-        pauseAudioLevel();
     }
 
     nextLevel() {
@@ -27,8 +24,7 @@ export default class WinScreen extends React.Component {
     }
 
     render() {
-        const { that } = this.props;
-
+        const {that} = this.props;
         return (
             <div className="win-screen-container">
                 <div className="win-screen-title">Well done!</div>
