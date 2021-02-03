@@ -10,6 +10,7 @@ export default class Statistics extends React.Component {
 
     close() {
         const { that } = this.props;
+
         that.showStatistics = false;
         that.forceUpdate();
     }
