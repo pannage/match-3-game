@@ -68,16 +68,18 @@ class App extends React.Component {
     }
 
     hotKeys({ key }) {
-        const isMaxLevel = parseInt(key) < parseInt(localStorage.getItem('max-level'));
-
         if (this.levelIsFinished || this.levelIsWon || !isMaxLevel) { return; }
 
-        if (parseInt(key) < 8 && !this.isLoadLevel) {
-            this.isLoadLevel = true;
+        if (!isNaN(parseInt(key))) {
+            const isMaxLevel = parseInt(key) <= parseInt(localStorage.getItem('max-level'));
 
-            this.getBoardDataOfStartLevel(key);
+            if (parseInt(key) < 8 && !this.isLoadLevel && isMaxLevel) {
+                this.isLoadLevel = true;
 
-            this.props.history.push('/level');
+                this.getBoardDataOfStartLevel(key);
+
+                this.props.history.push('/level');
+            }
         }
 
         switch (key) {
@@ -92,28 +94,15 @@ class App extends React.Component {
 
             break;
         case 'e':
-            // if (!this.state.isClickBtnMusic || !this.state.isClickBtnVolume) {
-            //     this.state.isClickBtnVolume = true;
-            //     volumeOff();
-            // } else {
-            //     volumeOn();
-            // }
 
             break;
         case 'r':
-            // if (!this.state.isClickBtnMusic || !this.state.isClickBtnVolume) {
-            //     this.state.isClickBtnMusic = true;
-            //     volumeOff();
-            // } else {
-            //     volumeOn();
-            // }
 
             break;
         default:
             break;
         }
 
-        // this.setState({ isClickBtnVolume: this.state.isClickBtnVolume }, { isClickBtnMusic: this.state.isClickBtnMusic });
     }
 
     checkColumn(cell, boardData) {
