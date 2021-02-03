@@ -55,6 +55,10 @@ class App extends React.Component {
         this.hotKeys = this.hotKeys.bind(this);
         this.checkBonusTask = this.checkBonusTask.bind(this);
         this.checkTask = this.checkTask.bind(this);
+        this.checkObstaclesTask = this.checkObstaclesTask.bind(this);
+        this.getMaxLevel = this.getMaxLevel.bind(this);
+        this.setMaxLevel = this.setMaxLevel.bind(this);
+        this.maxLevel = this.getMaxLevel();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -119,7 +123,6 @@ class App extends React.Component {
     checkColumn(cell, boardData) {
         for (let i = cell.y; i < 8; i += 1) {
             if (boardData[i][cell.x].type === 'ground') {
-                boardData[i][cell.x].toDelete = true;
                 i = 8;
             } else {
                 boardData[i][cell.x].toDelete = true;
@@ -128,7 +131,6 @@ class App extends React.Component {
 
         for (let i = cell.y; i >= 0; i -= 1) {
             if (boardData[i][cell.x].type === 'ground') {
-                boardData[i][cell.x].toDelete = true;
                 i = -1;
             } else {
                 boardData[i][cell.x].toDelete = true;
@@ -138,10 +140,15 @@ class App extends React.Component {
         return boardData;
     }
 
+    getMaxLevel() {
+        let maxLevel = localStorage.getItem('max-level');
+        if (!maxLevel) maxLevel = 1;
+        return maxLevel;
+    }
+
     checkRow(cell, boardData) {
         for (let i = cell.x; i < 8; i += 1) {
             if (boardData[cell.y][i].type === 'ground') {
-                boardData[cell.y][i].toDelete = true;
                 i = 8;
             } else {
                 boardData[cell.y][i].toDelete = true;
@@ -150,7 +157,6 @@ class App extends React.Component {
 
         for (let i = cell.x; i >= 0; i -= 1) {
             if (boardData[cell.y][i].type === 'ground') {
-                boardData[cell.y][i].toDelete = true;
                 i = -1;
             } else {
                 boardData[cell.y][i].toDelete = true;
@@ -161,6 +167,7 @@ class App extends React.Component {
     }
 
     handleDoubleClick(e, data) {
+        if (!this.toMove) return;
         const cell = {
             y: parseInt(e.target.dataset.rowIndex, 10),
             x: parseInt(e.target.dataset.cellIndex, 10),
@@ -215,35 +222,35 @@ class App extends React.Component {
         case 'mine':
             boardData[cell.y][cell.x].toDelete = true;
 
-            if (boardData[cell.y][cell.x + 1]) {
+            if (boardData[cell.y][cell.x + 1] && boardData[cell.y][cell.x + 1].type !== 'ground') {
                 boardData[cell.y][cell.x + 1].toDelete = true;
             }
 
-            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x + 1]) {
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x + 1] && boardData[cell.y + 1][cell.x + 1].type !== 'ground') {
                 boardData[cell.y + 1][cell.x + 1].toDelete = true;
             }
 
-            if (boardData[cell.y + 1]) {
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x].type !== 'ground') {
                 boardData[cell.y + 1][cell.x].toDelete = true;
             }
 
-            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x - 1]) {
+            if (boardData[cell.y + 1] && boardData[cell.y + 1][cell.x - 1] && boardData[cell.y + 1][cell.x - 1].type !== 'ground') {
                 boardData[cell.y + 1][cell.x - 1].toDelete = true;
             }
 
-            if (boardData[cell.y][cell.x - 1]) {
+            if (boardData[cell.y][cell.x - 1] && boardData[cell.y][cell.x - 1].type !== 'ground') {
                 boardData[cell.y][cell.x - 1].toDelete = true;
             }
 
-            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x - 1]) {
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x - 1] && boardData[cell.y - 1][cell.x - 1].type !== 'ground') {
                 boardData[cell.y - 1][cell.x - 1].toDelete = true;
             }
 
-            if (boardData[cell.y - 1]) {
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x].type !== 'ground') {
                 boardData[cell.y - 1][cell.x].toDelete = true;
             }
 
-            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x + 1]) {
+            if (boardData[cell.y - 1] && boardData[cell.y - 1][cell.x + 1] && boardData[cell.y - 1][cell.x + 1].type !== 'ground') {
                 boardData[cell.y - 1][cell.x + 1].toDelete = true;
             }
 
@@ -677,6 +684,7 @@ class App extends React.Component {
             && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
 
                     if (checkRight || checkLeft) {
+                        this.checkObstaclesTask(cell);
                         accumBoard[rowId][cellIndex] = {
                             url: 'url(../images/mine.png)',
                             type: 'mine',
@@ -700,6 +708,7 @@ class App extends React.Component {
             && bd[rowId - 2][cellIndex].type === bd[rowId][cellIndex].type;
 
                     if (checkBot || checkTop) {
+                        this.checkObstaclesTask(cell);
                         accumBoard[rowId][cellIndex] = {
                             url: 'url(../images/mine.png)',
                             type: 'mine',
@@ -754,6 +763,7 @@ class App extends React.Component {
             && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
 
                     if (checkRight || checkLeft) {
+                        this.checkObstaclesTask(cell);
                         accumBoard[rowId][cellIndex] = {
                             url: 'url(../images/mine.png)',
                             type: 'mine',
@@ -831,6 +841,7 @@ class App extends React.Component {
             && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
 
                     if (checkPositionLeft || checkPositionMiddle || checkPositionRight) {
+                        this.checkObstaclesTask(cell);
                         accumBoard[rowId][cellIndex] = {
                             url: 'url(../images/x-bomb.png)',
                             type: 'x-mine',
@@ -859,6 +870,7 @@ class App extends React.Component {
             && bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type;
 
                     if (checkPositionTop || checkPositionMiddle || checkPositionBot) {
+                        this.checkObstaclesTask(cell);
                         accumBoard[rowId][cellIndex] = {
                             url: 'url(../images/x-bomb.png)',
                             type: 'x-mine',
@@ -926,6 +938,7 @@ class App extends React.Component {
             && bd[rowId][cellIndex - 2].type === bd[rowId][cellIndex].type;
 
                     if (checkPositionLeft || checkPositionMiddle || checkPositionRight) {
+                        this.checkObstaclesTask(cell);
                         accumBoard[rowId][cellIndex] = {
                             url: 'url(../images/xx-bomb.png)',
                             type: 'three-row',
@@ -954,6 +967,7 @@ class App extends React.Component {
             && bd[rowId + 2][cellIndex].type === bd[rowId][cellIndex].type;
 
                     if (checkPositionTop || checkPositionMiddle || checkPositionBot) {
+                        this.checkObstaclesTask(cell);
                         accumBoard[rowId][cellIndex] = {
                             url: 'url(../images/xx-bomb.png)',
                             type: 'three-row',
@@ -1024,6 +1038,7 @@ class App extends React.Component {
 
                                     cell.url = sizeCheckRow === 4 ? urlImage : 'url(../images/rainbow.png)';
                                     cell.type = sizeCheckRow === 4 ? typeBonus : 'rainbow';
+                                    this.checkObstaclesTask(cell);
                                     cell.toDelete = false;
                                     cell.isDesk = false;
                                     cell.isFrozen = false;
@@ -1074,7 +1089,7 @@ class App extends React.Component {
             dataBeforeDelete = JSON.parse(JSON.stringify(boardData));
             newBoardData = boardData.map((row, rowIndex) => {
                 return row.map((cell, cellIndex) => {
-                    if (cell.toDelete && typeof cell.type !== 'number' && cell.type !== 'rainbow') {
+                    if (cell.toDelete && typeof cell.type !== 'number') {
                         const dragBonusEvent = {
                             target: {
                                 dataset: {
@@ -1082,6 +1097,10 @@ class App extends React.Component {
                                     cellIndex,
                                 },
                                 redraw: true,
+                                rainbowSet: {
+                                    rowIndex: rowIndex + 1,
+                                    cellIndex,
+                                },
                             },
                         };
 
@@ -1121,6 +1140,7 @@ class App extends React.Component {
         boardData = newBoardData.map((row) => {
             return row.map((cell) => {
                 if (cell.toDelete) {
+                    this.checkObstaclesTask(cell);
                     if (cell.isFrozen) {
                         return {
                             url: cell.url.replace(/candy-ice.png/, 'candy.png'),
@@ -1164,12 +1184,22 @@ class App extends React.Component {
             this.toMove = false;
             this.levelIsWon = true;
             this.levelIsFinished = true;
+            this.setMaxLevel();
             this.forceUpdate();
         } else if (moves <= 0) {
             this.clearLocalStorage();
             this.toMove = false;
             this.levelIsFinished = true;
             this.forceUpdate();
+        }
+    }
+
+    setMaxLevel() {
+        if (this.maxLevel === 7 || parseInt(this.state.level) !== this.maxLevel) {
+            return;
+        } else {
+            this.maxLevel += 1;
+            localStorage.setItem('max-level', this.maxLevel);
         }
     }
 
@@ -1262,6 +1292,19 @@ class App extends React.Component {
         }
     }
 
+    checkObstaclesTask(cell){
+        if (cell.isFrozen){
+            const index = this.taskCheck.message.findIndex((item) => item[0] === 'ice');
+                this.taskCheck.message[index][1] -= 1;
+        } else if (cell.isDesk){
+            const index = this.taskCheck.message.findIndex((item) => item[0] === 'desk');
+                this.taskCheck.message[index][1] -= 1;
+        } else if (cell.type === 'ground'){
+            const index = this.taskCheck.message.findIndex((item) => item[0] === 'ground');
+                this.taskCheck.message[index][1] -= 1;
+    }
+}
+
     getGameField(boardData) {
         return (
             <div
@@ -1308,29 +1351,31 @@ class App extends React.Component {
         return (
             <>
                 <div className="menu">
-                    <Link to="/">
-                        <button className="menu-btn" />
+                    <Link to="/" className="link">
+                        <button className="menu-btn">pause_circle_outline</button>
                     </Link>
                 </div>
                 <div className="app">
                     <Menu that={this}/>
                     <Switch>
                         <Route path="/level">
+                            <div>
                             <TaskBox
                                 moves={this.state.task?.moves}
                                 message={this.state.task?.message}
                             />
                             {this.getGameField(boardData)}
-                            {!this.levelIsWon && this.levelIsFinished && <LoseScreen that={this} />}
-                            {this.levelIsWon && this.levelIsFinished && <WinScreen that={this} />}
+
+                            { (!this.levelIsWon && this.levelIsFinished) && <LoseScreen that={this} /> }
+                            { (this.levelIsWon && this.levelIsFinished) && <WinScreen that={this} /> }
+                            </div>
                         </Route>
 
                         <Route exact path="/">
-                            <div
-                                onClick={({ target }) => this.getBoardDataOfStartLevel(target.dataset.level)
-                                }
-                            >
-                                <LevelRoad />
+                            <div onClick={({ target }) => {
+                                if (!target.dataset.level || target.dataset.typeBtn.includes('level-inactive')) return;
+                                this.getBoardDataOfStartLevel(target.dataset.level)}}>
+                                <LevelRoad level={this.maxLevel}/>
                             </div>
                         </Route>
                     </Switch>
