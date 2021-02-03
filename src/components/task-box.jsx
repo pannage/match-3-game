@@ -18,6 +18,7 @@ const candies = [
 
 export default class TaskBox extends React.Component {
     render() {
+
         return (
             <div className="task-box">
                 <div className="moves-wrap">
@@ -58,3 +59,19 @@ export default class TaskBox extends React.Component {
         );
     }
 }
+
+TaskBox.propTypes = {
+    that: PropTypes.objectOf(
+        PropTypes.object,
+        PropTypes.bool,
+        PropTypes.number,
+        PropTypes.string,
+    ),
+    moves: PropTypes.number,
+    message: PropTypes.arrayOf(
+        PropTypes.arrayOf(
+            PropTypes.number,
+            PropTypes.string,
+        ),
+    ),
+};

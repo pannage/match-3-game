@@ -41,3 +41,7 @@ export default class LevelRoad extends React.Component {
         );
     }
 }
+
+LevelRoad.propTypes = {
+    level: PropTypes.string.isRequired,
+};

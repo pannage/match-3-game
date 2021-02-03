@@ -48,3 +48,10 @@ export default class LoseScreen extends React.Component {
         );
     }
 }
+
+LoseScreen.propTypes = {
+    that: PropTypes.objectOf(
+        PropTypes.object,
+        PropTypes.bool,
+    ).isRequired,
+};
