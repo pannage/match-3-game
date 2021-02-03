@@ -7,6 +7,7 @@ import { playAudioLevel, pauseAudioLevel, playAudioEffect } from './playAudio';
 export default class WinScreen extends React.Component {
     constructor(props) {
         super(props);
+        this.clear = this.clear.bind(this);
     }
 
     clear() {
@@ -23,7 +24,7 @@ export default class WinScreen extends React.Component {
         const { that } = this.props;
         const { level } = that.state;
 
-        that.getBoardDataOfStartLevel((parseInt(level) + 1).toString());
+        that.getBoardDataOfStartLevel((parseInt(level, 10) + 1).toString());
         this.clear();
     }
 
@@ -36,7 +37,7 @@ export default class WinScreen extends React.Component {
                 <div className="win-screen-wrapper">
                     <div className="win-screen-moves">Moves: {30 - that.state.task.moves}</div>
                     <div className="button-wrap">
-                        <button className="button" onClick={() => this.nextLevel()}>Next</button>
+                        {parseInt(that.state.level, 10) !== 7 && <button className="button" onClick={() => this.nextLevel()}>Next</button>}
                         <Link to="/">
                             <button className="button" onClick={() => this.clear()}>
                                 Levels
