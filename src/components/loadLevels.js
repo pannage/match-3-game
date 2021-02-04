@@ -23,7 +23,7 @@ function getNewBoarDataOfGame() {
 function getBoardDataOfLevel1(boardData) {
     return boardData.map((row, rowId) => {
         return row.map((cell, cellId) => {
-            if (rowId >= 1 && rowId <= 6 && cellId >= 1 && cellId <= 6) {
+            if (rowId >= 1 && rowId <= 1 && cellId >= 1 && cellId <= 1) {
                 cell.isDesk = true;
             }
 
@@ -242,7 +242,7 @@ function checkNumberLevel(numberLevel) {
     case '1':
         result = {
             boardData: getBoardDataOfLevel1(boardData),
-            taskText: [[0, 15], [3, 15], [5, 15], ['desk', 36]],
+            taskText: [[0, 0], [3, 0], [5, 0], ['desk', 1]],
             moves: 30,
         };
 

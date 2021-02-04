@@ -24,8 +24,8 @@ export default class WinScreen extends React.Component {
         const { that } = this.props;
         const { level } = that.state;
 
-        that.getBoardDataOfStartLevel((parseInt(level, 10) + 1).toString());
         this.clear();
+        that.getBoardDataOfStartLevel((parseInt(level, 10) + 1).toString());
     }
 
     render() {

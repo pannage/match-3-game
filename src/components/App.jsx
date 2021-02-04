@@ -86,7 +86,7 @@ class App extends React.Component {
         if (!Number.isNaN(parseInt(key, 10))) {
             const isMaxLevel = parseInt(key, 10) <= +localStorage.getItem('max-level');
 
-            if (parseInt(key, 10) < 8 && !this.isLoadLevel && isMaxLevel) {
+            if (parseInt(key, 10) < 8 && parseInt(key, 10) > 0 && !this.isLoadLevel && isMaxLevel) {
                 this.isLoadLevel = true;
 
                 this.getBoardDataOfStartLevel(key);
@@ -107,11 +107,11 @@ class App extends React.Component {
             }
 
             break;
-        case 'e':
+        case 'r':
             this.showStatistics = true;
             this.forceUpdate();
             break;
-        case 'r':
+        case 'e':
             this.isClickRulesOfGame = true;
             this.forceUpdate();
             break;
