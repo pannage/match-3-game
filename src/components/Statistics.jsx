@@ -39,8 +39,5 @@ export default class Statistics extends React.Component {
 }
 
 Statistics.propTypes = {
-    that: PropTypes.objectOf(
-        PropTypes.object,
-        PropTypes.bool,
-    ).isRequired,
+    that: PropTypes.object.isRequired,
 };
