@@ -74,8 +74,5 @@ export default class Rules extends React.Component {
 }
 
 Rules.propTypes = {
-    that: PropTypes.objectOf(
-        PropTypes.object,
-        PropTypes.bool,
-    ).isRequired,
+    that: PropTypes.object.isRequired,
 };

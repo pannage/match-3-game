@@ -51,8 +51,5 @@ export default class WinScreen extends React.Component {
 }
 
 WinScreen.propTypes = {
-    that: PropTypes.objectOf(
-        PropTypes.object,
-        PropTypes.bool,
-    ).isRequired,
+    that: PropTypes.object.isRequired,
 };

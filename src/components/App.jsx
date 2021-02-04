@@ -1230,14 +1230,14 @@ class App extends React.Component {
     }
 
     setMaxLevel() {
-        if (this.maxLevel === 7 || parseInt(this.state.level, 10) !== this.maxLevel) {
+        const { level } = this.state;
+
+        if (this.maxLevel === 7 || parseInt(level, 10) !== parseInt(this.maxLevel, 10)) {
             return true;
         }
 
-        this.maxLevel += 1;
+        this.maxLevel = parseInt(this.maxLevel, 10) + 1;
         localStorage.setItem('max-level', this.maxLevel);
-
-        return true;
     }
 
     setResult() {
