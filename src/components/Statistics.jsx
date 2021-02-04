@@ -19,7 +19,7 @@ export default class Statistics extends React.Component {
         const result = JSON.parse(localStorage.getItem('result'));
 
         return (
-            <div className="win-screen-container">
+            <div className="win-screen-container statistics-wrapper">
                 <div className="win-screen-title">Statistics</div>
                 <div className="win-screen-wrapper">
                     {result ? <ul>
@@ -29,8 +29,7 @@ export default class Statistics extends React.Component {
                             </li>;
                         })}
                     </ul> : <div>Sorry, no statistics yet</div>}
-                    <div className="button-wrap">
-                        <button className="button" onClick={() => this.close()}>CLOSE</button>
+                    <div className="button-wrap close__btn" onClick={() => this.close()}>
                     </div>
                 </div>
 

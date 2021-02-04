@@ -19,7 +19,6 @@ export default class Rules extends React.Component {
         return (
             <div className="description-container win-screen-container">
                 <div className="close__btn" onClick={() => this.closeRules()}>
-                    HighlightOff
                 </div>
                 <div className="rules-description">
                     <h2 className="rules__title">Правила игры!</h2>

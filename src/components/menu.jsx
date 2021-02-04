@@ -69,7 +69,7 @@ export default class Menu extends React.Component {
         if (isLoadPage) {
             return (
                 <Link to="/">
-                    <div className="menu-point" onClick={() => this.clickButtonArrowBack()}>
+                    <div className="menu-point menu-point--hover" onClick={() => this.clickButtonArrowBack()}>
                         arrow_back
                     </div>
                 </Link>
@@ -77,7 +77,7 @@ export default class Menu extends React.Component {
         }
 
         return (
-            <div className="menu-point" onClick={() => this.clickButtonArrowBack()}>
+            <div className="menu-point menu-point--hover" onClick={() => this.clickButtonArrowBack()}>
                 arrow_back
             </div>
         );
@@ -93,12 +93,12 @@ export default class Menu extends React.Component {
     render() {
         const { that } = this.props;
 
-        if (that.levelIsFinished || that.levelIsWon) {
+        if (that.levelIsFinished || that.levelIsWon || that.isClickRulesOfGame || that.showStatistics) {
             pauseAudioLevel();
 
             return (
                 <div className="menu-container">
-                    <div className="menu-point">arrow_back</div>
+                    <div className="menu-point" >arrow_back</div>
                     <div className="menu-point">refresh</div>
                     <div className="menu-point">
                         {!this.isClickBtnVolume ? 'volume_up' : 'volume_off'}
@@ -115,19 +115,19 @@ export default class Menu extends React.Component {
         return (
             <div className="menu-container">
                 {that.isLoadLevel ? this.getButtonBackMenu(true) : this.getButtonBackMenu(false)}
-                <div className="menu-point" onClick={() => this.restartGame()}>
+                <div className="menu-point menu-point--hover" onClick={() => this.restartGame()}>
                     refresh
                 </div>
-                <div className="menu-point" onClick={() => this.volumeOffOn()}>
+                <div className="menu-point menu-point--hover" onClick={() => this.volumeOffOn()}>
                     {!this.isClickBtnVolume ? 'volume_up' : 'volume_off'}
                 </div>
-                <div className="menu-point" onClick={() => this.musicOffOn()}>
+                <div className="menu-point menu-point--hover" onClick={() => this.musicOffOn()}>
                     {!this.isClickBtnMusic ? 'music_note' : 'music_off'}
                 </div>
-                <div className="menu-point" onClick={() => this.showStatistics()}>
+                <div className="menu-point menu-point--hover" onClick={() => this.showStatistics()}>
                     grading
                 </div>
-                <div className="menu-point" onClick={() => this.showRulesPage()}>
+                <div className="menu-point menu-point--hover" onClick={() => this.showRulesPage()}>
                     contact_support
                 </div>
             </div>
