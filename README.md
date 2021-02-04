@@ -22,6 +22,7 @@
 
 # [Ссылка на статью](https://pannage.medium.com/%D0%B8%D0%B3%D1%80%D0%B0-match-3-game-150b323cccb0 )
 # [Ссылка на netlify](https://3-match-game.netlify.app/)
+# [Ссылка на презентацию](https://www.youtube.com/watch?v=kBgMOmCJ_Xs&feature=youtu.be)
 ## Реализованные <strong>фичи</strong>:
 - #### UI:
 > - [x] Есть возможность управление приложением/игрой с клавиатуры или наличие более пяти hot keys (20 баллов)
